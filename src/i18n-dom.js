@@ -56,6 +56,7 @@ var I18N_DOM = {
     if (typeof document === 'undefined') return;
     document.documentElement.lang = this.current === 'zh' ? 'zh-CN' : this.current;
     document.title = this.t('meta.title');
+    document.querySelectorAll('[data-i18n-content]').forEach(el => { el.setAttribute('content', this.t(el.dataset.i18nContent)); });
     document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = this.t(el.dataset.i18n); });
     document.querySelectorAll('[data-i18n-html]').forEach(el => {
       const key = el.dataset.i18nHtml;

@@ -1,10 +1,14 @@
 [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md)
 
-# 🌟 ネオン・サバイバー
+# 🌟 NEON SURVIVOR - ブラウザ弾幕回避サバイバルシューティングゲーム
 
 **NEON SURVIVOR** は、果てしなく押し寄せるネオンの怪物を相手にできるだけ長く生き残る、ブラウザ向けサバイバルアクションゲームです。移動し、避け、ジェムを集め、レベルアップカードでビルドを作ります。武器は自動で攻撃します。
 
 インストール不要 · PC/モバイル対応 · Vanilla JavaScript + Canvas 2D · 画像/音声アセットファイルなし
+
+## ▶️ オンラインでプレイ
+
+Cloudflare Pages の公開ビルドでプレイ: **https://neon-survivor.pages.dev/**
 
 ## 🌐 言語
 
@@ -24,7 +28,7 @@ python3 -m http.server
 
 その後 `http://127.0.0.1:8000/` を開いてください。
 
-現在のリポジトリには、検証済みの公開プレイ URL 用デプロイ設定は含まれていません。ゲームクライアントは静的ホスティングで動作します。Cloudflare Pages Functions は任意機能のグローバルランキングにのみ必要です。
+公開デプロイ URL: **https://neon-survivor.pages.dev/**。ゲームクライアントは静的ホスティングで動作します。Cloudflare Pages ビルドでは任意機能のグローバルランキングを Pages Functions で提供します。
 
 ## 🎮 操作
 

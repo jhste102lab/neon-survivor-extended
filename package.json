@@ -7,7 +7,7 @@
   },
   "name": "neon-survivor_jh",
   "version": "1.1.0",
-  "description": "**NEON SURVIVOR** is a browser survival action game where you outlast endless waves of neon monsters. Move, dodge, collect gems, and choose upgrade cards to shape your build while weapons attack automatically.",
+  "description": "NEON SURVIVOR - a free browser bullet hell survival shooting game with neon swarms, auto-attacking weapons, evolutions, bosses, and mobile-friendly controls.",
   "main": "index.js",
   "directories": {
     "doc": "docs"
@@ -16,11 +16,20 @@
     "type": "git",
     "url": "git+https://github.com/jhste102lab/neon-survivor_jh.git"
   },
-  "keywords": [],
+  "keywords": [
+    "neon-survivor",
+    "browser-game",
+    "bullet-hell",
+    "survival-shooter",
+    "web-game",
+    "canvas-game",
+    "auto-shooter",
+    "roguelite"
+  ],
   "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/jhste102lab/neon-survivor_jh/issues"
   },
-  "homepage": "https://github.com/jhste102lab/neon-survivor_jh#readme"
+  "homepage": "https://neon-survivor.pages.dev/"
 }

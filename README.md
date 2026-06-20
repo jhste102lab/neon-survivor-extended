@@ -1,10 +1,14 @@
 [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md)
 
-# 🌟 NEON SURVIVOR
+# 🌟 NEON SURVIVOR - Browser Bullet Hell Survival Shooting Game
 
 **NEON SURVIVOR** is a browser survival action game where you survive endless waves of neon monsters. Move, dodge, collect gems, and choose upgrade cards to shape your build while weapons attack automatically.
 
 No install · PC/mobile support · Vanilla JavaScript + Canvas 2D · no image/audio asset files
+
+## ▶️ Play online
+
+Play the public Cloudflare Pages build: **https://neon-survivor.pages.dev/**
 
 ## 🌐 Languages
 
@@ -24,7 +28,7 @@ python3 -m http.server
 
 Then open `http://127.0.0.1:8000/`.
 
-The repository does not currently contain a verified deployment configuration for a public play URL. Static hosts work for the game client; Cloudflare Pages Functions are only needed for the optional global leaderboard.
+Public deployment: **https://neon-survivor.pages.dev/**. Static hosts work for the game client; Cloudflare Pages Functions power the optional global leaderboard on the Cloudflare build.
 
 ## 🎮 Controls
 

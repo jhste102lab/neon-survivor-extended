@@ -1,10 +1,14 @@
 [English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md)
 
-# 🌟 霓虹幸存者
+# 🌟 NEON SURVIVOR - 浏览器弹幕躲避生存射击游戏
 
 **NEON SURVIVOR** 是一款浏览器生存动作游戏：在无尽涌来的霓虹怪潮中尽可能活得更久。移动、闪避、收集宝石，并在升级时选择卡牌构筑流派；武器会自动攻击。
 
 无需安装 · 支持 PC/移动端 · Vanilla JavaScript + Canvas 2D · 无图片/音频资源文件
+
+## ▶️ 在线游玩
+
+在 Cloudflare Pages 公开构建中游玩：**https://neon-survivor.pages.dev/**
 
 ## 🌐 语言
 
@@ -24,7 +28,7 @@ python3 -m http.server
 
 然后打开 `http://127.0.0.1:8000/`。
 
-当前仓库中没有已验证的公开游玩 URL 部署配置。游戏客户端可在静态托管上运行；Cloudflare Pages Functions 仅用于可选的全球排行榜。
+公开部署 URL：**https://neon-survivor.pages.dev/**。游戏客户端可在静态托管上运行；Cloudflare Pages 构建通过 Pages Functions 提供可选的全球排行榜。
 
 ## 🎮 操作
 
