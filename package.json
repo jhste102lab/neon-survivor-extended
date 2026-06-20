@@ -1,0 +1,26 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check:syntax": "find src functions -name '*.js' -type f -print0 | xargs -0 -n1 node --check",
+    "verify": "node scripts/verify-script-order.mjs && node scripts/verify-i18n-contract.mjs && node scripts/verify-evolution-contract.mjs && node scripts/verify-leaderboard-contract.mjs && node scripts/test-gameplay-outcomes.mjs && node scripts/test-audio-contract.mjs && node scripts/test-api-boundary.mjs"
+  },
+  "name": "neon-survivor_jh",
+  "version": "1.1.0",
+  "description": "**NEON SURVIVOR** is a browser survival action game where you outlast endless waves of neon monsters. Move, dodge, collect gems, and choose upgrade cards to shape your build while weapons attack automatically.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jhste102lab/neon-survivor_jh.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jhste102lab/neon-survivor_jh/issues"
+  },
+  "homepage": "https://github.com/jhste102lab/neon-survivor_jh#readme"
+}
