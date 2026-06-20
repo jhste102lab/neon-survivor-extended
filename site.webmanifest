@@ -1,0 +1,12 @@
+{
+  "name": "NEON SURVIVOR - Browser Bullet Hell Survival Shooting Game",
+  "short_name": "NEON SURVIVOR",
+  "description": "A free browser bullet hell survival shooting game with neon swarms, auto-attacking weapons, evolutions, bosses, and mobile-friendly controls.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "fullscreen",
+  "background_color": "#070815",
+  "theme_color": "#070815",
+  "lang": "en",
+  "categories": ["games", "entertainment", "action"]
+}

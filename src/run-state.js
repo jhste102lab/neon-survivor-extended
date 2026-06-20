@@ -1,0 +1,51 @@
+'use strict';
+// Fresh run-state construction. Lifecycle transitions delegate here instead of owning nested defaults.
+function createInitialRunState(options = {}) {
+  const time = Math.max(0, Number(options.time || 0));
+  return {
+    time,
+    timeScale: 1,
+    userTimeScale: 1,
+    hitStopT: 0,
+    kills: 0,
+    combo: 0,
+    comboT: 0,
+    maxCombo: 0,
+    boss: null,
+    levelQueue: 0,
+    deathT: -1,
+    novaSeq: 0,
+    dir: { spawnT: 1.2, eliteT: 100, burstT: 70, bossIdx: 0, bossT: 0, trapT: 14, megaBossCount: 0 },
+    cam: { x: 0, y: 0 },
+    blades: { angle: 0 },
+    frameSeq: 0,
+    frameTargets: null,
+    endless: false,
+    st: null,
+    activeEvent: null,
+    nextEventT: (CFG.unlockTime || CFG.winTime) + 20,
+    lastBossSpawnT: -999,
+    idleT: 0,
+    lastIdleWarnT: -999,
+    unlockNotified: false,
+    metrics: {
+      damageBySource: {}, killsBySource: {}, specialKills: {}, evolutions: [],
+      lastDamageSource: '', deathSource: '',
+      eventOffers: 0, eventStarts: 0, eventSuccess: 0, dropsExpired: 0, dropsTrimmed: 0,
+    },
+    runId: GameRuntime.runId(),
+    runProof: '',
+    player: {
+      x: 0, y: 0, hp: CFG.player.hp, level: 1, xp: 0, xpNeed: CFG.xpNeed(1),
+      invuln: 0, dead: false, moveX: 0, moveY: 1, trailT: 0,
+      weapons: [{ id: 'bolt', lv: 1, timer: 0.3 }],
+      passives: {},
+      transcend: { dmg: 0, cd: 0, hp: 0, spd: 0 },
+      evolved: {},
+      evoBonusTokens: 0,
+      evoSpent: 0,
+      barrier: 0,
+      companions: typeof createCompanionState === 'function' ? createCompanionState() : { count: 0, power: 0, rate: 0, fireT: 0.6, trail: [], nodes: [] },
+    },
+  };
+}
