@@ -116,6 +116,16 @@ const concurrentEntries = (await json(res)).entries;
 assert(concurrentEntries.some(entry => entry.runId === 'run-b'), 'concurrent entry run-b retained');
 assert(concurrentEntries.some(entry => entry.runId === 'run-c'), 'concurrent entry run-c retained');
 
+
+const eFast = env();
+const fastSession = await createSession(eFast, 'run-fast');
+const fastSessionKey = [...eFast.LEADERBOARD.map.keys()].find(key => key.startsWith('testenv:session:'));
+const fastSessionRecord = JSON.parse(eFast.LEADERBOARD.map.get(fastSessionKey));
+fastSessionRecord.startedAt = Date.now() - 10000;
+eFast.LEADERBOARD.map.set(fastSessionKey, JSON.stringify(fastSessionRecord));
+res = await leaderboardApi.onRequestPost({ request: req(JSON.stringify(entryFor('run-fast', fastSession.proof, { time: 30, kills: 10, level: 3 }))), env: eFast });
+assert(res.status === 201, `accelerated legal run status ${res.status} ${JSON.stringify(await json(res))}`);
+
 const e3 = env(new DelayedRateKV(13));
 const attempts = [];
 for (let i = 0; i < 13; i++) attempts.push(sessionApi.onRequestPost({ request: req(JSON.stringify({ runId: `r${i}` }), { 'CF-Connecting-IP': '203.0.113.5' }), env: e3 }));

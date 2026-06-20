@@ -2,13 +2,20 @@
 
 # 🌟 NEON SURVIVOR - Browser Bullet Hell Survival Shooting Game
 
-**NEON SURVIVOR** is a browser survival action game where you survive endless waves of neon monsters. Move, dodge, collect gems, and choose upgrade cards to shape your build while weapons attack automatically.
+**NEON SURVIVOR** is a fast browser bullet-hell survival shooter about one tiny pilot trapped inside a glowing monster storm. You dodge by hand, your weapons fire automatically, and every level-up turns the run into a new build: lightning chains, black holes, drones, mines, lasers, orbitals, evolutions, companions, and boss pressure that keeps escalating past 10 minutes.
 
-No install · PC/mobile support · Vanilla JavaScript + Canvas 2D · no image/audio asset files
+No install, no downloads, no account required — open the page and survive as long as you can on PC or mobile. The current v1.1.1 Cloudflare build includes global leaderboard support, 24 weapon evolutions, recurring fusion bosses, speed controls, and late-game swarm rendering optimized for crowded screens.
 
 ## ▶️ Play online
 
-Play the public Cloudflare Pages build: **https://neon-survivor.pages.dev/**
+Play now: **https://neon-survivor.pages.dev/**
+
+## 🕹️ What kind of game is it?
+
+- **Dodge-first action**: movement is the main skill; attacks are automatic so you can focus on threading through neon swarms.
+- **Roguelite build choices**: choose upgrade cards, complete recipe passives, and evolve every weapon in the arsenal.
+- **Escalating survival loop**: enemies speed up from 6 minutes, pressure becomes obvious around 7–8 minutes, and a huge Cluster Core fusion boss returns every 10 minutes.
+- **Short-session web game**: instant restart, local records, optional global leaderboard, keyboard/mouse-free mobile joystick, and 1x/2x/3x speed controls.
 
 ## 🌐 Languages
 

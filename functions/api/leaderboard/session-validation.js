@@ -1,3 +1,4 @@
+import { MAX_CLIENT_TIME_SCALE, SESSION_TIME_GRACE_SECONDS, WIN_TIME_SECONDS } from './config.js';
 import { clientIdentity } from './request-identity.js';
 import { sessionKey } from './kv-keys.js';
 import { cleanSessionProof, entryFingerprint } from './session-proof.js';
@@ -24,8 +25,9 @@ export async function validateSession(env, request, body, entry) {
 
   const elapsed = elapsedSeconds(session);
   if (!Number.isFinite(elapsed) || elapsed < 0) return failedSession('invalid_session');
-  if (entry.time > elapsed + 10) return failedSession('time_ahead_of_session');
-  if (entry.won && elapsed < 590) return failedSession('win_too_early');
+  const maxCreditedTime = elapsed * MAX_CLIENT_TIME_SCALE + SESSION_TIME_GRACE_SECONDS;
+  if (entry.time > maxCreditedTime) return failedSession('time_ahead_of_session');
+  if (entry.won && Math.min(entry.time, maxCreditedTime) < WIN_TIME_SECONDS - 10) return failedSession('win_too_early');
 
   const ipHash = await requestIdentityHash(request);
   if (session.ipHash && session.ipHash !== ipHash) return failedSession('session_owner_changed');
