@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jhste102lab/neon-survivor_jh.git"
+    "url": "git+https://github.com/jhste102lab/neon-survivor-extended.git"
   },
   "keywords": [
     "neon-survivor",
@@ -29,7 +29,7 @@
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jhste102lab/neon-survivor_jh/issues"
+    "url": "https://github.com/jhste102lab/neon-survivor-extended/issues"
   },
   "homepage": "https://neon-survivor.pages.dev/"
 }
