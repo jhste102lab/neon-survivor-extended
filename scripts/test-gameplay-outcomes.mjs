@@ -63,6 +63,18 @@ const CombatKills = getGlobal('CombatKills');
   approx(game.player.barrier, 3.5, 'boomerang return outcome adds barrier');
 }
 
+
+{
+  const spawned = [];
+  const disc = { kind: 'disc', evolved: true, x: 2000, y: 0, vx: 100, vy: 0, r: 13, dmg: 20, baseDmg: 20, pierce: 8, life: 3, bounces: 2 };
+  const game = { cam: { x: 0, y: 0 }, bullets: [disc], pushPlayerBullet(bullet) { spawned.push(bullet); } };
+  const result = PlayerBulletMovement.moveStandard(game, disc, 0);
+  assert(spawned.length === 0, 'disc bounce movement must not spawn split disc before outcome apply');
+  assert(result.outcomes.some(outcome => outcome.type === 'spawnPlayerBullet'), 'evolved disc split should be returned as outcome');
+  PlayerBulletOutcomes.applyAll(game, result.outcomes);
+  assert(spawned.length === 1 && spawned[0].childDisc === true, 'disc split outcome spawns child disc when applied');
+}
+
 {
   sounds.length = 0;
   const enemy = { x: 0, y: 0, r: 10, hp: 10, slowT: 0, slowK: 0, def: { knock: 1 } };

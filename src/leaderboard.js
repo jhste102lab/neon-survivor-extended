@@ -67,7 +67,7 @@ const Leaderboard = {
     } catch (e) {
       this.entries = this.readLocal().slice(0, this.publicLimit);
       this.source = 'local';
-      this.fallbackReason = e && e.message ? e.message : 'remote unavailable';
+      this.fallbackReason = LeaderboardRemote.publicFallbackReason(e);
       return this.entries;
     }
   },
@@ -98,8 +98,8 @@ const Leaderboard = {
       this.fallbackReason = '';
       return { ok: true, source: 'global' };
     } catch (e) {
-      this.fallbackReason = e && e.message ? e.message : 'remote unavailable';
-      return { ok: true, source: 'local', warning: this.fallbackReason };
+      this.fallbackReason = LeaderboardRemote.publicFallbackReason(e);
+      return { ok: true, source: 'local', warning: this.fallbackReason, warningKind: e && e.leaderboardKind || 'unknown' };
     }
   },
 };

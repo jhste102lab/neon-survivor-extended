@@ -82,9 +82,9 @@ const PlayerBulletMovement = {
   moveStandard(game, b, dt) {
     const outcomes = [];
     if (b.kind === 'missile') outcomes.push(...this.guideMissile(game, b, dt));
-    if (b.kind === 'disc') this.bounceDisc(game, b);
+    if (b.kind === 'disc') outcomes.push(...this.bounceDisc(game, b));
     this.advanceLinear(b, dt);
-    if (b.kind === 'disc') this.bounceDisc(game, b);
+    if (b.kind === 'disc') outcomes.push(...this.bounceDisc(game, b));
     return { outcomes };
   },
 
@@ -124,6 +124,7 @@ const PlayerBulletMovement = {
   },
 
   bounceDisc(game, b) {
+    const outcomes = [];
     const view = GameRuntime.viewportHalf ? GameRuntime.viewportHalf() : { w: 960, h: 540 };
     const pad = 90;
     const left = game.cam.x - view.w - pad, right = game.cam.x + view.w + pad;
@@ -139,22 +140,23 @@ const PlayerBulletMovement = {
       b.y = clamp(b.y, top, bottom);
       bounced = true;
     }
-    if (bounced) this.applyEvolvedDiscBounce(game, b);
+    if (bounced) outcomes.push(...this.evolvedDiscBounceOutcomes(game, b));
+    return outcomes;
   },
 
-  applyEvolvedDiscBounce(game, b) {
-    if (!b.evolved) return;
+  evolvedDiscBounceOutcomes(game, b) {
+    if (!b.evolved) return [];
     b.bounces = (b.bounces || 0) + 1;
     b.dmg = Math.min((b.baseDmg || b.dmg) * 1.32, b.dmg * 1.045);
-    if (b.splitDone || b.childDisc || b.bounces < 3) return;
+    if (b.splitDone || b.childDisc || b.bounces < 3) return [];
     b.splitDone = true;
-    if (game.bullets.filter(x => x && x.childDisc).length >= 4) return;
+    if (game.bullets.filter(x => x && x.childDisc).length >= 4) return [];
     const a = Math.atan2(b.vy || 0, b.vx || 1) + Math.PI / 2;
-    game.pushPlayerBullet({
+    return [{ type: 'spawnPlayerBullet', bullet: {
       kind: 'disc', source: 'weapon:ricochet:evolved:split', hitOnce: true, childDisc: true,
       x: b.x, y: b.y, vx: Math.cos(a) * Math.hypot(b.vx || 0, b.vy || 0) * 0.92, vy: Math.sin(a) * Math.hypot(b.vx || 0, b.vy || 0) * 0.92,
       r: Math.max(8, (b.r || 13) * 0.72), dmg: (b.baseDmg || b.dmg) * 0.42, baseDmg: (b.baseDmg || b.dmg) * 0.42,
       pierce: Math.max(3, Math.floor((b.pierce || 8) * 0.45)), life: Math.min(2.4, b.life), kb: 85, color: '#d9fbff',
-    });
+    } }];
   },
 };

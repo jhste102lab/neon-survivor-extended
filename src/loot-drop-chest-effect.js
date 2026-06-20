@@ -1,8 +1,10 @@
 'use strict';
-// Chest drop opening effect.
+// Chest drop effect plan.
 const LootDropChestEffect = {
-  apply(game) {
-    GameRuntime.playSound('chest');
-    game.openChest();
+  plan() {
+    return [
+      { type: 'sound', name: 'chest' },
+      { type: 'openChest' },
+    ];
   },
 };

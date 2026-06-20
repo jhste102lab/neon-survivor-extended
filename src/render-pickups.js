@@ -43,13 +43,14 @@ const DropRenderAssets = (() => {
 })();
 
 Object.assign(Render, {
-  drawGems(x) {
+  drawGems(x, frame = this._frame) {
+    const visible = frame && frame.worldVisible ? frame.worldVisible : (px, py, pad) => this.worldVisible(px, py, pad);
     const colors = ['#3dff8e', '#19a8ff', '#d44dff'];
     const ms = this.mobileVisualScale();
     const sizes = [5.5 * ms, 7 * ms, 10 * ms];
     x.save();
     for (const g of Game.gems) {
-      if (!this.worldVisible(g.x, g.y, 90)) continue;
+      if (!visible(g.x, g.y, 90)) continue;
       const r = sizes[g.tier] * (1 + Math.sin(g.bob) * 0.12);
       const sp = Sprites.glowDot(colors[g.tier], sizes[g.tier]);
       x.drawImage(sp, g.x - r * 2.5, g.y - r * 2.5, r * 5, r * 5);
@@ -61,12 +62,13 @@ Object.assign(Render, {
     }
     x.restore();
   },
-  drawDrops(x) {
+  drawDrops(x, frame = this._frame) {
+    const visible = frame && frame.worldVisible ? frame.worldVisible : (px, py, pad) => this.worldVisible(px, py, pad);
     const ms = this.mobileVisualScale();
     const commonDrawLimit = Game.dropLimit ? Math.max(44, Math.round(Game.dropLimit() * 0.72)) : 96;
     let commonDrawn = 0;
     for (const d of Game.drops) {
-      if (!this.worldVisible(d.x, d.y, 130)) continue;
+      if (!visible(d.x, d.y, 130)) continue;
       const important = d.boss || d.kind === 'chest';
       if (!important && commonDrawn++ >= commonDrawLimit) continue;
       const fy = d.y + Math.sin(d.bob) * 5;

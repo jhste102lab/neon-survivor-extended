@@ -1,11 +1,10 @@
 'use strict';
-// Magnet drop gem-attraction effect.
+// Magnet drop gem-attraction effect plan.
 const LootDropMagnetEffect = {
-  apply(game) {
-    for (const gem of game.gems) {
-      gem.mag = true;
-      gem.ms = 500;
-    }
-    GameRuntime.playSound('pickup');
+  plan() {
+    return [
+      { type: 'magnetizeGems', speed: 500 },
+      { type: 'sound', name: 'pickup' },
+    ];
   },
 };

@@ -34,6 +34,8 @@ const PlayerBulletOutcomes = {
       if (outcome.barrier) game.player.barrier = Math.min(outcome.maxBarrier || 42, (game.player.barrier || 0) + outcome.barrier);
     } else if (outcome.type === 'decrementPierce') {
       outcome.bullet.pierce = Math.max(0, (outcome.bullet.pierce || 0) - (outcome.amount || 1));
+    } else if (outcome.type === 'spawnPlayerBullet') {
+      game.pushPlayerBullet(outcome.bullet);
     }
   },
 };

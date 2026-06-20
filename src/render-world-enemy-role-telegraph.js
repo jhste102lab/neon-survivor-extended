@@ -52,16 +52,17 @@ const RenderWorldEnemyRoleTelegraphs = (() => {
     spawner: (x, e, t, ms) => drawSpawnerTelegraph(x, e, t, ms),
   });
 
-  function drawKnownRoleTelegraph(x, e, t, ms) {
-    const draw = RoleTelegraphDrawers[e.special];
+  function drawKnownRoleTelegraph(x, e, t, ms, telegraph = null) {
+    const kind = telegraph && telegraph.kind ? telegraph.kind : e.special;
+    const draw = RoleTelegraphDrawers[kind];
     if (draw) draw(x, e, t, ms);
   }
 
 
-  function drawEnemyRoleTelegraph(x, e, t, ms) {
-    if (!e || !e.special) return;
+  function drawEnemyRoleTelegraph(x, e, t, ms, telegraph = null) {
+    if (!e || (!e.special && !(telegraph && telegraph.kind))) return;
     x.save();
-    drawKnownRoleTelegraph(x, e, t, ms);
+    drawKnownRoleTelegraph(x, e, t, ms, telegraph);
     x.restore();
   }
 

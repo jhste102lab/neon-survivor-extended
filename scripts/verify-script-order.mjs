@@ -36,6 +36,8 @@ before('src/namespace.js', 'src/runtime.js', 'runtime and registries are boot fo
 before('src/runtime.js', 'src/game-lifecycle.js', 'GameRuntime is used by lifecycle helpers');
 before('src/runtime.js', 'src/main.js', 'main boot uses GameRuntime');
 before('src/game-loop-phases.js', 'src/game-loop.js', 'phase schedule drives Game.update');
+before('src/director-spawn-policy.js', 'src/director-spawn.js', 'director-spawn applies pure scheduling policies');
+before('src/pressure-pattern-plans.js', 'src/pressure-patterns.js', 'pressure dispatch selects registered planners before side effects');
 before('src/run-state.js', 'src/game-lifecycle.js', 'reset delegates to run-state factory');
 
 const weaponHandlers = scripts.filter(s => /^src\/weapon-fire-[a-z0-9]+\.js$/.test(s) && s !== 'src/weapon-fire.js');
@@ -53,6 +55,16 @@ groupBefore([
   'src/render-canvas.js','src/render-world-stars.js','src/render-world-grid.js','src/render-world-enemy-role-telegraph.js',
   'src/render-world-enemy-state.js','src/render-world-enemy-overlays.js','src/render-world-enemy-sprite.js','src/render-world-enemies.js','src/render-world-player.js',
 ], 'src/render-world.js', 'render-world facade delegates to focused helpers');
+
+groupBefore([
+  'src/render-combat-beams.js','src/render-combat-orbit.js','src/render-combat-drones.js','src/render-combat-projectiles.js','src/render-combat-bolts.js',
+], 'src/render-combat.js', 'render-combat facade delegates to focused helpers');
+
+groupBefore([
+  'src/render-effects-novas.js','src/render-effects-mega-absorbs.js','src/render-effects-particles.js','src/render-effects-floating-texts.js',
+], 'src/render-effects.js', 'render-effects facade delegates to focused helpers');
+before('src/render-canvas.js', 'src/render-frame.js', 'frame orchestration needs render context construction');
+before('src/render-frame.js', 'src/render-core.js', 'Render.draw delegates frame orchestration');
 before('src/render-canvas.js', 'src/render-core.js', 'Render.init delegates canvas lifecycle');
 
 groupBefore([

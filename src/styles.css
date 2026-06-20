@@ -82,8 +82,8 @@ canvas#c{position:fixed;inset:0;display:block}
   filter:drop-shadow(0 0 18px rgba(25,227,255,.55)) drop-shadow(0 0 50px rgba(255,43,214,.3))}
 .title-ko{font-size:20px;letter-spacing:12px;color:#9fe9ff;margin:6px 0 3px;text-shadow:0 0 14px rgba(25,227,255,.6)}
 .subtitle{color:#8fa3c8;font-size:13px;margin-bottom:12px}
-.githubLink{display:inline-flex;align-items:center;gap:7px;margin:3px auto 9px;padding:6px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.045);color:#bdefff;text-decoration:none;font-family:var(--font-en);font-size:11px;letter-spacing:1px;transition:transform .12s,box-shadow .12s,border-color .12s,color .12s}
-.githubLink svg{width:15px;height:15px;filter:drop-shadow(0 0 7px rgba(25,227,255,.35))}.githubLink:hover,.githubLink:focus-visible{color:#fff;border-color:rgba(25,227,255,.62);box-shadow:0 0 18px rgba(25,227,255,.28);transform:translateY(-1px);outline:none}
+.publicLink{display:inline-flex;align-items:center;gap:7px;margin:3px auto 9px;padding:6px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.045);color:#bdefff;text-decoration:none;font-family:var(--font-en);font-size:11px;letter-spacing:1px;transition:transform .12s,box-shadow .12s,border-color .12s,color .12s}
+.publicLink svg{width:15px;height:15px;filter:drop-shadow(0 0 7px rgba(25,227,255,.35))}.publicLink:hover,.publicLink:focus-visible{color:#fff;border-color:rgba(25,227,255,.62);box-shadow:0 0 18px rgba(25,227,255,.28);transform:translateY(-1px);outline:none}
 .bestline{margin:3px 0 10px;font-size:15px;color:#ffd9a8;text-shadow:0 0 10px rgba(255,210,61,.35)}
 .languageBox{margin:0 auto 8px;max-width:440px;padding:8px 14px;border:1px solid rgba(25,227,255,.22);border-radius:16px;background:rgba(25,227,255,.035);text-align:left}
 .languageLabel{display:block;color:#9fe9ff;font-size:13px;margin-bottom:6px;letter-spacing:1px}

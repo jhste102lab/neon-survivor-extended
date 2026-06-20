@@ -68,7 +68,6 @@ Object.assign(Game, {
     d.idleMissileT = this.nextIdleMissileDelay(idleK, threat);
     const context = this.idleMissileContext(idle, idleK, threat);
     this.spawnIdleMissilePattern(context);
-    GameRuntime.playSound('missile');
   },
 
   resetIdleMissileTimer(d) {
