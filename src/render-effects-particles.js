@@ -2,7 +2,8 @@
 // Particle rendering.
 {
   function particleAlpha(particle) {
-    return Math.min(1, particle.life / particle.maxLife * 1.4);
+    const clarity = Game.clarityK ? Game.clarityK() : 0;
+    return Math.min(1, particle.life / particle.maxLife * 1.4) * (1 - clarity * 0.58);
   }
 
   function particleDrawSize(particle) {

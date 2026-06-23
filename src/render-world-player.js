@@ -12,8 +12,10 @@ const RenderWorldPlayer = (() => {
     drawPlayerAura(x, p, ms);
     applyPlayerInvulnerabilityAlpha(x, p, t);
     drawPlayerCore(x, p, ms);
+    x.globalAlpha = 1;
     x.globalCompositeOperation = 'source-over';
     drawPlayerBarrier(x, p, t);
+    drawPlayerInvulnerabilityRing(x, p, t, ms);
     drawPlayerOutline(x, p);
     drawPlayerDirection(x, p, ms);
     x.restore();
@@ -41,6 +43,24 @@ const RenderWorldPlayer = (() => {
     x.strokeStyle = `rgba(125,255,193,${0.45 + Math.sin(t * 8) * 0.12})`;
     x.lineWidth = 4;
     x.beginPath(); x.arc(p.x, p.y, CFG.player.radius + 9, 0, TAU); x.stroke();
+  }
+
+  function drawPlayerInvulnerabilityRing(x, p, t, ms) {
+    if (!(p.invuln > 0)) return;
+    const k = clamp(p.invuln / (CFG.player.invuln || 0.72), 0, 1);
+    const flash = p.invuln < 0.2 ? (0.55 + Math.sin(t * 48) * 0.32) : 0.86;
+    const r = (CFG.player.radius + 15) * ms;
+    x.save();
+    x.globalAlpha = flash;
+    x.strokeStyle = '#9ff3ff';
+    x.lineWidth = 3.2 * ms;
+    x.beginPath();
+    x.arc(p.x, p.y, r, -Math.PI / 2, -Math.PI / 2 + TAU * k);
+    x.stroke();
+    x.globalAlpha = 0.18 * flash;
+    x.fillStyle = '#9ff3ff';
+    x.beginPath(); x.arc(p.x, p.y, r + 4 * ms, 0, TAU); x.fill();
+    x.restore();
   }
 
   function drawPlayerOutline(x, p) {

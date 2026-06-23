@@ -1,6 +1,14 @@
 'use strict';
 // Loot entity policies and outcome application separated from entity iteration.
 const LootOutcomes = {
+  stackableDrop(kind) {
+    return kind === 'chicken' || kind === 'magnet' || kind === 'bomb';
+  },
+
+  dropStack(drop) {
+    return Math.max(1, Math.min(CFG.maxDropStack || 3, Math.round(Number(drop && drop.stack) || 1)));
+  },
+
   mergeGemValue(gem, value) {
     gem.v += value;
     if (gem.v >= 25) gem.tier = 2;
@@ -37,8 +45,8 @@ const LootOutcomes = {
     };
   },
 
-  dropOutcome(kind) {
-    return { type: 'collectDrop', kind };
+  dropOutcome(kind, drop = null) {
+    return { type: 'collectDrop', kind, stack: this.dropStack(drop) };
   },
 
   applyAll(game, outcomes = []) {
@@ -52,7 +60,7 @@ const LootOutcomes = {
       if (outcome.sound) GameRuntime.playSound(outcome.sound.name, ...(outcome.sound.args || []));
       if (outcome.burst) game.spawnBurst(outcome.burst.x, outcome.burst.y, outcome.burst.color, outcome.burst.count, outcome.burst.speed, outcome.burst.size, outcome.burst.life);
     } else if (outcome.type === 'collectDrop') {
-      LootDropEffects.apply(game, outcome.kind);
+      LootDropEffects.apply(game, outcome.kind, { stack: outcome.stack || 1 });
     } else if (outcome.type === 'dropExpired') {
       game.metrics.dropsExpired = (game.metrics.dropsExpired || 0) + 1;
     } else if (outcome.type === 'dropTrimmed') {

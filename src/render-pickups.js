@@ -48,8 +48,14 @@ Object.assign(Render, {
     const colors = ['#3dff8e', '#19a8ff', '#d44dff'];
     const ms = this.mobileVisualScale();
     const sizes = [5.5 * ms, 7 * ms, 10 * ms];
+    const clarity = Game.clarityK ? Game.clarityK() : 0;
+    const drawLimit = Math.round(lerp(260, 96, clarity));
+    const stride = Game.gems.length > drawLimit ? Math.ceil(Game.gems.length / drawLimit) : 1;
+    let index = 0;
     x.save();
+    x.globalAlpha = 1 - clarity * 0.42;
     for (const g of Game.gems) {
+      if (stride > 1 && (index++ % stride) !== 0 && !g.mag && g.tier < 2) continue;
       if (!visible(g.x, g.y, 90)) continue;
       const r = sizes[g.tier] * (1 + Math.sin(g.bob) * 0.12);
       const sp = Sprites.glowDot(colors[g.tier], sizes[g.tier]);
@@ -65,7 +71,8 @@ Object.assign(Render, {
   drawDrops(x, frame = this._frame) {
     const visible = frame && frame.worldVisible ? frame.worldVisible : (px, py, pad) => this.worldVisible(px, py, pad);
     const ms = this.mobileVisualScale();
-    const commonDrawLimit = Game.dropLimit ? Math.max(44, Math.round(Game.dropLimit() * 0.72)) : 96;
+    const clarity = Game.clarityK ? Game.clarityK() : 0;
+    const commonDrawLimit = Game.dropLimit ? Math.max(28, Math.round(Game.dropLimit() * lerp(0.72, 0.42, clarity))) : 96;
     let commonDrawn = 0;
     for (const d of Game.drops) {
       if (!visible(d.x, d.y, 130)) continue;
@@ -78,9 +85,19 @@ Object.assign(Render, {
       const blink = imminent ? (0.48 + Math.sin(Game.time * 16) * 0.24) : warning ? (0.76 + Math.sin(Game.time * 8) * 0.12) : 1;
       const sprite = DropRenderAssets.sprite(d.kind, ms, imminent);
 
-      x.globalAlpha = blink;
+      x.globalAlpha = blink * (important ? 1 : 1 - clarity * 0.32);
       x.drawImage(sprite, d.x - 38 * ms, fy - 38 * ms, 76 * ms, 76 * ms);
       x.globalAlpha = 1;
+      if ((d.stack || 1) > 1) {
+        x.fillStyle = '#07121d';
+        x.strokeStyle = DropRenderAssets.colors[d.kind] || '#ffffff';
+        x.lineWidth = 1.5 * ms;
+        x.beginPath(); x.arc(d.x + 19 * ms, fy - 19 * ms, 10 * ms, 0, TAU); x.fill(); x.stroke();
+        x.fillStyle = '#ffffff';
+        x.font = `bold ${Math.round(11 * ms)}px Arial`;
+        x.textAlign = 'center'; x.textBaseline = 'middle';
+        x.fillText(`x${d.stack}`, d.x + 19 * ms, fy - 19 * ms + 0.5 * ms);
+      }
       if (warning) {
         x.strokeStyle = imminent ? '#ff4d5e' : (DropRenderAssets.colors[d.kind] || '#ffffff');
         x.lineWidth = imminent ? 3 : 2;

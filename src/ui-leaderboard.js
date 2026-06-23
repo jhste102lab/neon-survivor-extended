@@ -30,6 +30,12 @@ Object.assign(UI, {
     badge.textContent = Leaderboard.source === 'global' ? 'GLOBAL' : 'LOCAL';
     head.append(title, badge);
     el.appendChild(head);
+    if (Leaderboard.source !== 'global' && Leaderboard.fallbackReason) {
+      const warn = document.createElement('div');
+      warn.className = 'lbWarn';
+      warn.textContent = tr('leaderboard.fallback', { reason: Leaderboard.fallbackReason });
+      el.appendChild(warn);
+    }
     if (opts.message) {
       const msg = document.createElement('div');
       msg.className = 'lbEmpty';

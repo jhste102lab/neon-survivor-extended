@@ -301,6 +301,7 @@ const RenderEffectNovas = {
   draw(render, x, frame = null) {
     x.save();
     x.globalCompositeOperation = 'lighter';
+    x.globalAlpha = 1 - ((Game.clarityK ? Game.clarityK() : 0) * 0.34);
     const visible = frame && frame.worldVisible ? frame.worldVisible : (px, py, pad) => render.worldVisible(px, py, pad);
     for (const nova of Game.novas) {
       if (!visible(nova.x, nova.y, novaVisibilityPad(nova))) continue;

@@ -41,6 +41,7 @@ const RenderCombatBeams = {
   draw(render, x, frame = null) {
     x.save();
     x.globalCompositeOperation = 'lighter';
+    x.globalAlpha = 1 - ((Game.clarityK ? Game.clarityK() : 0) * 0.46);
     const segmentVisible = frame && frame.segmentVisible ? frame.segmentVisible : (x1, y1, x2, y2, pad) => render.segmentVisible(x1, y1, x2, y2, pad);
     for (const beam of Game.beams) {
       const len = beamLength(beam);

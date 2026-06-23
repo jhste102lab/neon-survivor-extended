@@ -46,6 +46,7 @@ const RenderCombatBolts = {
     if (!Game.bolts.length) return;
     x.save();
     x.globalCompositeOperation = 'lighter';
+    x.globalAlpha = 1 - ((Game.clarityK ? Game.clarityK() : 0) * 0.44);
     const segmentVisible = frame && frame.segmentVisible ? frame.segmentVisible : (x1, y1, x2, y2, pad) => render.segmentVisible(x1, y1, x2, y2, pad);
     for (const bolt of Game.bolts) {
       if (!segmentVisible(bolt.x1, bolt.y1, bolt.x2, bolt.y2, 160)) continue;

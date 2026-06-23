@@ -14,8 +14,9 @@ Object.assign(Game, {
   },
 
   setUserTimeScale(scale) {
-    this.userTimeScale = clamp(Number(scale) || 1, 1, 3);
+    const requested = Number(scale) || 1;
+    const slowAllowed = this.time >= (CFG.slowSpeedUnlockTime || 480);
+    this.userTimeScale = requested < 1 && !slowAllowed ? 1 : clamp(requested, 0.5, 3);
     if (typeof UI !== 'undefined' && UI.syncSpeedControls) UI.syncSpeedControls(this.userTimeScale);
   },
 });
-

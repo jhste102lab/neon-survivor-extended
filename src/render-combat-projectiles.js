@@ -345,6 +345,7 @@ const RenderCombatProjectiles = {
   drawPlayerBullets(render, x, frame = null) {
     x.save();
     x.globalCompositeOperation = 'lighter';
+    x.globalAlpha = 1 - ((Game.clarityK ? Game.clarityK() : 0) * 0.52);
     const mobileScale = frame ? frame.mobileScale : render.mobileVisualScale();
     const visible = frame && frame.worldVisible ? frame.worldVisible : (px, py, pad) => render.worldVisible(px, py, pad);
     for (const bullet of Game.bullets) {

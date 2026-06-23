@@ -2,6 +2,7 @@
 // Remote leaderboard enablement, session, network adapter, and public fallback classification.
 const LeaderboardRemote = {
   sessionPath: '/api/session',
+  publicApiOrigin: 'https://neon-survivor.pages.dev',
 
   sessionPathForApi(apiPath) {
     if (typeof window !== 'undefined' && typeof window.NS_LEADERBOARD_SESSION_API === 'string' && window.NS_LEADERBOARD_SESSION_API) {
@@ -24,11 +25,19 @@ const LeaderboardRemote = {
       return true;
     }
     try {
+      if (new URLSearchParams(location.search).get('remoteLb') === '0') return false;
+    } catch (e) {}
+    const host = location.hostname;
+    if (host === '') return false;
+    if (host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0') {
+      state.apiPath = `${this.publicApiOrigin}/api/leaderboard`;
+      this.sessionPath = `${this.publicApiOrigin}/api/session`;
+      return true;
+    }
+    try {
       if (new URLSearchParams(location.search).get('remoteLb') === '1') return true;
     } catch (e) {}
     if (window.NS_ENABLE_REMOTE_LEADERBOARD === true) return true;
-    const host = location.hostname;
-    if (host === 'localhost' || host === '127.0.0.1' || host === '') return false;
     if (host.endsWith('github.io')) return false;
     return location.protocol === 'https:' || host.endsWith('.pages.dev') || host.endsWith('.workers.dev');
   },

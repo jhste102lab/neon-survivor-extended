@@ -40,8 +40,15 @@ function boot() {
     Game.setUserTimeScale(Number(btn.dataset.speed) || 1);
   });
   UI.syncSpeedControls = scale => {
-    const speed = String(Math.round(scale || 1));
-    document.querySelectorAll('.speedBtn').forEach(btn => btn.classList.toggle('active', btn.dataset.speed === speed));
+    const slowAllowed = Game.time >= (CFG.slowSpeedUnlockTime || 480);
+    const speed = Number(scale || 1) === 0.5 ? '0.5' : String(Math.round(scale || 1));
+    document.querySelectorAll('.speedBtn').forEach(btn => {
+      const isSlow = Number(btn.dataset.speed) < 1;
+      btn.disabled = isSlow && !slowAllowed;
+      btn.classList.toggle('locked', isSlow && !slowAllowed);
+      btn.classList.toggle('active', btn.dataset.speed === speed);
+      if (isSlow) btn.title = slowAllowed ? 'Precision speed' : 'Unlocks at 08:00';
+    });
   };
   UI.syncSpeedControls(Game.userTimeScale || 1);
   $('btnMute').addEventListener('click', () => { AudioFX.ensure(); AudioFX.toggleMute(); });

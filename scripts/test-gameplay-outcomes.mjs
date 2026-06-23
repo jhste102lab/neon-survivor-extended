@@ -11,7 +11,7 @@ const context = vm.createContext({
   Math,
   Set,
   TAU: Math.PI * 2,
-  CFG: { lateRampStart: 420, maxGems: 3, maxDrops: 3, dropLife: { chicken: 150 } },
+  CFG: { lateRampStart: 420, maxGems: 3, maxDrops: 3, dropMergeRadius: 48, maxDropStack: 3, dropLife: { chicken: 150, bomb: 50, chest: 70 } },
   RNG: { next: () => 0 },
   rand: (a, b) => (a + b) / 2,
   clamp: (n, a, b) => Math.min(b, Math.max(a, n)),
@@ -44,12 +44,14 @@ loadClassic('src/player-bullet-outcomes.js');
 loadClassic('src/player-bullet-movement.js');
 loadClassic('src/player-bullet-collision.js');
 loadClassic('src/loot-outcomes.js');
+loadClassic('src/loot-drops.js');
 loadClassic('src/combat-kills.js');
 
 const PlayerBulletOutcomes = getGlobal('PlayerBulletOutcomes');
 const PlayerBulletMovement = getGlobal('PlayerBulletMovement');
 const PlayerBulletCollision = getGlobal('PlayerBulletCollision');
 const LootOutcomes = getGlobal('LootOutcomes');
+const LootDrops = getGlobal('LootDrops');
 const CombatKills = getGlobal('CombatKills');
 
 {
@@ -144,6 +146,24 @@ const CombatKills = getGlobal('CombatKills');
   assert(game.dropKinds.includes('chicken'), 'drop outcome delegates effect');
   assert(game.metrics.dropsExpired === 1 && game.metrics.dropsTrimmed === 1, 'drop expiry/trim outcomes update separate metrics');
   assert(game.bursts.length === 1 && sounds.some(sound => sound.name === 'gem'), 'gem presentation outcomes apply');
+}
+
+{
+  const game = {
+    drops: [],
+    player: { x: 0, y: 0 },
+    dropLimit: () => 10,
+    trimDropsForSpawn: LootDrops.trimDropsForSpawn,
+    mergeNearbyDrop: LootDrops.mergeNearbyDrop,
+    spawnDrop: LootDrops.spawnDrop,
+  };
+  game.spawnDrop('bomb', 0, 0);
+  game.spawnDrop('bomb', 20, 0);
+  assert(game.drops.length === 1, 'nearby stackable drops should merge');
+  assert(game.drops[0].stack === 2 && game.drops[0].life === 50, 'merged drop resets life and increments stack');
+  game.spawnDrop('chest', 0, 0);
+  game.spawnDrop('chest', 10, 0);
+  assert(game.drops.filter(d => d.kind === 'chest').length === 2, 'chests must not merge');
 }
 
 {

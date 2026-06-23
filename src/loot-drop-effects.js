@@ -8,14 +8,14 @@ const LootDropEffects = {
     chest: LootDropChestEffect,
   },
 
-  plan(game, kind) {
+  plan(game, kind, opts = {}) {
     const effect = this.effects[kind];
     if (!effect || typeof effect.plan !== 'function') return [];
-    return effect.plan(game);
+    return effect.plan(game, opts);
   },
 
-  apply(game, kind) {
-    this.applyOutcomes(game, this.plan(game, kind));
+  apply(game, kind, opts = {}) {
+    this.applyOutcomes(game, this.plan(game, kind, opts));
   },
 
   applyOutcomes(game, outcomes = []) {
@@ -31,7 +31,7 @@ const LootDropEffects = {
     } else if (outcome.type === 'spawnText') {
       game.spawnText(outcome.x, outcome.y, outcome.text, !!outcome.crit, outcome.color);
     } else if (outcome.type === 'magnetizeGems') {
-      for (const gem of game.gems) { gem.mag = true; gem.ms = outcome.speed; }
+      this.magnetizeGems(game, outcome);
     } else if (outcome.type === 'openChest') {
       game.openChest();
     } else if (outcome.type === 'sound') {
@@ -40,6 +40,38 @@ const LootDropEffects = {
       GameRuntime.flashEffect(outcome.id, outcome.duration);
     } else if (outcome.type === 'shake') {
       game.shake(outcome.amount, outcome.duration);
+    }
+  },
+
+  magnetizeGems(game, outcome) {
+    const gems = game.gems || [];
+    const motionLimit = Math.max(1, Math.round(outcome.motionLimit || gems.length || 1));
+    if (gems.length <= motionLimit) {
+      for (const gem of gems) { gem.mag = true; gem.ms = outcome.speed; }
+      return;
+    }
+
+    const p = game.player || { x: 0, y: 0 };
+    const ranked = gems.map((gem, index) => ({ gem, index, d2: dist2(gem.x, gem.y, p.x, p.y) }))
+      .sort((a, b) => a.d2 - b.d2);
+    const keep = new Set(ranked.slice(0, motionLimit).map(item => item.gem));
+    const motionGems = [];
+    let xp = 0;
+    for (const gem of gems) {
+      if (keep.has(gem)) {
+        gem.mag = true;
+        gem.ms = outcome.speed;
+        motionGems.push(gem);
+      } else {
+        xp += gem.v || 0;
+      }
+    }
+    gems.length = 0;
+    gems.push(...motionGems);
+    if (xp > 0) {
+      if (typeof game.addXp === 'function') game.addXp(xp);
+      if (typeof game.spawnText === 'function') game.spawnText(p.x, p.y - 44, `+${Math.round(xp)} XP`, false, '#41f0ff');
+      if (typeof game.spawnBurst === 'function') game.spawnBurst(p.x, p.y, '#41f0ff', Math.min(12, Math.max(4, Math.round(motionLimit / 10))), 120, 3, 0.22);
     }
   },
 

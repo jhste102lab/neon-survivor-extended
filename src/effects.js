@@ -31,10 +31,12 @@ Object.assign(Game, {
 
   spawnText(x, y, txt, crit, color) {
     if (this.test.noFx) return;
-    const late = this.loadShedK ? this.loadShedK(CFG.unlockTime || 300, 240) : clamp((this.time - (CFG.lateRampStart || 420)) / 240, 0, 1);
+    const late = this.clarityK ? this.clarityK() : (this.loadShedK ? this.loadShedK(CFG.unlockTime || 300, 240) : clamp((this.time - (CFG.lateRampStart || 420)) / 240, 0, 1));
     if (!crit && !color) {
-      const keep = this.isMobileRuntime && this.isMobileRuntime() ? lerp(0.34, 0.16, late) : lerp(0.60, 0.25, late);
+      const keep = this.isMobileRuntime && this.isMobileRuntime() ? lerp(0.30, 0.06, late) : lerp(0.54, 0.10, late);
       if (RNG.next() > keep) return;
+    } else if (color && !crit && late > 0.85 && !/[A-Z가-힣+]/.test(String(txt))) {
+      if (RNG.next() > 0.45) return;
     }
     const T = this.texts;
     const cap = this.textLimit ? this.textLimit() : 70;

@@ -20,6 +20,33 @@ const LeaderboardRemote = vm.runInContext('LeaderboardRemote', context);
 function assert(condition, message) { if (!condition) throw new Error(message); }
 
 {
+  context.location.href = 'http://localhost:5173/';
+  context.location.protocol = 'http:';
+  context.location.hostname = 'localhost';
+  context.location.search = '';
+  const state = { apiPath: '/api/leaderboard' };
+  assert(LeaderboardRemote.enabled(state) === true, 'localhost should use public Cloudflare leaderboard by default');
+  assert(state.apiPath === 'https://neon-survivor.pages.dev/api/leaderboard', 'localhost should point at public leaderboard API');
+}
+
+{
+  context.location.href = 'http://localhost:5173/?remoteLb=0';
+  context.location.protocol = 'http:';
+  context.location.hostname = 'localhost';
+  context.location.search = '?remoteLb=0';
+  const state = { apiPath: '/api/leaderboard' };
+  assert(LeaderboardRemote.enabled(state) === false, 'remoteLb=0 should disable remote leaderboard even on localhost');
+}
+
+{
+  context.location.href = 'file:///tmp/index.html';
+  context.location.protocol = 'file:';
+  context.location.hostname = '';
+  const state = { apiPath: '/api/leaderboard' };
+  assert(LeaderboardRemote.enabled(state) === false, 'file URLs should remain local-only');
+}
+
+{
   const c = LeaderboardRemote.classifyResponseError(422, { error: 'implausible_entry' });
   assert(c.kind === 'contract_rejected', '422 should be classified as contract rejection');
   assert(c.message.includes('contract rejected'), 'contract rejection message should be explicit');

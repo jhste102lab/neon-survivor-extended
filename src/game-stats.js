@@ -47,6 +47,19 @@ Object.assign(Game, {
     return clamp((this.time - start) / span, 0, 1);
   },
 
+  clarityK() {
+    const start = CFG.clarityStart || CFG.unlockTime || 300;
+    const full = Math.max(start + 1, CFG.clarityFull || CFG.idlePressureStart || 480);
+    const timeK = clamp((this.time - start) / (full - start), 0, 1);
+    const loadParts = [];
+    if (this.enemies && this.enemyLimit) loadParts.push(this.enemies.length / Math.max(1, this.enemyLimit()));
+    if (this.bullets && this.playerBulletLimit) loadParts.push(this.bullets.length / Math.max(1, this.playerBulletLimit()));
+    if (this.gems && this.gemLimit) loadParts.push(this.gems.length / Math.max(1, this.gemLimit()));
+    const loadK = clamp(Math.max(0, ...loadParts) - 0.72, 0, 0.38) / 0.38;
+    const mobileBias = this.isMobileRuntime && this.isMobileRuntime() ? 0.16 : 0;
+    return clamp(Math.max(timeK, loadK * 0.82) + mobileBias, 0, 1);
+  },
+
   enemyLimit() {
     const pressureT = Math.max(0, this.time - (CFG.dropTaperStart || 360));
     const endlessT = Math.max(0, this.time - CFG.winTime);
@@ -88,15 +101,15 @@ Object.assign(Game, {
   },
 
   particleLimit() {
-    const late = this.loadShedK(CFG.unlockTime || 300, 240);
-    if (!this.isMobileRuntime()) return Math.round(lerp(500, CFG.lateParticleCap || 280, late));
-    return Math.round(lerp(CFG.mobile.particleCap || 320, CFG.mobile.lateParticleCap || 220, late));
+    const late = this.clarityK ? this.clarityK() : this.loadShedK(CFG.unlockTime || 300, 240);
+    if (!this.isMobileRuntime()) return Math.round(lerp(500, CFG.lateParticleCap || 220, late));
+    return Math.round(lerp(CFG.mobile.particleCap || 320, CFG.mobile.lateParticleCap || 140, late));
   },
 
   textLimit() {
-    if (this.isMobileRuntime()) return CFG.mobile.textCap || 44;
-    const late = this.loadShedK(CFG.unlockTime || 300, 240);
-    return Math.round(lerp(56, CFG.lateTextCap || 38, late));
+    const late = this.clarityK ? this.clarityK() : this.loadShedK(CFG.unlockTime || 300, 240);
+    if (this.isMobileRuntime()) return Math.round(lerp(CFG.mobile.textCap || 32, 14, late));
+    return Math.round(lerp(56, 18, late));
   },
 
   dropLimit() {
@@ -106,9 +119,9 @@ Object.assign(Game, {
   },
 
   fxScale() {
-    const late = this.loadShedK(CFG.unlockTime || 300, 240);
-    if (!this.isMobileRuntime()) return lerp(0.92, 0.52, late);
-    return lerp(0.68, 0.34, late);
+    const late = this.clarityK ? this.clarityK() : this.loadShedK(CFG.unlockTime || 300, 240);
+    if (!this.isMobileRuntime()) return lerp(0.92, 0.38, late);
+    return lerp(0.68, 0.24, late);
   },
 
   itemDropScale() {

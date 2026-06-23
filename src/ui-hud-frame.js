@@ -13,6 +13,7 @@ const UIHudFrame = {
       UIHudXp.update(player);
       UIHudLevel.update(player.level);
       UI.updateTimer(G.time);
+      if (UI.syncSpeedControls) UI.syncSpeedControls(G.userTimeScale || 1);
       UIHudKills.updateIfDirty(G);
       if (G.slotsDirty) { UI.refreshSlots(); G.slotsDirty = false; }
       if (G.boss) UI.updateBossBar(G.boss);

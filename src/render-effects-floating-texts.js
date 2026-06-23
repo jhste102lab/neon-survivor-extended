@@ -2,7 +2,9 @@
 // Floating combat text rendering.
 {
   function textAlpha(text) {
-    return clamp(text.life / 0.7, 0, 1);
+    const clarity = Game.clarityK ? Game.clarityK() : 0;
+    const important = text.crit || text.color;
+    return clamp(text.life / 0.7, 0, 1) * (important ? 1 : 1 - clarity * 0.35);
   }
 
   function textFont(text) {

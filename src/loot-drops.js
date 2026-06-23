@@ -3,8 +3,30 @@
 const LootDrops = {
   spawnDrop(kind, x, y, life = null, boss = false) {
     const ttl = life || CFG.dropLife[kind] || 150;
+    if (!boss && this.mergeNearbyDrop && this.mergeNearbyDrop(kind, x, y, ttl)) return;
     this.trimDropsForSpawn(!!boss);
-    this.drops.push({ x, y, kind, bob: 0, life: ttl, maxLife: ttl, boss: !!boss });
+    this.drops.push({ x, y, kind, bob: 0, life: ttl, maxLife: ttl, boss: !!boss, stack: 1 });
+  },
+
+  mergeNearbyDrop(kind, x, y, ttl) {
+    if (!LootOutcomes.stackableDrop(kind)) return false;
+    const radius = CFG.dropMergeRadius || 48;
+    const maxStack = CFG.maxDropStack || 3;
+    let best = null;
+    let bestD2 = radius * radius;
+    for (const d of this.drops) {
+      if (d.boss || d.kind !== kind || (d.stack || 1) >= maxStack) continue;
+      const d2 = dist2(x, y, d.x, d.y);
+      if (d2 <= bestD2) { best = d; bestD2 = d2; }
+    }
+    if (!best) return false;
+    best.stack = Math.min(maxStack, (best.stack || 1) + 1);
+    best.maxLife = ttl;
+    best.life = ttl;
+    best.x = (best.x * 2 + x) / 3;
+    best.y = (best.y * 2 + y) / 3;
+    best.bob = 0;
+    return true;
   },
 
   trimDropsForSpawn(incomingBoss = false) {
@@ -29,7 +51,7 @@ const LootDrops = {
       d.bob += dt * 2.5;
       if (dist2(d.x, d.y, p.x, p.y) < 42 * 42) {
         LootOutcomes.removeAt(this.drops, i);
-        LootOutcomes.applyAll(this, [LootOutcomes.dropOutcome(d.kind)]);
+        LootOutcomes.applyAll(this, [LootOutcomes.dropOutcome(d.kind, d)]);
       }
     }
   },

@@ -13,6 +13,11 @@ const context = vm.createContext({
   TAU: Math.PI * 2,
   pick: arr => arr[0],
   clamp: (n, a, b) => Math.min(b, Math.max(a, n)),
+  lerp: (a, b, t) => a + (b - a) * t,
+  dist2: (x1, y1, x2, y2) => (x1 - x2) ** 2 + (y1 - y2) ** 2,
+  CFG: { maxDropStack: 3, magnetMotionLimit: 2, slowSpeedUnlockTime: 480 },
+  UI: { syncSpeedControls: scale => commands.push(['speedSync', scale]) },
+  Game: { time: 0, hitStopT: 0, timeScale: 1, shakeT: 0 },
   GameRuntime: {
     viewportHalf: () => ({ w: 100, h: 100 }),
     playSound: name => sounds.push(name),
@@ -30,9 +35,11 @@ load('src/loot-drop-chest-effect.js');
 load('src/loot-drop-chicken-effect.js');
 load('src/loot-drop-magnet-effect.js');
 load('src/loot-drop-effects.js');
+load('src/game-loop-frame.js');
 const DirectorSpawnPolicy = get('DirectorSpawnPolicy');
 const PressurePatternPlans = get('PressurePatternPlans');
 const LootDropEffects = get('LootDropEffects');
+const Game = get('Game');
 
 {
   const ctx = DirectorSpawnPolicy.normalContext({ time: 480, winTime: 600, dropTaperStart: 360, threat: 2, eventMul: 1.25, mobileMul: 0.82 });
@@ -57,14 +64,25 @@ const LootDropEffects = get('LootDropEffects');
 }
 
 {
+  Game.time = 100;
+  Game.setUserTimeScale(0.5);
+  assert(Game.userTimeScale === 1, '0.5x must stay locked before 08:00');
+  Game.time = 480;
+  Game.setUserTimeScale(0.5);
+  assert(Game.userTimeScale === 0.5, '0.5x unlocks at 08:00');
+}
+
+{
   const game = {
     player: { x: 5, y: 6, hp: 10 },
-    gems: [{ mag: false, ms: 0 }],
+    gems: [{ x: 0, y: 0, v: 1, mag: false, ms: 0 }],
     enemies: [{ x: 0, y: 0, hp: 10 }],
     cam: { x: 0, y: 0 },
     stat: () => ({ maxHp: 30 }),
     idleRecoverySuppression: () => 0,
     damageEnemy(e, damage) { e.hp -= damage; },
+    addXp(v) { commands.push(['xp', v]); },
+    spawnBurst(x, y, color, count) { commands.push(['burst', count]); },
     spawnText(x, y, text) { commands.push(['text', x, y, text]); },
     shake(amount, duration) { commands.push(['shake', amount, duration]); },
     openChest() { commands.push(['chest']); },
@@ -77,6 +95,8 @@ const LootDropEffects = get('LootDropEffects');
   assert(game.gems[0].mag === false, 'magnet planning must not mutate gems');
   LootDropEffects.applyOutcomes(game, magnetPlan);
   assert(game.gems[0].mag === true && game.gems[0].ms === 500, 'magnet outcome applies gem attraction');
+  const stackedBomb = LootDropEffects.plan(game, 'bomb', { stack: 3 });
+  assert(stackedBomb.find(o => o.type === 'damageVisibleEnemies').damage === 423, 'stacked bomb applies capped 1.3x scaling');
 }
 
 console.log('Director, pressure, and drop outcome policy tests passed.');

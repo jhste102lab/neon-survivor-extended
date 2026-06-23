@@ -10,6 +10,12 @@ const CFG = {
   weaponSlotStep: 5,
   dropTaperStart: 360,     // 6분부터 일반 보상 드롭률을 다시 낮추기 시작
   idlePressureStart: 480,  // 8분부터 제자리 방치 카운터 시작
+  slowSpeedUnlockTime: 480, // 8분부터 0.5x 정밀 조작 해금
+  clarityStart: 300,       // 5분부터 후반 가독성 보정 시작
+  clarityFull: 480,        // 8분부터 가독성 보정을 강하게 적용
+  dropMergeRadius: 48,
+  maxDropStack: 3,
+  magnetMotionLimit: 80,
   player: { hp: 120, speed: 235, radius: 13, pickup: 115, invuln: 0.72 },
   maxEnemies: 320,
   maxGems: 380,
