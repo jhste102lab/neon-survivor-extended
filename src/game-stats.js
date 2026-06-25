@@ -69,7 +69,8 @@ Object.assign(Game, {
     if (!this.isMobileRuntime()) {
       const late = this.loadShedK(CFG.dropTaperStart || 360, 300);
       const cap = Math.round(lerp(CFG.maxEnemies, CFG.maxEnemies + 90, late)) + endlessBonus;
-      return Math.min(base, Math.max(CFG.lateEnemyCap || 275, cap));
+      const hardCap = this.endless ? (CFG.endlessEnemyCap || 420) : (CFG.preEndlessEnemyCap || 360);
+      return Math.min(base, hardCap, Math.max(CFG.lateEnemyCap || 275, cap));
     }
     const late = clamp((this.time - (CFG.dropTaperStart || 360)) / 300, 0, 1);
     const mobilePressureBonus = Math.min(52, Math.floor(pressureT / 5));

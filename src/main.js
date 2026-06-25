@@ -11,7 +11,9 @@ function boot() {
   try {
     Game.best = RunRecords.loadBest();
     AudioFX.applyPersistedMute();
-  } catch (e) {}
+  } catch (e) {
+    console.warn('Local preference load failed; continuing with defaults.');
+  }
   if (typeof I18N !== 'undefined') I18N.init();
   Profile.initDom();
   Game.reset();
@@ -55,17 +57,22 @@ function boot() {
   let lastPauseTap = 0;
   const togglePause = e => {
     if (e) { e.preventDefault(); e.stopPropagation(); }
+    if (e && e.pointerType && e.isPrimary === false) return;
     const now = performance.now();
-    if (now - lastPauseTap < 220) return;
+    if (now - lastPauseTap < 360) return;
     lastPauseTap = now;
     AudioFX.ensure(); AudioFX.uiClick();
     if (Game.state === 'play') Game.pause();
     else if (Game.state === 'pause') Game.resume();
   };
   const pauseBtn = $('btnPause');
-  pauseBtn.addEventListener('click', togglePause);
-  pauseBtn.addEventListener('pointerdown', togglePause);
-  pauseBtn.addEventListener('touchstart', togglePause, { passive: false });
+  if (window.PointerEvent) {
+    pauseBtn.addEventListener('pointerdown', togglePause);
+    pauseBtn.addEventListener('click', e => { if (e.detail === 0) togglePause(e); });
+  } else {
+    pauseBtn.addEventListener('touchstart', togglePause, { passive: false });
+    pauseBtn.addEventListener('click', togglePause);
+  }
   // 첫 제스처에서 오디오 잠금 해제
   addEventListener('pointerdown', () => AudioFX.ensure(), { once: false });
   addEventListener('contextmenu', e => e.preventDefault());

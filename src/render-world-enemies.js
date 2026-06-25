@@ -4,17 +4,19 @@ const RenderWorldEnemies = (() => {
   const NORMAL_VIEW_PAD = 82;
   const IMPORTANT_VIEW_PAD = 220;
   const BOSS_VIEW_PAD = 520;
-  const MASS_LAYER_ENEMY_THRESHOLD = 300;
+  const MASS_LAYER_ENEMY_THRESHOLD = 999;
+  const MOBILE_MASS_LAYER_ENEMY_THRESHOLD = 999;
   const MASS_LAYER_SCALE = 0.45;
-  const MASS_LAYER_REDRAW_INTERVAL = 3;
+  const MASS_LAYER_REDRAW_INTERVAL = 30;
+  const MOBILE_MASS_LAYER_REDRAW_INTERVAL = 24;
 
   function drawEnemies(render, x, frameContext = null) {
     const t = Game.time;
     const ms = frameContext ? frameContext.mobileScale : render.mobileVisualScale();
     const view = frameContext ? frameContext.view : (render._view || render.viewBounds(0));
     const queryPad = BOSS_VIEW_PAD;
-    if (Game.enemies && Game.enemies.length >= 120) prepareMassEnemyLayer(render);
-    if (shouldUseMassLayer()) {
+    if (Game.enemies && Game.enemies.length >= mobileAwareMassLayerThreshold(render, frameContext)) prepareMassEnemyLayer(render);
+    if (shouldUseMassLayer(render, frameContext)) {
       drawEnemiesWithMassLayer(render, x, t, ms, view, frameContext, queryPad);
       return;
     }
@@ -25,23 +27,36 @@ const RenderWorldEnemies = (() => {
     for (const e of Game.enemies) drawEnemyIfVisible(x, e, t, ms, view);
   }
 
-  function shouldUseMassLayer() {
-    return Game.enemies && Game.enemies.length >= MASS_LAYER_ENEMY_THRESHOLD;
+  function isMobileFrame(render, frameContext) {
+    if (frameContext && frameContext.game && typeof frameContext.game.isMobileRuntime === 'function') return frameContext.game.isMobileRuntime();
+    return render && typeof render.isMobileView === 'function' && render.isMobileView();
+  }
+
+  function mobileAwareMassLayerThreshold(render, frameContext) {
+    return isMobileFrame(render, frameContext) ? MOBILE_MASS_LAYER_ENEMY_THRESHOLD : MASS_LAYER_ENEMY_THRESHOLD;
+  }
+
+  function massLayerRedrawInterval(render, frameContext) {
+    return isMobileFrame(render, frameContext) ? MOBILE_MASS_LAYER_REDRAW_INTERVAL : MASS_LAYER_REDRAW_INTERVAL;
+  }
+
+  function shouldUseMassLayer(render, frameContext) {
+    return Game.enemies && Game.enemies.length >= mobileAwareMassLayerThreshold(render, frameContext);
   }
 
   function drawEnemiesWithMassLayer(render, x, t, ms, view, frameContext, queryPad) {
     const layer = prepareMassEnemyLayer(render);
     const detailed = [];
     collectDetailedEnemies(view, queryPad, detailed);
-    if (shouldRedrawMassLayer(render)) redrawMassEnemyLayer(render, layer, ms, view, frameContext, queryPad);
+    if (shouldRedrawMassLayer(render, frameContext)) redrawMassEnemyLayer(render, layer, ms, view, frameContext, queryPad);
     drawMassLayerToScreen(render, x, layer, frameContext);
     for (const e of detailed) drawEnemyDetailed(x, e, t, ms);
   }
 
-  function shouldRedrawMassLayer(render) {
+  function shouldRedrawMassLayer(render, frameContext) {
     if (!render._massEnemyLayerReady) return true;
     const frame = Game.frameSeq || 0;
-    return frame % MASS_LAYER_REDRAW_INTERVAL === 0;
+    return frame % massLayerRedrawInterval(render, frameContext) === 0;
   }
 
   function collectDetailedEnemies(view, queryPad, detailed) {

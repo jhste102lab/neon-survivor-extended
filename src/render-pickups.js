@@ -49,7 +49,8 @@ Object.assign(Render, {
     const ms = this.mobileVisualScale();
     const sizes = [5.5 * ms, 7 * ms, 10 * ms];
     const clarity = Game.clarityK ? Game.clarityK() : 0;
-    const drawLimit = Math.round(lerp(260, 96, clarity));
+    const mobile = Game.isMobileRuntime && Game.isMobileRuntime();
+    const drawLimit = mobile ? Math.round(lerp(120, 54, clarity)) : Math.round(lerp(260, 96, clarity));
     const stride = Game.gems.length > drawLimit ? Math.ceil(Game.gems.length / drawLimit) : 1;
     let index = 0;
     x.save();
@@ -72,7 +73,9 @@ Object.assign(Render, {
     const visible = frame && frame.worldVisible ? frame.worldVisible : (px, py, pad) => this.worldVisible(px, py, pad);
     const ms = this.mobileVisualScale();
     const clarity = Game.clarityK ? Game.clarityK() : 0;
-    const commonDrawLimit = Game.dropLimit ? Math.max(28, Math.round(Game.dropLimit() * lerp(0.72, 0.42, clarity))) : 96;
+    const mobile = Game.isMobileRuntime && Game.isMobileRuntime();
+    const minDraw = mobile ? 16 : 28;
+    const commonDrawLimit = Game.dropLimit ? Math.max(minDraw, Math.round(Game.dropLimit() * lerp(0.72, 0.42, clarity))) : 96;
     let commonDrawn = 0;
     for (const d of Game.drops) {
       if (!visible(d.x, d.y, 130)) continue;
