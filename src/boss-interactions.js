@@ -1,7 +1,7 @@
 'use strict';
 // Endless boss rush affixes, player debuffs, and low-cost interaction state.
 const BossInteractions = (() => {
-  const NORMAL_AFFIXES = Object.freeze(['devour', 'seal', 'silence', 'distort']);
+  const NORMAL_AFFIXES = Object.freeze(['devour', 'silence', 'distort']);
   const COLORS = Object.freeze({
     devour: '#ff2bd6',
     seal: '#ffd23d',

@@ -59,6 +59,7 @@ const Game = get('Game');
   assert(DirectorSpawnPolicy.normalBatchSize(ctx) >= 1, 'normal batch size should be pure and positive');
   assert(DirectorSpawnPolicy.eliteDelay({ time: 700, winTime: 600, endless: true, threat: 5 }) >= 18, 'elite delay should be pure');
   assert(DirectorSpawnPolicy.scheduledBossIndex({ time: 360, bossIdx: 1, hasBoss: false }) === 1, 'scheduled boss policy returns due boss index');
+  assert(!BossInteractions.NORMAL_AFFIXES.includes('seal'), 'endless boss affix rotation must not block item drops');
   assert(BossInteractions.megaAffixesForTier(3).length === 1, 'mega bosses should keep one affix only');
   const patch = DirectorSpawnPolicy.endlessBossPatternPatch({ ringN: 8, ringCd: 5.7 }, 3, arr => arr[0]);
   assert(patch.endlessTier === 3 && patch.ring, 'endless boss patch should be produced from plain input');
