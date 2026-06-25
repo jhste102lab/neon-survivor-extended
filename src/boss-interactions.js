@@ -1,7 +1,7 @@
 'use strict';
 // Endless boss rush affixes, player debuffs, and low-cost interaction state.
 const BossInteractions = (() => {
-  const NORMAL_AFFIXES = Object.freeze(['devour', 'silence', 'distort']);
+  const NORMAL_AFFIXES = Object.freeze(['devour', 'seal', 'silence', 'distort']);
   const COLORS = Object.freeze({
     devour: '#ff2bd6',
     seal: '#ffd23d',
@@ -28,8 +28,8 @@ const BossInteractions = (() => {
     return NORMAL_AFFIXES[minute % NORMAL_AFFIXES.length];
   }
   function megaAffixesForTier(tier) {
-    const count = Math.min(NORMAL_AFFIXES.length, Math.max(1, Math.floor(tier || 1)));
-    return NORMAL_AFFIXES.slice(0, count);
+    const index = Math.max(0, Math.floor(tier || 1) - 1) % NORMAL_AFFIXES.length;
+    return [NORMAL_AFFIXES[index]];
   }
   function shouldUseMegaSlot(time, winTime = CFG.winTime) {
     if (time < winTime) return false;
@@ -51,7 +51,6 @@ const BossInteractionCastHandlers = Object.freeze({
   silence(game, boss) { game.applyWeaponSilence(boss, boss.bossKind === 'mega' ? 5.2 : 4.4); },
   distort(game, boss) { game.applyControlDistortion(boss, boss.bossKind === 'mega' && game.time >= CFG.winTime + 540 ? 'invert' : 'swirl', boss.bossKind === 'mega' ? 2.7 : 2.2); },
 });
-const BOSS_DROP_HEAL = Object.freeze({ chest: 760, chicken: 420, bomb: 260 });
 const BOSS_RUSH_ENERGY = Object.freeze({
   mega: { gain: 0.18, absorb: 12, color: 'mega', burstN: 18, burstR: 9 },
   normal: { gain: 0.08, absorb: 4, color: 'devour', burstN: 8, burstR: 5 },
@@ -109,9 +108,8 @@ Object.assign(Game, {
     const boss = this.boss || this.enemies.find(e => e.boss);
     if (!boss) return false;
     const energy = BOSS_RUSH_ENERGY[kind] || BOSS_RUSH_ENERGY.normal;
-    const hpGain = boss.maxHp * energy.gain;
-    boss.maxHp += hpGain;
-    boss.hp += hpGain;
+    const maxHpGain = boss.maxHp * energy.gain;
+    boss.maxHp += maxHpGain;
     boss.absorbCount = (boss.absorbCount || 0) + energy.absorb;
     const color = BossInteractions.color(energy.color);
     this.spawnBossLink(this.player.x, this.player.y, boss.x, boss.y, color, 0.55, tr('boss.empowered'));
@@ -236,9 +234,10 @@ Object.assign(Game, {
       if (dist2(d.x, d.y, boss.x, boss.y) > 620 * 620) continue;
       this.pullPickupToBoss(d, boss, dt, 250, 'drop');
       if (dist2(d.x, d.y, boss.x, boss.y) < Math.max(34, boss.r * 0.55) ** 2) {
-        const heal = this.bossDropHealValue(d);
+        const stack = Math.max(1, Math.min(CFG.maxDropStack || 3, Math.round(Number(d.stack) || 1)));
         LootOutcomes.removeAt(this.drops, i);
-        this.healBossFromAbsorb(boss, heal, d.x, d.y, tr('boss.heal', { value: Math.round(heal) }));
+        if (d.kind === 'bomb') this.backfireAbsorbedBomb(boss, stack, d.x, d.y);
+        else this.recordBossAbsorb(boss, d.x, d.y, tr('boss.absorb'), '#7dffc1');
       }
     }
   },
@@ -249,9 +248,8 @@ Object.assign(Game, {
       if (dist2(g.x, g.y, boss.x, boss.y) > 520 * 520) continue;
       this.pullPickupToBoss(g, boss, dt, 210, 'gem');
       if (dist2(g.x, g.y, boss.x, boss.y) < Math.max(30, boss.r * 0.5) ** 2) {
-        const heal = Math.min(220, 32 + (g.v || 1) * 12);
         LootOutcomes.removeAt(this.gems, i);
-        this.healBossFromAbsorb(boss, heal, g.x, g.y, tr('boss.heal', { value: Math.round(heal) }));
+        this.recordBossAbsorb(boss, g.x, g.y, tr('boss.absorb'), '#3dff8e');
       }
     }
   },
@@ -270,17 +268,20 @@ Object.assign(Game, {
     }
   },
 
-  bossDropHealValue(drop) {
-    const stack = Math.max(1, Number(drop.stack || 1));
-    return (BOSS_DROP_HEAL[drop.kind] || 220) * stack;
+  absorbedBombDamage(stack) {
+    return Math.round(250 * Math.pow(1.3, Math.max(0, stack - 1)));
   },
-
-  healBossFromAbsorb(boss, heal, x, y, text) {
-    boss.hp = Math.min(boss.maxHp, boss.hp + heal);
+  backfireAbsorbedBomb(boss, stack, x, y) {
+    const damage = this.absorbedBombDamage(stack);
+    this.recordBossAbsorb(boss, x, y, tr('boss.bombBackfire', { value: damage }), '#ff4d5e');
+    if (typeof this.damageEnemy === 'function') this.damageEnemy(boss, damage, 0, 0, 'drop:bomb:boss-absorb');
+    else boss.hp = Math.max(0, boss.hp - damage);
+    if (this.boss === boss && boss.hp > 0) GameRuntime.updateBossBar(boss);
+  },
+  recordBossAbsorb(boss, x, y, text, color = '#7dffc1') {
     boss.absorbCount = (boss.absorbCount || 0) + 1;
-    this.spawnText(x, y - 16, text, false, '#7dffc1');
-    this.spawnBossLink(x, y, boss.x, boss.y, '#7dffc1', 0.32, '');
-    if (this.boss === boss) GameRuntime.updateBossBar(boss);
+    this.spawnText(x, y - 16, text, false, color);
+    this.spawnBossLink(x, y, boss.x, boss.y, color, 0.32, '');
   },
 
   spawnBossLink(x1, y1, x2, y2, color, life = 0.4, label = '') {

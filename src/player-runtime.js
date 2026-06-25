@@ -1,5 +1,8 @@
 'use strict';
 // Player movement, pressure, recovery, trail, and companion runtime helpers.
+const FocusPickupShelvePolicy = Object.freeze({
+  drop(game, item) { return game.canShelveFocusDrop(item); },
+});
 Object.assign(Game, {
   focusModeActive() {
     return !!this.focusMode && this.state === 'play' && this.player && !this.player.dead;
@@ -16,6 +19,22 @@ Object.assign(Game, {
     for (const g of this.gems || []) if (g && g.focusShelved) count++;
     for (const d of this.drops || []) if (d && d.focusShelved) count += Math.max(1, Number(d.stack || 1));
     return count;
+  },
+
+  focusedDropCount(kind, except = null) {
+    let count = 0;
+    for (const d of this.drops || []) {
+      if (!d || d === except || !d.focusShelved || d.kind !== kind) continue;
+      count += Math.max(1, Number(d.stack || 1));
+    }
+    return count;
+  },
+
+  canShelveFocusDrop(item) {
+    if (!item || !item.kind) return false;
+    const cap = Math.max(1, (CFG.focusMode && CFG.focusMode.dropKindCap) || 3);
+    const stack = Math.max(1, Number(item.stack || 1));
+    return this.focusedDropCount(item.kind, item) + stack <= cap;
   },
 
   dashMaxChargesAtTime(time = this.time) {
@@ -101,6 +120,11 @@ Object.assign(Game, {
   updateFocusPickup(item, dt, kind = 'gem') {
     if (!item) return false;
     if (!this.focusModeActive() || item.bossPull) {
+      item.focusShelved = false;
+      return false;
+    }
+    const shelvePolicy = FocusPickupShelvePolicy[kind];
+    if (shelvePolicy && !shelvePolicy(this, item)) {
       item.focusShelved = false;
       return false;
     }

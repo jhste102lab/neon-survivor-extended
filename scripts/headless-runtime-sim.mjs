@@ -235,7 +235,7 @@ async function smokeBossInteractions() {
   for (let i = 0; i < 10; i++) G.updateBossInteractions(0.1, G.st || G.stat());
   const absorb = { hpDelta: +(boss.hp - beforeHp).toFixed(1), dropsRemoved: beforeDrops + 1 - G.drops.length, absorbCount: boss.absorbCount || 0 };
   G.applyDropSeal(boss, 3);
-  const dropScaleWhileSealed = G.itemDropScale ? G.itemDropScale() : null;
+  const dropSealActive = G.bossDebuffs && G.bossDebuffs.dropSealT > 0;
   G.applyWeaponSilence(boss, 3);
   const silencedWeaponId = G.bossDebuffs.weaponSilenceId;
   const silencedWeapon = (G.player.weapons || []).find(w => w.id === silencedWeaponId);
@@ -243,9 +243,9 @@ async function smokeBossInteractions() {
   G.applyControlDistortion(boss, 'swirl', 3);
   const transformed = G.transformControlVector({ x: 1, y: 0 });
   const controlChanged = Math.abs(transformed.y) > 0.15 || Math.abs(transformed.x - 1) > 0.15;
-  const ok = errors.length === 0 && absorb.hpDelta > 0 && absorb.dropsRemoved >= 1
-    && dropScaleWhileSealed === 0 && !!silencedWeaponId && silenceCheck && controlChanged;
-  return { ok, time: +G.time.toFixed(1), state: G.state, absorb, dropScaleWhileSealed, silencedWeaponId, silenceCheck,
+  const ok = errors.length === 0 && absorb.hpDelta === 0 && absorb.dropsRemoved >= 1
+    && dropSealActive && !!silencedWeaponId && silenceCheck && controlChanged;
+  return { ok, time: +G.time.toFixed(1), state: G.state, absorb, dropSealActive, silencedWeaponId, silenceCheck,
     transformed: { x: +transformed.x.toFixed(3), y: +transformed.y.toFixed(3) }, links: (G.bossLinks || []).length, errors };
 }
 `;

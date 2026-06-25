@@ -26,9 +26,12 @@ for (const [id, evo] of Object.entries(evolutions)) {
 if (weaponIds.length !== 24 || evolutionIds.length !== 24) {
   errors.push(`expected 24 weapons and 24 evolutions, got weapons=${weaponIds.length} evolutions=${evolutionIds.length}`);
 }
+if (passiveIds.size !== 8) {
+  errors.push(`expected 8 passive upgrades, got passives=${passiveIds.size}`);
+}
 if (errors.length) {
   console.error(`evolution contract verification failed with ${errors.length} issue(s):`);
   for (const error of errors) console.error(`- ${error}`);
   process.exit(1);
 }
-console.log('Evolution contract verification passed (24 weapons, 24 evolutions).');
+console.log('Evolution contract verification passed (24 weapons, 24 evolutions, 8 passives).');
