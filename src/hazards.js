@@ -9,7 +9,7 @@ Object.assign(Game, {
       x: opts.x, y: opts.y, r: opts.r || 50,
       warn: opts.warn || 0, maxWarn: opts.warn || 0, life: opts.life || 3, maxLife: opts.life || 3,
       dmg: opts.dmg || 10, tick: 0, tickEvery: opts.tick || 0.55,
-      color: opts.color || '#ff4d1f', source: opts.source || 'hazard', label: opts.label || '',
+      color: opts.color || '#ff4d5e', source: opts.source || 'hazard', label: opts.label || '',
       bypassInvuln: !!opts.bypassInvuln,
     };
     this.hazards.push(h);

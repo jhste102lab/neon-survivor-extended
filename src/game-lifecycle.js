@@ -101,12 +101,31 @@ Object.assign(Game, {
     GameRuntime.banner(tr('banner.endlessContinue'), 'warn');
   },
 
-  onKey(k) {
+  onKey(k, event = null) {
+    if (this.state === 'title' && (k === 'enter' || k === ' ')) { this.start(); return; }
+    if (!event || !event.repeat) {
+      if (k === 'tab' && (this.state === 'play' || this.state === 'pause' || this.state === 'levelup')) {
+        this.focusMode = !this.focusMode;
+        return;
+      }
+      if ((k === 'e' || k === 'ㄷ') && this.state === 'play' && typeof this.consumeFocusPickups === 'function') {
+        this.consumeFocusPickups();
+        return;
+      }
+      if (k === ' ' && this.state === 'play' && typeof this.tryStartDash === 'function') {
+        this.tryStartDash();
+        return;
+      }
+    }
+    if (this.state === 'levelup' && ['1', '2', '3'].includes(k)) { GameRuntime.pickLevelCard(+k - 1); return; }
+    const speedByKey = { '`': 0.5, '~': 0.5, '1': 1, '2': 2, '3': 3 };
+    if (this.state !== 'title' && Object.prototype.hasOwnProperty.call(speedByKey, k)) {
+      this.setUserTimeScale(speedByKey[k]);
+      return;
+    }
     if (k === 'm' || k === 'ㅡ') { GameRuntime.toggleMute(); return; }
     if (this.state === 'play' && (k === 'p' || k === 'ㅔ' || k === 'escape')) this.pause();
     else if (this.state === 'pause' && (k === 'p' || k === 'ㅔ' || k === 'escape')) this.resume();
-    else if (this.state === 'levelup' && ['1', '2', '3'].includes(k)) GameRuntime.pickLevelCard(+k - 1);
-    else if (this.state === 'title' && (k === 'enter' || k === ' ')) this.start();
     else if ((this.state === 'over' || this.state === 'win') && k === 'enter') this.start();
   },
 });

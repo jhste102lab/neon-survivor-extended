@@ -49,11 +49,24 @@
   </div>
   <div id="killwrap"><span id="killNum">💀 0</span><br><span class="best" id="bestMini"></span></div>
   <div id="slotwrap">
+    <button class="focusChip" id="btnFocusMode" type="button">TAB FOCUS</button>
     <div id="weaponCount" class="weaponCount">Weapons 1/5</div>
     <div class="slotrow" id="wslots"></div>
     <div class="slotrow" id="pslots"></div>
   </div>
   <div id="combo"><span class="lbl">COMBO</span><span id="comboNum">x0</span></div>
+  <div id="dashHud" class="dashHud">
+    <div class="dashLabel">DASH</div>
+    <div class="dashMeter">
+      <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <circle class="dashMeterBg" cx="32" cy="32" r="24"></circle>
+        <circle class="dashMeterRing" id="dashMeterRing" cx="32" cy="32" r="24"></circle>
+      </svg>
+      <div class="dashMeterText" id="dashMeterText">READY</div>
+    </div>
+    <div class="dashSlots" id="dashSlots"></div>
+    <div class="dashCount" id="dashCount">2 / 2</div>
+  </div>
   <div id="bosswrap"><div id="bossname"></div><div id="bossbar"><div id="bossfill"></div></div></div>
   <div class="vin"></div>
   <div id="hurtfx"></div><div id="lvlfx"></div><div id="dangerfx"></div>
@@ -86,10 +99,10 @@
         <button class="miniBtn" id="btnRandomNick" type="button" data-i18n="profile.random">Random</button>
       </div>
       <div class="profileHint" data-i18n="profile.hint">Example: BraveOtter1234@ · duplicate names are allowed</div>
-      <div class="profileSpeedHint" data-i18n="profile.speedHint">Speed can be changed during play from the 1x / 2x / 3x buttons.</div>
     </div>
     <div class="leaderboard" id="titleLeaderboard"></div>
     <button class="btn primary" id="btnStart" data-i18n="button.start">Start Game</button>
+    <div class="titleControlsHint" data-i18n-html="title.controlsHint"><kbd>SPACE</kbd> Dash · <kbd>TAB</kbd> Focus · Scout Neon + <kbd>E</kbd> Collect</div>
     <button class="btn hide" id="btnContinueRun" data-i18n="button.continueRun">Continue Run</button>
     <div class="help desktopHelp">
       <span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / <kbd>↑</kbd><kbd>↓</kbd><kbd>←</kbd><kbd>→</kbd></span><span data-i18n="help.move">Move (attacks are automatic!)</span>
@@ -98,7 +111,7 @@
     </div>
     <div class="mobileHelp" data-i18n="help.mobile">Drag the lower screen to move · attacks are automatic · the game pauses when hidden</div>
     <div class="tip" data-i18n-html="help.tip">💡 Defeat enemies, collect gems, and build your own weapon combo on level-up!<br>On mobile, drag the lower part of the screen to move.</div>
-    <div class="wver" data-i18n="app.version">v1.1.6 · Cloudflare build</div>
+    <div class="wver" data-i18n="app.version">v1.1.7 · Cloudflare build</div>
   </div>
 </div>
 
@@ -199,6 +212,7 @@
 <script src="src/game-loop-stats.js"></script>
 <script src="src/game-loop-slots.js"></script>
 <script src="src/player-runtime.js"></script>
+<script src="src/support-buffs.js"></script>
 <script src="src/game-loop-weapons.js"></script>
 <script src="src/game-loop-death.js"></script>
 <script src="src/game-loop-world.js"></script>

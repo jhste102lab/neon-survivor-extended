@@ -36,6 +36,11 @@ function boot() {
   bind('btnToTitle', () => UI.toTitle());
   bind('btnToTitle2', () => UI.toTitle());
   bind('btnRandomNick', () => Profile.randomizeInput());
+  const focusBtn = $('btnFocusMode');
+  if (focusBtn) focusBtn.addEventListener('click', () => {
+    AudioFX.ensure(); AudioFX.uiClick();
+    if (['play', 'pause', 'levelup'].includes(Game.state)) Game.focusMode = !Game.focusMode;
+  });
   const speedControls = $('speedControls');
   if (speedControls) speedControls.addEventListener('click', event => {
     const btn = event.target && event.target.closest ? event.target.closest('.speedBtn') : null;
@@ -51,7 +56,9 @@ function boot() {
       btn.disabled = isSlow && !slowAllowed;
       btn.classList.toggle('locked', isSlow && !slowAllowed);
       btn.classList.toggle('active', btn.dataset.speed === speed);
-      if (isSlow) btn.title = slowAllowed ? 'Precision speed' : 'Unlocks at 08:00';
+      const shortcut = { '0.5': '~', '1': '1', '2': '2', '3': '3' }[btn.dataset.speed] || '';
+      const baseTitle = isSlow ? (slowAllowed ? 'Precision speed' : 'Unlocks at 08:00') : `${btn.dataset.speed}x speed`;
+      btn.title = shortcut ? `${baseTitle} · shortcut ${shortcut}` : baseTitle;
     });
   };
   UI.syncSpeedControls(Game.userTimeScale || 1);

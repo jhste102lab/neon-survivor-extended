@@ -126,13 +126,6 @@ Object.assign(Game, {
   },
 
   itemDropScale() {
-    if (this.bossDebuffs && this.bossDebuffs.dropSealT > 0) return 0;
-    const start = CFG.dropTaperStart || 360;
-    if (!this.player || this.time < start) return 1;
-    const settle = clamp((this.time - start) / 120, 0, 1);
-    const afterMinutes = Math.max(0, (this.time - start - 120) / 60);
-    let scale = lerp(1, 0.68, settle) / Math.pow(1.07, afterMinutes);
-    if (this.player.weapons.length >= Object.keys(WEAPONS).length) scale *= 0.82;
-    return clamp(scale, 0.38, 1);
+    return 1;
   },
 });

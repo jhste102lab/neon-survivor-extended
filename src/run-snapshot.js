@@ -52,6 +52,7 @@ const RunSnapshot = {
         blades: game.blades,
         frameSeq: game.frameSeq,
         endless: game.endless,
+        focusMode: !!game.focusMode,
         activeEvent: game.activeEvent,
         bossDebuffs: game.bossDebuffs,
         nextEventT: game.nextEventT,
@@ -145,7 +146,7 @@ const RunSnapshot = {
     game.kills = run.kills || 0; game.combo = run.combo || 0; game.comboT = run.comboT || 0; game.maxCombo = run.maxCombo || 0;
     game.levelQueue = run.levelQueue || 0; game.deathT = -1; game.novaSeq = run.novaSeq || 0;
     game.dir = run.dir || game.dir; game.cam = run.cam || game.cam; game.blades = run.blades || game.blades;
-    game.frameSeq = run.frameSeq || 0; game.endless = !!run.endless; game.activeEvent = run.activeEvent || null;
+    game.frameSeq = run.frameSeq || 0; game.endless = !!run.endless; game.focusMode = !!run.focusMode; game.activeEvent = run.activeEvent || null;
     game.bossDebuffs = run.bossDebuffs || game.bossDebuffs;
     game.nextEventT = run.nextEventT || game.nextEventT; game.lastBossSpawnT = run.lastBossSpawnT || -999;
     game.idleT = run.idleT || 0; game.lastIdleWarnT = run.lastIdleWarnT || -999; game.unlockNotified = !!run.unlockNotified;

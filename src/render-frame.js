@@ -38,6 +38,7 @@ const RenderFrame = {
   },
 
   drawPlayLayers(render, x, frame) {
+    const focusMode = !!frame.game.focusMode;
     render.drawGrid(x, frame.width, frame.height, frame);
     render.drawFrost(x, frame);
     render.drawGems(x, frame);
@@ -46,14 +47,14 @@ const RenderFrame = {
     if (render.drawEvents) render.drawEvents(x, frame);
     render.drawNovas(x, frame);
     if (render.drawMegaAbsorbs) render.drawMegaAbsorbs(x, frame);
-    render.drawBeams(x, frame);
+    if (!focusMode) render.drawBeams(x, frame);
     render.drawEnemies(x, frame);
     if (render.drawBossInteractions) render.drawBossInteractions(x, frame);
-    render.drawBlades(x, frame);
-    if (render.drawDrones) render.drawDrones(x, frame);
-    render.drawBullets(x, frame);
-    render.drawBolts(x, frame);
-    if (render.drawCompanions) render.drawCompanions(x, frame);
+    if (!focusMode) render.drawBlades(x, frame);
+    if (!focusMode && render.drawDrones) render.drawDrones(x, frame);
+    if (!focusMode) render.drawBullets(x, frame);
+    if (!focusMode) render.drawBolts(x, frame);
+    if (!focusMode && render.drawCompanions) render.drawCompanions(x, frame);
     render.drawPlayer(x, frame);
     render.drawEnemyBullets(x, frame);
   },

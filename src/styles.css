@@ -35,6 +35,13 @@ canvas#c{position:fixed;inset:0;display:block}
 #killwrap{position:fixed;top:16px;right:16px;text-align:right;font-size:18px;line-height:1.45;text-shadow:0 0 8px rgba(255,80,120,.6)}
 #killwrap .best{font-size:12px;color:#8fa3c8;text-shadow:none}
 #slotwrap{position:fixed;left:16px;bottom:14px;display:flex;flex-direction:column;gap:7px}
+.focusChip{pointer-events:auto;align-self:flex-start;height:28px;padding:0 12px;border-radius:999px;border:1px solid rgba(25,227,255,.36);background:rgba(6,16,34,.76);color:#9fd9ff;font-family:var(--font-en);font-size:10px;letter-spacing:1px;cursor:pointer;transition:transform .12s,box-shadow .12s,border-color .12s,background .12s,filter .12s}
+.focusChip:hover{transform:translateY(-1px);border-color:var(--cy);box-shadow:0 0 14px rgba(25,227,255,.2)}
+.focusChip.active{color:#08111e;background:linear-gradient(135deg,#9ff3ff,#7dffc1);border-color:transparent;box-shadow:0 0 18px rgba(25,227,255,.35);animation:focusChipPulse 1.8s ease-in-out infinite}
+.focusChip.recall{background:linear-gradient(135deg,#7dffc1,#ffd23d);box-shadow:0 0 20px rgba(125,255,193,.28)}
+.focusChip.recallReady{background:linear-gradient(135deg,#7dffc1,#ffd23d,#ffb6ec);box-shadow:0 0 24px rgba(255,210,61,.4),0 0 44px rgba(125,255,193,.3);filter:saturate(1.18);animation:focusChipRecallPulse .72s ease-in-out infinite}
+@keyframes focusChipPulse{0%,100%{box-shadow:0 0 14px rgba(25,227,255,.22)}50%{box-shadow:0 0 24px rgba(25,227,255,.4)}}
+@keyframes focusChipRecallPulse{0%,100%{transform:translateY(0) scale(1);box-shadow:0 0 18px rgba(255,210,61,.28),0 0 36px rgba(125,255,193,.22)}50%{transform:translateY(-1px) scale(1.03);box-shadow:0 0 30px rgba(255,210,61,.54),0 0 56px rgba(125,255,193,.36)}}
 .weaponCount{align-self:flex-start;font-family:var(--font-en);font-size:11px;letter-spacing:1px;color:#bdefff;background:rgba(10,14,34,.72);border:1px solid rgba(25,227,255,.3);border-radius:999px;padding:3px 9px;box-shadow:0 0 10px rgba(25,227,255,.12)}
 .slotrow{display:flex;gap:7px}
 .slot{width:46px;height:46px;border-radius:11px;background:rgba(10,14,34,.82);border:1px solid rgba(25,227,255,.35);
@@ -53,6 +60,20 @@ canvas#c{position:fixed;inset:0;display:block}
 #combo.pop{animation:comboPop .22s ease-out forwards}
 #combo .lbl{font-size:15px;display:block;text-align:center;letter-spacing:4px;color:#ffb6ec}
 @keyframes comboPop{0%{opacity:.4;transform:scale(1.5)}100%{opacity:1;transform:scale(1)}}
+#dashHud{position:fixed;left:50%;bottom:118px;transform:translateX(-50%);display:flex;align-items:center;gap:12px;pointer-events:none;padding:9px 15px;border-radius:18px;background:linear-gradient(180deg,rgba(14,22,44,.88),rgba(6,10,26,.78));border:1px solid rgba(255,255,255,.14);box-shadow:0 0 24px rgba(25,227,255,.12),inset 0 0 18px rgba(25,227,255,.06);backdrop-filter:blur(6px)}
+#dashHud.active{box-shadow:0 0 30px rgba(125,255,193,.26),inset 0 0 24px rgba(125,255,193,.14)}
+#dashHud.ready{box-shadow:0 0 26px rgba(255,210,61,.22),0 0 42px rgba(25,227,255,.15),inset 0 0 20px rgba(255,210,61,.08)}
+.dashLabel{font-family:var(--font-en);font-size:11px;letter-spacing:2px;color:#9fd9ff;text-shadow:0 0 10px rgba(25,227,255,.28)}
+.dashMeter{position:relative;width:42px;height:42px}
+.dashMeter svg{display:block;width:42px;height:42px;transform:rotate(-90deg)}
+.dashMeterBg{fill:none;stroke:rgba(255,255,255,.10);stroke-width:6}
+.dashMeterRing{fill:none;stroke:url(#none);stroke:#7dffc1;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset .16s,stroke .16s;filter:drop-shadow(0 0 8px rgba(125,255,193,.34))}
+.dashMeterText{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-en);font-size:9px;color:#eaffff;letter-spacing:.5px;text-shadow:0 0 10px rgba(25,227,255,.26)}
+.dashSlots{display:flex;gap:5px;align-items:center}
+.dashSlots i{width:12px;height:12px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);box-shadow:inset 0 0 8px rgba(255,255,255,.04)}
+.dashSlots i.on{background:linear-gradient(135deg,#7dffc1,#9ff3ff);border-color:transparent;box-shadow:0 0 12px rgba(125,255,193,.34),0 0 22px rgba(25,227,255,.18)}
+.dashSlots i.next{background:linear-gradient(135deg,rgba(255,210,61,.26),rgba(25,227,255,.20));border-color:rgba(255,210,61,.28);box-shadow:0 0 10px rgba(255,210,61,.16)}
+.dashCount{min-width:56px;text-align:right;font-family:var(--font-en);font-size:14px;color:#fff;text-shadow:0 0 10px rgba(125,255,193,.2)}
 #bosswrap{position:fixed;left:50%;bottom:78px;transform:translateX(-50%);width:46%;min-width:300px;display:none}
 #bosswrap.on{display:block}
 #bossname{text-align:center;font-size:15px;color:#ffc4cc;text-shadow:0 0 10px var(--rd);margin-bottom:4px;letter-spacing:2px}
@@ -105,6 +126,8 @@ canvas#c{position:fixed;inset:0;display:block}
 .profileHint{margin-top:6px;color:#6f87a8;font-size:12px;text-align:center}
 .profileTitle{font-family:var(--font-en);letter-spacing:2px;text-align:center;color:#eaffff;font-size:13px;margin-bottom:8px;text-shadow:0 0 12px rgba(25,227,255,.4)}
 .profileSpeedHint{margin-top:6px;color:#ffd23d;font-size:11px;text-align:center;text-shadow:0 0 10px rgba(255,210,61,.22)}
+.profileControlsHint{margin-top:7px;color:#9fd9ff;font-size:11px;line-height:1.55;text-align:center}
+.profileControlsHint kbd{font-family:var(--font-en);font-size:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);border-bottom-width:3px;border-radius:6px;padding:2px 7px;color:#fff;margin:0 2px}
 .leaderboard{margin:8px auto 10px;max-width:520px;padding:12px 14px;border-radius:16px;background:rgba(2,8,20,.54);border:1px solid rgba(255,255,255,.12)}
 .resultLb{margin-top:0;margin-bottom:16px}
 .lbHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;color:#dffaff;font-size:15px}
@@ -112,6 +135,10 @@ canvas#c{position:fixed;inset:0;display:block}
 .lbWarn{margin:-2px 0 7px;color:#ffcf8a;font-size:10px;line-height:1.35;opacity:.82}
 .lbRow{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:8px;align-items:center;padding:5px 0;border-top:1px solid rgba(255,255,255,.06);font-size:13px}
 .lbRow:first-of-type{border-top:0}
+.lbRow.me{border-radius:12px;padding:8px 10px;margin:3px -6px;background:linear-gradient(135deg,rgba(255,210,61,.18),rgba(25,227,255,.12));border:1px solid rgba(255,210,61,.42);box-shadow:0 0 18px rgba(255,210,61,.14),inset 0 0 18px rgba(25,227,255,.08)}
+.lbRow.me .lbRank{color:#fff1a8;text-shadow:0 0 10px rgba(255,210,61,.55)}
+.lbRow.me .lbName{color:#fff}
+.lbRow.me .lbStat{color:#dffaff}
 .lbRank{font-family:var(--font-en);color:#ffd23d;font-size:11px}
 .lbName{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff;text-align:left}
 .lbStat{color:#94abc9;text-align:right;font-family:Arial,sans-serif;font-size:12px}
@@ -125,6 +152,8 @@ canvas#c{position:fixed;inset:0;display:block}
   background:linear-gradient(135deg,var(--cy),#6df0ff);box-shadow:0 0 30px rgba(25,227,255,.55)}
 .btn.primary:hover{box-shadow:0 0 46px rgba(25,227,255,.85);transform:translateY(-3px) scale(1.02)}
 .btn.ghost{font-size:15px;padding:8px 22px;border-color:rgba(255,255,255,.25);color:#b9c9e8}
+.titleControlsHint{margin:8px auto 8px;display:block;width:fit-content;max-width:min(92vw,560px);padding:8px 14px;border-radius:16px;background:rgba(25,227,255,.05);border:1px solid rgba(25,227,255,.18);color:#a8dbff;font-size:11px;line-height:1.6;text-align:center}
+.titleControlsHint kbd{font-family:var(--font-en);font-size:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);border-bottom-width:3px;border-radius:6px;padding:2px 7px;color:#fff;margin:0 2px}
 .help{display:grid;grid-template-columns:auto auto;gap:7px 18px;justify-content:center;align-items:center;
   margin:10px auto 4px;font-size:15px;color:#a8c8d8;text-align:left}
 .help kbd{font-family:var(--font-en);font-size:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.22);
@@ -165,6 +194,7 @@ h2.ovtitle{font-family:var(--font-en);font-weight:900;font-size:38px;letter-spac
 .statgrid .k{color:#8fa3c8;text-align:right}
 .statgrid .v{color:#fff;text-align:left;font-family:var(--font-en);font-weight:700}
 .newbest{display:inline-block;margin-bottom:14px;color:#ffd23d;font-size:18px;text-shadow:0 0 14px rgba(255,210,61,.7);animation:pulseG 1s ease-in-out infinite}
+.newbestName{margin:-6px 0 12px;color:#fff1a8;font-family:var(--font-en);font-size:15px;letter-spacing:1px;text-shadow:0 0 12px rgba(255,210,61,.35)}
 @keyframes pulseG{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
 #buildList{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:14px 0 18px;max-width:520px}
 #buildList .bslot{width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,.05);border:1px solid rgba(25,227,255,.3);
@@ -215,6 +245,7 @@ h2.ovtitle{font-family:var(--font-en);font-weight:900;font-size:38px;letter-spac
   .lbStat{grid-column:2;text-align:left;font-size:11px}
   #movePad{display:block;height:calc(150px + env(safe-area-inset-bottom,0px))}
   #slotwrap{left:8px;right:62px;bottom:calc(10px + env(safe-area-inset-bottom,0px));gap:4px;max-width:calc(100vw - 78px)}
+  .focusChip{height:25px;padding:0 10px;font-size:9px}
   .weaponCount{font-size:10px;padding:2px 7px;background:rgba(10,14,34,.62)}
   .slotrow{flex-wrap:wrap;gap:4px;max-width:100%}
   .slot{width:36px;height:36px;border-radius:9px;font-size:19px}
@@ -225,6 +256,8 @@ h2.ovtitle{font-family:var(--font-en);font-weight:900;font-size:38px;letter-spac
   .speedControls{right:58px;bottom:calc(10px + env(safe-area-inset-bottom,0px));padding:4px;gap:3px}.speedBtn{min-width:31px;height:32px;font-size:11px}
   .pausebtn.on{display:flex;right:10px;bottom:calc(58px + env(safe-area-inset-bottom,0px));width:42px;height:42px}
   #timer{top:66px}
+  #dashHud{bottom:112px;padding:7px 11px;gap:10px}
+  .dashMeter{width:38px;height:38px}.dashMeter svg{width:38px;height:38px}.dashMeterText{font-size:8px}.dashCount{font-size:12px;min-width:48px}.dashSlots i{width:10px;height:10px}
   #bosswrap{top:104px;bottom:auto;min-width:230px;width:72%}
   #bannerwrap{top:12%;gap:5px}
   .banner{max-width:86vw;font-size:16px;line-height:1.25;padding:7px 14px;text-align:center}
@@ -239,6 +272,7 @@ h2.ovtitle{font-family:var(--font-en);font-weight:900;font-size:38px;letter-spac
   .mutebtn{right:10px;bottom:calc(8px + env(safe-area-inset-bottom,0px));width:40px;height:40px}
   .speedControls{right:56px;bottom:calc(8px + env(safe-area-inset-bottom,0px));padding:3px;gap:2px}.speedBtn{min-width:29px;height:30px;font-size:10px}
   .pausebtn.on{display:flex;right:58px;bottom:calc(8px + env(safe-area-inset-bottom,0px));width:40px;height:40px}
+  #dashHud{bottom:74px;padding:5px 10px;gap:8px}
   #bosswrap{top:70px;bottom:auto;min-width:230px;width:54%}
   #bannerwrap{top:12%;gap:4px}
   .banner{max-width:78vw;font-size:14px;line-height:1.22;padding:5px 12px}

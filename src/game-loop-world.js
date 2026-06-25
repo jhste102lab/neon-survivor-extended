@@ -4,6 +4,7 @@ Object.assign(Game, {
   updateWorldSystems(dt, st) {
     this.director(dt);
     if (this.updateEvents) this.updateEvents(dt, st);
+    if (this.updateSupportBuffs) this.updateSupportBuffs(dt, st);
     this.updateEnemies(dt, st);
     this.updateBullets(dt, st);
     this.updateEBullets(dt);

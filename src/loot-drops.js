@@ -49,6 +49,7 @@ const LootDrops = {
         continue;
       }
       d.bob += dt * 2.5;
+      if (this.updateFocusPickup && this.updateFocusPickup(d, dt, 'drop')) continue;
       if (d.bossPullT > 0) d.bossPullT -= dt;
       else d.bossPull = false;
       if (dist2(d.x, d.y, p.x, p.y) < 42 * 42) {

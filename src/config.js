@@ -17,6 +17,8 @@ const CFG = {
   maxDropStack: 3,
   magnetMotionLimit: 80,
   player: { hp: 120, speed: 235, radius: 13, pickup: 115, invuln: 0.72 },
+  dash: { maxCharges: 2, growthStart: 480, growthEvery: 120, recharge: 4.8, duration: 0.14, speed: 760, invuln: 0.2, trailEvery: 0.02 },
+  focusMode: { pullRadius: 360, pullSpeed: 560, holdRadiusGem: 66, holdRadiusDrop: 78 },
   maxEnemies: 320,
   maxGems: 380,
   maxPlayerBullets: 450,

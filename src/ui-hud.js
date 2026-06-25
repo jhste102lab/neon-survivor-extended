@@ -60,4 +60,12 @@ Object.assign(UI, {
   hideBossBar() {
     return UIHudBoss.hideBossBar();
   },
+
+  updateDashHud(game = Game) {
+    return UIHudBoss.updateDashHud(game);
+  },
+
+  updateFocusChip(game = Game) {
+    return UIHudBoss.updateFocusChip(game);
+  },
 });

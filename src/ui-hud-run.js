@@ -11,5 +11,7 @@ const UIHudRun = {
     UIHudXp.reset();
     UIHudHp.reset();
     UI.refreshSlots();
+    if (UI.updateDashHud) UI.updateDashHud(Game);
+    if (UI.updateFocusChip) UI.updateFocusChip(Game);
   },
 };

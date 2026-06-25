@@ -18,6 +18,31 @@ Object.assign(Game, {
     return this.playerBulletLimit ? this.playerBulletLimit() : CFG.maxPlayerBullets;
   },
 
+  playerBulletTrimIndexForSpawn() {
+    if (!this.bullets.length) return -1;
+    const view = GameRuntime.viewportHalf ? GameRuntime.viewportHalf() : { w: 960, h: 540 };
+    const pad = 180;
+    const left = this.cam.x - view.w - pad, right = this.cam.x + view.w + pad;
+    const top = this.cam.y - view.h - pad, bottom = this.cam.y + view.h + pad;
+    let offscreen = -1, offscreenLife = Infinity, any = 0, anyLife = Infinity;
+    for (let i = 0; i < this.bullets.length; i++) {
+      const x = this.bullets[i];
+      const life = x.life == null ? 9 : x.life;
+      if (life < anyLife) { anyLife = life; any = i; }
+      const out = x.x < left || x.x > right || x.y < top || x.y > bottom;
+      if (out && life < offscreenLife) { offscreenLife = life; offscreen = i; }
+    }
+    return offscreen >= 0 ? offscreen : any;
+  },
+
+  trimPlayerBulletForSpawn() {
+    const idx = this.playerBulletTrimIndexForSpawn();
+    if (idx < 0) return false;
+    const last = this.bullets.pop();
+    if (idx < this.bullets.length) this.bullets[idx] = last;
+    return true;
+  },
+
   pushPlayerBullet(b) {
     if (!b) return false;
     b.source = b.source || (b.kind ? `weapon:${b.kind}` : 'weapon:unknown');
@@ -27,7 +52,9 @@ Object.assign(Game, {
       if ((x.kind === b.kind) && (!!x.child === !!b.child) && (b.kind !== 'companion' || x.source === b.source)) same++;
     }
     if (same >= cap) return false;
-    while (this.bullets.length >= (this.playerBulletLimit ? this.playerBulletLimit() : CFG.maxPlayerBullets)) this.bullets.pop();
+    while (this.bullets.length >= (this.playerBulletLimit ? this.playerBulletLimit() : CFG.maxPlayerBullets)) {
+      if (!this.trimPlayerBulletForSpawn()) break;
+    }
     this.bullets.push(b);
     return true;
   },

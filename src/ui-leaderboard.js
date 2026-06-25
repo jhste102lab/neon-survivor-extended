@@ -44,6 +44,8 @@ Object.assign(UI, {
       return;
     }
     const entries = Leaderboard.entries || [];
+    const highlightRunId = opts.highlightRunId || Leaderboard.highlightRunId || '';
+    const highlightName = opts.highlightName || Leaderboard.highlightName || '';
     if (!entries.length) {
       const empty = document.createElement('div');
       empty.className = 'lbEmpty';
@@ -54,12 +56,15 @@ Object.assign(UI, {
     entries.slice(0, Leaderboard.publicLimit).forEach((e, i) => {
       const row = document.createElement('div');
       row.className = 'lbRow';
+      const isMine = !!((highlightRunId && e.runId === highlightRunId) || (!highlightRunId && highlightName && e.name === highlightName));
+      row.classList.toggle('me', isMine);
       const rank = document.createElement('span');
       rank.className = 'lbRank';
       rank.textContent = `#${i + 1}`;
       const name = document.createElement('span');
       name.className = 'lbName';
       name.textContent = e.name;
+      if (isMine) name.setAttribute('title', `#${i + 1}`);
       const stat = document.createElement('span');
       stat.className = 'lbStat';
       stat.textContent = tr('leaderboard.stat', { time: fmtTime(e.time), kills: e.kills, level: e.level, combo: e.maxCombo || 0 });

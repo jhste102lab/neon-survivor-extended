@@ -12,7 +12,7 @@ loadClassic('src/i18n-ui-copy.js', context);
 loadClassic('src/i18n-content.js', context);
 const copy = vm.runInContext('I18N_UI_COPY', context);
 const content = vm.runInContext('I18N_CONTENT', context);
-const htmlAllowed = new Set(['help.tip', 'leaderboard.bestLine']);
+const htmlAllowed = new Set(['help.tip', 'profile.controlsHint', 'title.controlsHint', 'leaderboard.bestLine']);
 const markupPattern = /<[^>]+>/;
 
 for (const [locale, dict] of Object.entries(copy)) {

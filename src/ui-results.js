@@ -4,6 +4,19 @@
    UI results
    ================================================================ */
 Object.assign(UI, {
+  setNewBestName(targetId, visible) {
+    const badge = $(targetId);
+    if (!badge || !badge.parentNode) return;
+    let nameEl = badge.parentNode.querySelector('.newbestName');
+    if (!nameEl) {
+      nameEl = document.createElement('div');
+      nameEl.className = 'newbestName hide';
+      badge.insertAdjacentElement('afterend', nameEl);
+    }
+    nameEl.textContent = Profile.ensureName();
+    nameEl.classList.toggle('hide', !visible);
+  },
+
   statsHtml() {
     const G = Game;
     return `
@@ -24,6 +37,7 @@ Object.assign(UI, {
     UI.hideBossBar();
     const newBest = this.saveRecord(false);
     $('nbOver').classList.toggle('hide', !newBest);
+    this.setNewBestName('nbOver', newBest);
     $('overStats').innerHTML = this.statsHtml();
     LeaderboardController.submitRunAndRefresh({ won: false, targetId: 'overLeaderboard' });
     showOverlay('overOv');
@@ -37,6 +51,7 @@ Object.assign(UI, {
     AudioFX.win();
     const newBest = this.saveRecord(true);
     $('nbWin').classList.toggle('hide', !newBest);
+    this.setNewBestName('nbWin', newBest);
     $('winStats').innerHTML = this.statsHtml();
     LeaderboardController.submitRunAndRefresh({ won: true, targetId: 'winLeaderboard' });
     showOverlay('winOv');

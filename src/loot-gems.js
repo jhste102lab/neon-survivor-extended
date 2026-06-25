@@ -16,6 +16,7 @@ const LootGems = {
     const pr2 = st.pickup * st.pickup;
     for (let i = this.gems.length - 1; i >= 0; i--) {
       const g = this.gems[i];
+      if (this.updateFocusPickup && this.updateFocusPickup(g, dt, 'gem')) { g.mag = false; g.ms = 0; continue; }
       if (g.bossPullT > 0) g.bossPullT -= dt;
       else g.bossPull = false;
       g.bob += dt * 3;

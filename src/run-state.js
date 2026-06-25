@@ -21,6 +21,7 @@ function createInitialRunState(options = {}) {
     frameSeq: 0,
     frameTargets: null,
     endless: false,
+    focusMode: false,
     st: null,
     activeEvent: null,
     bossDebuffs: { controlT: 0, controlMode: '', controlAngle: 0, dropSealT: 0, weaponSilenceT: 0, weaponSilenceId: '' },
@@ -39,6 +40,7 @@ function createInitialRunState(options = {}) {
     player: {
       x: 0, y: 0, hp: CFG.player.hp, level: 1, xp: 0, xpNeed: CFG.xpNeed(1),
       invuln: 0, dead: false, moveX: 0, moveY: 1, trailT: 0,
+      dashCharges: CFG.dash.maxCharges, dashRechargeT: 0, dashActiveT: 0, dashDirX: 0, dashDirY: 1, dashTrailT: 0, dashMaxSeen: CFG.dash.maxCharges,
       weapons: [{ id: 'bolt', lv: 1, timer: 0.3 }],
       passives: {},
       transcend: { dmg: 0, cd: 0, hp: 0, spd: 0 },

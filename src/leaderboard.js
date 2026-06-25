@@ -11,6 +11,8 @@ const Leaderboard = {
   fallbackReason: '',
   activeRunId: '',
   activeProof: '',
+  highlightRunId: '',
+  highlightName: '',
   sessionSeq: 0,
   pendingSessionRunId: '',
   pendingSessionPromise: null,
@@ -79,6 +81,8 @@ const Leaderboard = {
   async submit(entry) {
     const normalized = this.normalizeEntry(entry);
     if (!normalized) return { ok: false, source: this.source, error: 'invalid entry' };
+    this.highlightRunId = normalized.runId;
+    this.highlightName = normalized.name;
 
     const local = this.upsert(this.readLocal(), normalized);
     this.writeLocal(local);

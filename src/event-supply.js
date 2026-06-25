@@ -12,7 +12,7 @@ Object.assign(Game, {
       this.spawnHazard({
         kind: 'supply', x: ev.x + Math.cos(a) * rand(95, 150), y: ev.y + Math.sin(a) * rand(95, 150),
         r: 44, warn: 0.9, life: 4.6, dmg: 11, tick: 0.6,
-        color: '#7dffc1', source: 'event:supply', label: 'DROP',
+        color: '#ff4d5e', source: 'event:supply', label: 'DANGER',
       });
     }
     if (ev.hold >= 6) this.completeEvent(ev, true);

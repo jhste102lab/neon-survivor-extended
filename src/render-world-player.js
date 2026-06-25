@@ -24,7 +24,7 @@ const RenderWorldPlayer = (() => {
   function drawPlayerAura(x, p, ms) {
     x.globalCompositeOperation = 'lighter';
     const aura = Sprites.glowDot('#19e3ff', 16 * ms);
-    x.globalAlpha = 0.45;
+    x.globalAlpha = Game.focusMode ? 0.18 : 0.45;
     x.drawImage(aura, p.x - 52 * ms, p.y - 52 * ms, 104 * ms, 104 * ms);
     x.globalAlpha = 1;
   }

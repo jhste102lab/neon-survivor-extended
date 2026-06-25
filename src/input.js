@@ -3,11 +3,12 @@
 /* ---------------- 입력 ---------------- */
 function bindKeyboardInput(input) {
   addEventListener('keydown', e => {
+    const game = typeof GameRuntime !== 'undefined' ? GameRuntime.activeGame() : null;
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) e.preventDefault();
+    if (e.key === 'Tab' && game && ['play', 'pause', 'levelup'].includes(game.state)) e.preventDefault();
     input.keys[e.key.toLowerCase()] = true;
     if (typeof GameRuntime !== 'undefined') {
-      const game = GameRuntime.activeGame();
-      if (game && typeof game.onKey === 'function') game.onKey(e.key.toLowerCase());
+      if (game && typeof game.onKey === 'function') game.onKey(e.key.toLowerCase(), e);
     }
   });
   addEventListener('keyup', e => { input.keys[e.key.toLowerCase()] = false; });

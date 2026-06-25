@@ -1,7 +1,7 @@
 'use strict';
 // DOM localization binding/application and runtime UI refresh helpers.
 var I18N_DOM = {
-  htmlKeys: Object.freeze(['help.tip', 'leaderboard.bestLine']),
+  htmlKeys: Object.freeze(['help.tip', 'profile.controlsHint', 'title.controlsHint', 'leaderboard.bestLine']),
 
   assertHtmlAllowed(key) {
     if (!this.htmlKeys.includes(key)) throw new Error(`Translation key is not HTML-allowlisted: ${key}`);
@@ -88,7 +88,9 @@ var I18N_DOM = {
       if (Game.state === 'pause' && UI.showPause) UI.showPause();
       if (Game.state === 'over' && UI.statsHtml) document.getElementById('overStats').innerHTML = UI.statsHtml();
       if (Game.state === 'win' && UI.statsHtml) document.getElementById('winStats').innerHTML = UI.statsHtml();
-    } catch (e) {}
+    } catch (e) {
+      if (typeof console !== 'undefined' && console.debug) console.debug('i18n runtime refresh skipped', e && e.message ? e.message : e);
+    }
   },
 
   install(i18n) {
@@ -98,4 +100,3 @@ var I18N_DOM = {
     i18n.refreshRuntime = I18N_DOM.refreshRuntime;
   },
 };
-

@@ -43,6 +43,32 @@ const DropRenderAssets = (() => {
 })();
 
 Object.assign(Render, {
+  drawCompactGem(x, g, color, ms, alpha = null) {
+    const r = Math.max(2.4, (g.tier >= 2 ? 4.5 : 3.2) * ms);
+    x.save();
+    x.globalAlpha = alpha == null ? (g.mag ? 0.88 : 0.58) : alpha;
+    x.fillStyle = color;
+    x.beginPath(); x.arc(g.x, g.y, r, 0, TAU); x.fill();
+    x.globalAlpha = 0.72;
+    x.fillStyle = '#ffffff';
+    x.beginPath(); x.arc(g.x - r * 0.22, g.y - r * 0.22, Math.max(1.2, r * 0.34), 0, TAU); x.fill();
+    x.restore();
+  },
+  drawCompactDrop(x, d, ms, imminent = false, alpha = null) {
+    const fy = d.y + Math.sin(d.bob) * 4;
+    const color = DropRenderAssets.colors[d.kind] || '#ffffff';
+    x.save();
+    x.globalAlpha = alpha == null ? (imminent ? 0.86 : 0.64) : alpha;
+    x.fillStyle = 'rgba(4,8,20,0.82)';
+    x.strokeStyle = color;
+    x.lineWidth = 1.6 * ms;
+    x.beginPath(); x.arc(d.x, fy, 14 * ms, 0, TAU); x.fill(); x.stroke();
+    x.fillStyle = color;
+    x.font = `${Math.round(14 * ms)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",serif`;
+    x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillText(({ chicken: '🍗', magnet: '🧲', bomb: '💣', chest: '📦' })[d.kind] || '•', d.x, fy + 0.5 * ms);
+    x.restore();
+  },
   drawGems(x, frame = this._frame) {
     const visible = frame && frame.worldVisible ? frame.worldVisible : (px, py, pad) => this.worldVisible(px, py, pad);
     const colors = ['#3dff8e', '#19a8ff', '#d44dff'];
@@ -56,8 +82,14 @@ Object.assign(Render, {
     x.save();
     x.globalAlpha = 1 - clarity * 0.42;
     for (const g of Game.gems) {
-      if (stride > 1 && (index++ % stride) !== 0 && !g.mag && g.tier < 2) continue;
+      if (g.focusShelved) {
+        if (!visible(g.x, g.y, 90)) continue;
+        this.drawCompactGem(x, g, 'rgba(92,112,126,0.92)', ms, 0.16);
+        continue;
+      }
+      const skippedByBudget = stride > 1 && (index++ % stride) !== 0 && !g.mag && g.tier < 2;
       if (!visible(g.x, g.y, 90)) continue;
+      if (skippedByBudget) { this.drawCompactGem(x, g, colors[g.tier], ms); continue; }
       const r = sizes[g.tier] * (1 + Math.sin(g.bob) * 0.12);
       const sp = Sprites.glowDot(colors[g.tier], sizes[g.tier]);
       x.drawImage(sp, g.x - r * 2.5, g.y - r * 2.5, r * 5, r * 5);
@@ -84,8 +116,10 @@ Object.assign(Render, {
     let commonDrawn = 0;
     for (const d of Game.drops) {
       if (!visible(d.x, d.y, 130)) continue;
+      if (d.focusShelved) { this.drawCompactDrop(x, d, ms, false, 0.16); continue; }
       const important = d.boss || d.kind === 'chest';
-      if (!important && commonDrawn++ >= commonDrawLimit) continue;
+      const overBudget = !important && commonDrawn++ >= commonDrawLimit;
+      if (overBudget) { this.drawCompactDrop(x, d, ms, d.life < 20); continue; }
       const fy = d.y + Math.sin(d.bob) * 5;
       const lifeK = d.maxLife ? clamp(d.life / d.maxLife, 0, 1) : 1;
       const warning = d.life < 60;

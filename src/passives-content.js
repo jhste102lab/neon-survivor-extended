@@ -10,4 +10,9 @@ const PASSIVES = {
   regen:   { name: '나노 재생', icon: '💚', color: '#7dff6b', desc: '체력이 조금씩 회복됩니다.',              per: '체력이 조금씩 회복됩니다.' },
   luck:    { name: '행운의 부적', icon: '🍀', color: '#5dff9a', desc: '좋은 일이 더 자주 일어납니다.',         per: '아이템과 치명타 기회가 늘어납니다.' },
   wisdom:  { name: '지식의 룬', icon: '📚', color: '#6ba8ff', desc: '성장 속도가 빨라집니다.',                per: '성장 속도가 빨라집니다.' },
+  pulse:   { name: '네온 펄스', icon: '🟢', color: '#3dff8e', desc: '주변 적을 밀어내는 광역 파동을 전개합니다.', per: '광역 파동의 범위와 위력이 증가합니다.' },
+  aegis:   { name: '위상 방벽', icon: '🛡️', color: '#7dffc1', desc: '전투 중 보호막을 재충전합니다.',             per: '보호막 충전량과 저장량이 증가합니다.' },
+  prism:   { name: '프리즘 표식', icon: '🔷', color: '#8fd6ff', desc: '근처 적을 약화시켜 집중 공격하기 쉽게 만듭니다.', per: '약화 범위와 표식 수가 증가합니다.' },
+  anchor:  { name: '중력 앵커', icon: '🟣', color: '#a36bff', desc: '적 무리 한복판에 느려지는 네온 장을 생성합니다.', per: '네온 장의 지속시간과 제어력이 증가합니다.' },
+  relay:   { name: '릴레이 코일', icon: '🔗', color: '#ffd23d', desc: '주변 적 사이를 튀는 보조 전격을 호출합니다.', per: '전격의 연쇄 횟수와 피해량이 증가합니다.' },
 };
