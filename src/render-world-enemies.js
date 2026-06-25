@@ -16,7 +16,6 @@ const RenderWorldEnemies = (() => {
     const ms = frameContext ? frameContext.mobileScale : render.mobileVisualScale();
     const view = frameContext ? frameContext.view : (render._view || render.viewBounds(0));
     const queryPad = BOSS_VIEW_PAD;
-    if (Game.enemies && Game.enemies.length >= mobileAwareMassLayerThreshold(render, frameContext)) prepareMassEnemyLayer(render);
     if (shouldUseMassLayer(render, frameContext)) {
       drawEnemiesWithMassLayer(render, x, t, ms, view, frameContext, queryPad);
       return;
@@ -51,7 +50,7 @@ const RenderWorldEnemies = (() => {
   }
 
   function shouldUseMassLayer(render, frameContext) {
-    return Game.enemies && Game.enemies.length >= mobileAwareMassLayerThreshold(render, frameContext);
+    return false;
   }
 
   function drawEnemiesWithMassLayer(render, x, t, ms, view, frameContext, queryPad) {
@@ -186,10 +185,7 @@ const RenderWorldEnemies = (() => {
   }
 
   function shouldUseSimpleNormalEnemy(render = null, frameContext = null) {
-    const count = Game.enemies ? Game.enemies.length : 0;
-    const threshold = isMobileFrame(render, frameContext) ? MOBILE_SIMPLE_NORMAL_ENEMY_THRESHOLD : SIMPLE_NORMAL_ENEMY_THRESHOLD;
-    const pressure = typeof PerformanceBudget !== 'undefined' ? PerformanceBudget.visualPressure() : 0;
-    return count >= threshold || pressure >= SIMPLE_NORMAL_ENEMY_PRESSURE;
+    return false;
   }
 
   function drawSimpleEnemyOnScreenLayer(x, e, ms, render, frameContext) {
@@ -212,9 +208,7 @@ const RenderWorldEnemies = (() => {
   }
 
   function shouldUseSimpleDetailedEnemy(e) {
-    if (!e || !e.boss) return false;
-    const pressure = typeof PerformanceBudget !== 'undefined' ? PerformanceBudget.visualPressure() : 0;
-    return e.r >= 96 || pressure >= 0.16;
+    return false;
   }
   return { drawEnemies };
 })();

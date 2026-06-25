@@ -142,8 +142,15 @@ h2.ovtitle{font-family:var(--font-en);font-weight:900;font-size:38px;letter-spac
   transition:transform .14s,box-shadow .14s;animation:cardIn .3s ease backwards}
 .card.tiered{box-shadow:inset 0 0 28px var(--tier-glow,rgba(25,227,255,.08))}
 .card.newCard{border-style:solid;box-shadow:inset 0 0 34px var(--tier-glow,rgba(255,210,61,.16)),0 0 18px rgba(255,210,61,.16)}
+.card.neonCard::before{content:"";position:absolute;inset:-4px;border-radius:20px;padding:3px;pointer-events:none;z-index:0;
+  background:linear-gradient(90deg,#ff4d5e,#ffd23d,#3dff8e,#19e3ff,#a36bff,#ff2bd6,#ff4d5e);background-size:260% 100%;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+  animation:cardRainbow 1.65s linear infinite;filter:drop-shadow(0 0 14px rgba(25,227,255,.65)) drop-shadow(0 0 22px rgba(255,43,214,.45))}
+.card.neonCard{box-shadow:inset 0 0 34px rgba(25,227,255,.18),0 0 18px rgba(255,43,214,.16)}
+.card.neonCard>*{position:relative;z-index:2}
 .card:nth-child(2){animation-delay:.07s}.card:nth-child(3){animation-delay:.14s}
 @keyframes cardIn{from{opacity:0;transform:translateY(26px) scale(.94)}to{opacity:1}}
+@keyframes cardRainbow{0%{background-position:0% 50%}100%{background-position:260% 50%}}
 .card:hover{transform:translateY(-8px) scale(1.03);box-shadow:0 0 26px var(--rar,#3aa0ff),0 18px 40px rgba(0,0,0,.5)}
 .card .tag{position:absolute;top:-11px;left:50%;transform:translateX(-50%);font-size:11px;letter-spacing:2px;
   background:var(--rar,#3aa0ff);color:#020815;border-radius:999px;padding:3px 12px;font-weight:bold;white-space:nowrap}

@@ -70,12 +70,17 @@ Object.assign(Game, {
       const d2 = dx * dx + dy * dy;
       const interval = this.enemyUpdateInterval(e, d2);
       const due = this.enemyUpdateDue(e, interval, frame);
-      const stepDt = this.enemyStepDelta(e, dt, due, interval);
-      if (stepDt <= 0) continue;
       const dist = Math.sqrt(d2) || 1;
-      const mv = this.resolveEnemyVelocity(e, stepDt, st, p, dx, dy, dist);
-      const adjusted = this.applyEnemyMovementModifiers(e, stepDt, mv.mvx, mv.mvy, crowdPressure);
-      this.moveEnemyWithKnockback(e, stepDt, adjusted.mvx, adjusted.mvy);
+      let adjusted;
+      if (due || e.cachedMvx == null || e.cachedMvy == null) {
+        const mv = this.resolveEnemyVelocity(e, dt, st, p, dx, dy, dist);
+        adjusted = this.applyEnemyMovementModifiers(e, dt, mv.mvx, mv.mvy, crowdPressure);
+        e.cachedMvx = adjusted.mvx;
+        e.cachedMvy = adjusted.mvy;
+      } else {
+        adjusted = { mvx: e.cachedMvx, mvy: e.cachedMvy };
+      }
+      this.moveEnemyWithKnockback(e, dt, adjusted.mvx, adjusted.mvy);
       this.separateEnemyCrowd(e, d2, frame);
       const postDx = p.x - e.x, postDy = p.y - e.y;
       const postD2 = postDx * postDx + postDy * postDy;

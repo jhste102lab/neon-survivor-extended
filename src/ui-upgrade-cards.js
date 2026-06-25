@@ -30,7 +30,8 @@ Object.assign(UI, {
     this.choices.forEach((choice, i) => {
       const dto = UpgradeRules.describeChoice(choice, Game);
       const el = document.createElement('div');
-      el.className = `card tiered${dto.isNew ? ' newCard' : ''}`;
+      const neonCard = choice.kind === 'nc';
+      el.className = `card tiered${dto.isNew ? ' newCard' : ''}${neonCard ? ' neonCard' : ''}`;
       el.style.setProperty('--rar', dto.color);
       el.style.setProperty('--tier', tierInfo.color);
       el.style.setProperty('--tier-bg', tierInfo.bg);

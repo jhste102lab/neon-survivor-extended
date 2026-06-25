@@ -14,16 +14,20 @@ const CombatKills = (() => {
     return true;
   }
 
-  function incrementKillCount(game) {
-    game.kills++;
+  function killCountForEnemy(enemy) {
+    return Math.max(1, Math.floor(Number(enemy && enemy.stackCount) || 1));
+  }
+
+  function incrementKillCount(game, enemy) {
+    game.kills += killCountForEnemy(enemy);
   }
 
   function recordKillSource(game, enemy) {
-    game.metrics.killsBySource[enemy.lastHitSource || 'unknown'] = (game.metrics.killsBySource[enemy.lastHitSource || 'unknown'] || 0) + 1;
+    game.metrics.killsBySource[enemy.lastHitSource || 'unknown'] = (game.metrics.killsBySource[enemy.lastHitSource || 'unknown'] || 0) + killCountForEnemy(enemy);
   }
 
   function recordSpecialKill(game, enemy) {
-    if (enemy.special) game.metrics.specialKills[enemy.special] = (game.metrics.specialKills[enemy.special] || 0) + 1;
+    if (enemy.special) game.metrics.specialKills[enemy.special] = (game.metrics.specialKills[enemy.special] || 0) + killCountForEnemy(enemy);
   }
 
   function recordBossKill(game, enemy) {
@@ -36,8 +40,8 @@ const CombatKills = (() => {
     recordBossKill(game, enemy);
   }
 
-  function advanceCombo(game) {
-    game.combo++;
+  function advanceCombo(game, enemy) {
+    game.combo += killCountForEnemy(enemy);
     game.comboT = 2;
     game.maxCombo = Math.max(game.maxCombo, game.combo);
   }
@@ -92,10 +96,10 @@ const CombatKills = (() => {
   function applyKillEnemyOutcome(game, outcome) {
     if (!outcome.killed) return false;
     if (!removeEnemy(game, outcome.enemy)) return false;
-    incrementKillCount(game);
+    incrementKillCount(game, outcome.enemy);
     recordKillMetrics(game, outcome.enemy);
     for (const effect of outcome.effects) {
-      if (effect.type === 'combo') { advanceCombo(game); showComboIfReady(game); }
+      if (effect.type === 'combo') { advanceCombo(game, outcome.enemy); showComboIfReady(game); }
       else if (effect.type === 'hudKillsDirty') notifyKillHud();
       else if (effect.type === 'soundEnemyDie') playKillSound();
       else if (effect.type === 'deathBurst') showKillBurst(game, outcome.enemy);

@@ -1,8 +1,18 @@
 'use strict';
 // Enemy death reward policy: XP gems, item drops, and boss reward aftermath.
 (function attachEnemyDeathRewards() {
+  function rewardStackCount(e) {
+    return Math.max(1, Math.floor(Number(e && e.stackCount) || 1));
+  }
+
+  function rewardXpValue(e) {
+    const count = rewardStackCount(e);
+    const unitXp = Math.max(0, Number(e && e.stackUnitXp) || Number(e && e.xp) || 0);
+    return Math.round(unitXp * count);
+  }
+
   function spawnXpGems(game, e) {
-    let v = e.xp;
+    let v = rewardXpValue(e);
     while (v > 0) {
       let tier, tv;
       if (v >= 25) { tier = 2; tv = 25; } else if (v >= 5) { tier = 1; tv = 5; } else { tier = 0; tv = 1; }
@@ -27,7 +37,7 @@
     GameRuntime.playSound('chest');
   }
 
-  function maybeDropNormalEnemyReward(game, e) {
+  function maybeDropOneNormalEnemyReward(game, e) {
     const luck = game.st ? game.st.luck : 1;
     const dropLuck = Math.min(2.2, luck);
     const dropScale = game.itemDropScale ? game.itemDropScale() : 1;
@@ -44,6 +54,11 @@
     else if (roll < specialChestT) game.spawnDrop('chest', e.x, e.y, CFG.dropLife.chest);
   }
 
+  function maybeDropNormalEnemyRewards(game, e) {
+    const rolls = Math.min(rewardStackCount(e), 18);
+    for (let i = 0; i < rolls; i++) maybeDropOneNormalEnemyReward(game, e);
+  }
+
   Object.assign(Game, {
     grantEnemyDeathRewards(e) {
       spawnXpGems(this, e);
@@ -53,7 +68,7 @@
       } else if (e.elite) {
         this.spawnDrop('chest', e.x, e.y);
       } else if (e.type !== 'swarm') {
-        maybeDropNormalEnemyReward(this, e);
+        maybeDropNormalEnemyRewards(this, e);
       }
     },
   });

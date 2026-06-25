@@ -60,6 +60,7 @@ const CombatDamage = (() => {
 
   function finishEnemyDamage(game, enemy) {
     if (enemy.hp <= 0) game.killEnemy(enemy);
+    else if (game.resolveStackDamageDeaths && game.resolveStackDamageDeaths(enemy)) CombatUiFx.updateBossDamageBar(game, enemy);
     else CombatUiFx.updateBossDamageBar(game, enemy);
   }
 

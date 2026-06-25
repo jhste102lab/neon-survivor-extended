@@ -21,6 +21,13 @@ const Sprites = {
       seen.add(key);
       this.shape(def.shape, def.color, r, false);
       this.shape(def.shape, def.color, r, true);
+      const eliteR = this.cacheRadius(def.r * 1.55);
+      const eliteKey = `${def.shape}_${def.color}_${eliteR}`;
+      if (!seen.has(eliteKey)) {
+        seen.add(eliteKey);
+        this.shape(def.shape, def.color, eliteR, false);
+        this.shape(def.shape, def.color, eliteR, true);
+      }
     }
   },
   // 부드러운 발광 원 (파티클/총알/보석용)
