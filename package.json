@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "check:syntax": "find src functions -name '*.js' -type f -print0 | xargs -0 -n1 node --check",
-    "verify": "node scripts/verify-script-order.mjs && node scripts/verify-i18n-contract.mjs && node scripts/verify-evolution-contract.mjs && node scripts/verify-leaderboard-contract.mjs && node scripts/test-gameplay-outcomes.mjs && node scripts/test-policy-outcomes.mjs && node scripts/test-leaderboard-remote.mjs && node scripts/test-audio-contract.mjs && node scripts/test-api-boundary.mjs"
+    "verify": "node scripts/verify-script-order.mjs && node scripts/verify-i18n-contract.mjs && node scripts/verify-evolution-contract.mjs && node scripts/verify-leaderboard-contract.mjs && node scripts/test-gameplay-outcomes.mjs && node scripts/test-policy-outcomes.mjs && node scripts/test-leaderboard-remote.mjs && node scripts/test-audio-contract.mjs && node scripts/test-api-boundary.mjs && node scripts/test-runtime-stability.mjs"
   },
   "name": "neon-survivor_jh",
   "version": "1.1.3",

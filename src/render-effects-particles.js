@@ -22,7 +22,10 @@ const RenderEffectParticles = {
     x.save();
     x.globalCompositeOperation = 'lighter';
     const visible = frame && frame.worldVisible ? frame.worldVisible : (px, py, pad) => render.worldVisible(px, py, pad);
+    const stride = typeof PerformanceBudget !== 'undefined' ? PerformanceBudget.particleStride() : 1;
+    let index = 0;
     for (const particle of Game.particles) {
+      if (stride > 1 && (index++ % stride) !== 0) continue;
       if (!visible(particle.x, particle.y, 90)) continue;
       drawParticle(x, particle);
     }

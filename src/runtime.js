@@ -56,7 +56,12 @@ const GameRuntime = {
   },
 
   gameOver() {
-    if (!this.isHeadless() && typeof UI !== 'undefined') UI.gameOver();
+    const game = this.activeGame();
+    if (this.isHeadless()) {
+      if (game) game.state = 'over';
+      return;
+    }
+    if (typeof UI !== 'undefined') UI.gameOver();
   },
 
   pickLevelCard(index) {

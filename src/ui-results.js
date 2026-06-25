@@ -19,6 +19,7 @@ Object.assign(UI, {
 
   gameOver() {
     Game.state = 'over';
+    if (typeof RunSnapshot !== 'undefined') RunSnapshot.clear();
     Music.stop();
     UI.hideBossBar();
     const newBest = this.saveRecord(false);
@@ -30,6 +31,7 @@ Object.assign(UI, {
 
   win() {
     Game.state = 'win';
+    if (typeof RunSnapshot !== 'undefined') RunSnapshot.clear();
     Music.stop();
     UI.hideBossBar();
     AudioFX.win();

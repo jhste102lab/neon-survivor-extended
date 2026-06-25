@@ -5,8 +5,12 @@
    ================================================================ */
 const Sprites = {
   cache: {},
+  cacheRadius(r) {
+    return Math.max(0.5, Math.round((Number(r) || 0.5) * 2) / 2);
+  },
   // 부드러운 발광 원 (파티클/총알/보석용)
   glowDot(color, r, core = '#ffffff') {
+    r = this.cacheRadius(r);
     const key = `dot_${color}_${r}_${core}`;
     if (this.cache[key]) return this.cache[key];
     const size = Math.ceil(r * 5), cv = document.createElement('canvas');
@@ -21,6 +25,7 @@ const Sprites = {
   },
   // 적 도형 스프라이트 (글로우 포함). white=피격 플래시용
   shape(kind, color, r, white = false) {
+    r = this.cacheRadius(r);
     const key = `sh_${kind}_${color}_${r}_${white}`;
     if (this.cache[key]) return this.cache[key];
     const pad = Math.ceil(r * 0.82), size = (r + pad) * 2;

@@ -28,5 +28,8 @@ Object.assign(Game, {
   enterEndlessIfReady(player) {
     if (this.time >= CFG.winTime && !player.dead && !this.endless) this.enterEndlessLoop();
   },
-});
 
+  saveRunSnapshotIfDue() {
+    if (typeof RunSnapshot !== 'undefined') RunSnapshot.schedule(this);
+  },
+});

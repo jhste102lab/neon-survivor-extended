@@ -4,8 +4,8 @@ const RenderWorldEnemies = (() => {
   const NORMAL_VIEW_PAD = 82;
   const IMPORTANT_VIEW_PAD = 220;
   const BOSS_VIEW_PAD = 520;
-  const MASS_LAYER_ENEMY_THRESHOLD = 999;
-  const MOBILE_MASS_LAYER_ENEMY_THRESHOLD = 999;
+  const MASS_LAYER_ENEMY_THRESHOLD = 220;
+  const MOBILE_MASS_LAYER_ENEMY_THRESHOLD = 70;
   const MASS_LAYER_SCALE = 0.45;
   const MASS_LAYER_REDRAW_INTERVAL = 30;
   const MOBILE_MASS_LAYER_REDRAW_INTERVAL = 24;
@@ -33,7 +33,9 @@ const RenderWorldEnemies = (() => {
   }
 
   function mobileAwareMassLayerThreshold(render, frameContext) {
-    return isMobileFrame(render, frameContext) ? MOBILE_MASS_LAYER_ENEMY_THRESHOLD : MASS_LAYER_ENEMY_THRESHOLD;
+    const base = isMobileFrame(render, frameContext) ? MOBILE_MASS_LAYER_ENEMY_THRESHOLD : MASS_LAYER_ENEMY_THRESHOLD;
+    const pressure = typeof PerformanceBudget !== 'undefined' ? PerformanceBudget.visualPressure() : 0;
+    return Math.max(36, Math.round(lerp(base, base * 0.55, pressure)));
   }
 
   function massLayerRedrawInterval(render, frameContext) {

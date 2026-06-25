@@ -13,16 +13,21 @@ Object.assign(Game, {
 
   spawnParticle(x, y, vx, vy, life, size, color, drag) {
     if (this.test.noFx) return;
+    if (typeof PerformanceBudget !== 'undefined' && PerformanceBudget.visualPressure() > 0.72 && RNG.next() < 0.42) return;
     const P = this.particles;
     const cap = this.particleLimit ? this.particleLimit() : 700;
-    if (P.length >= cap) { P[0] = P[P.length - 1]; P.pop(); }
-    P.push({ x, y, vx, vy, life, maxLife: life, size, color, drag });
+    const particle = P.length >= cap ? P[0] : {};
+    particle.x = x; particle.y = y; particle.vx = vx; particle.vy = vy;
+    particle.life = life; particle.maxLife = life; particle.size = size; particle.color = color; particle.drag = drag;
+    if (P.length >= cap) P[0] = P[P.length - 1];
+    P[P.length >= cap ? P.length - 1 : P.length] = particle;
   },
 
   spawnBurst(x, y, color, n, spd, size, life) {
     if (this.test.noFx) return;
     const scale = this.fxScale ? this.fxScale() : 1;
-    n = Math.max(1, Math.round(n * scale));
+    const budgetScale = typeof PerformanceBudget !== 'undefined' ? PerformanceBudget.fxMultiplier() : 1;
+    n = Math.max(1, Math.round(n * scale * budgetScale));
     for (let i = 0; i < n; i++) {
       const a = rand(0, TAU), s = rand(spd * 0.3, spd);
       this.spawnParticle(x, y, Math.cos(a) * s, Math.sin(a) * s, rand(life * 0.5, life), rand(size * 0.5, size), color, 0.92);
@@ -40,8 +45,11 @@ Object.assign(Game, {
     }
     const T = this.texts;
     const cap = this.textLimit ? this.textLimit() : 70;
-    if (T.length >= cap) { T[0] = T[T.length - 1]; T.pop(); }
-    T.push({ x, y, vy: -55, life: 0.7, txt: String(txt), crit, color: color || (crit ? '#ffd23d' : '#ffffff') });
+    const text = T.length >= cap ? T[0] : {};
+    text.x = x; text.y = y; text.vy = -55; text.life = 0.7; text.txt = String(txt);
+    text.crit = crit; text.color = color || (crit ? '#ffd23d' : '#ffffff');
+    if (T.length >= cap) T[0] = T[T.length - 1];
+    T[T.length >= cap ? T.length - 1 : T.length] = text;
   },
 
   updateFX(dt) {

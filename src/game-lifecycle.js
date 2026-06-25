@@ -30,7 +30,9 @@ Object.assign(Game, {
 
   start() {
     GameRuntime.ensureProfileName();
+    if (typeof RunSnapshot !== 'undefined') RunSnapshot.clear();
     this.reset();
+    if (typeof PerformanceBudget !== 'undefined') PerformanceBudget.reset();
     this.state = 'play';
     GameRuntime.showOverlay(null);
     GameRuntime.setHudVisible(true);
@@ -46,6 +48,7 @@ Object.assign(Game, {
   pause() {
     if (this.state !== 'play') return;
     this.state = 'pause';
+    if (typeof RunSnapshot !== 'undefined') RunSnapshot.save(this, { force: true });
     GameRuntime.showPause();
     GameRuntime.suspendAudio(); // 일시정지 중엔 소리도 정지
   },
@@ -54,9 +57,26 @@ Object.assign(Game, {
     if (this.state !== 'pause') return;
     this.state = 'play';
     GameRuntime.showOverlay(null);
+    GameRuntime.setHudVisible(true);
     GameRuntime.resumeAudio();
     // 일시정지 사이에 밀린 레벨업 처리
     if (this.levelQueue > 0 && !this.player.dead) GameRuntime.showLevelUp();
+  },
+
+  restoreLastRun() {
+    if (typeof RunSnapshot === 'undefined' || !RunSnapshot.restore(this)) return false;
+    if (typeof PerformanceBudget !== 'undefined') PerformanceBudget.reset();
+    GameRuntime.setHudVisible(true);
+    GameRuntime.clearBanners();
+    GameRuntime.hideBossBar();
+    GameRuntime.ensureAudio();
+    if (this.state === 'play') GameRuntime.startMusic();
+    else GameRuntime.suspendAudio();
+    GameRuntime.refreshBestMini();
+    GameRuntime.beginLeaderboardRun(this.runId);
+    if (this.state === 'pause') GameRuntime.showPause();
+    else GameRuntime.showOverlay(null);
+    return true;
   },
 
   enterEndlessLoop(showBanner = true) {

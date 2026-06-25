@@ -21,10 +21,12 @@ function boot() {
   UI.refreshTitleBest();
   UI.refreshBestMini();
   UI.refreshLeaderboard();
+  if (UI.refreshContinueRun) UI.refreshContinueRun();
 
   // 버튼
   const bind = (id, fn) => $(id).addEventListener('click', () => { AudioFX.ensure(); AudioFX.uiClick(); fn(); });
   bind('btnStart', () => Game.start());
+  bind('btnContinueRun', () => Game.restoreLastRun());
   bind('btnResume', () => Game.resume());
   bind('btnRestart', () => Game.start());
   bind('btnQuit', () => UI.toTitle());
@@ -76,6 +78,7 @@ function boot() {
   // 첫 제스처에서 오디오 잠금 해제
   addEventListener('pointerdown', () => AudioFX.ensure(), { once: false });
   addEventListener('contextmenu', e => e.preventDefault());
+  addEventListener('pagehide', () => { if (typeof RunSnapshot !== 'undefined') RunSnapshot.save(Game, { force: true }); });
 
   // 메인 루프
   let last = performance.now();
@@ -83,9 +86,11 @@ function boot() {
     const rdt = Math.min(0.05, (now - last) / 1000);
     last = now;
     if (!Game.test.manualClock) {
+      const frameStart = performance.now();
       Game.update(rdt);
       Render.draw();
       UI.frame();
+      if (typeof PerformanceBudget !== 'undefined') PerformanceBudget.recordFrame(performance.now() - frameStart);
     }
     requestAnimationFrame(loop);
   };
@@ -96,6 +101,6 @@ function boot() {
 window.G = Game;
 window.UIx = UI;
 window.NS_BOOT = boot;
-window.NS = Object.assign(window.NS || {}, { Game, UI, Input, Render, AudioFX, Music, CFG, WEAPONS, PASSIVES, EVOLUTIONS, COMPANION_ROLES, ENEMY_TYPES, BOSSES, RNG, Profile, Leaderboard, UpgradeRules, GameRuntime, RunRecords, I18N, sim: BalanceSim });
+window.NS = Object.assign(window.NS || {}, { Game, UI, Input, Render, AudioFX, Music, CFG, WEAPONS, PASSIVES, EVOLUTIONS, COMPANION_ROLES, ENEMY_TYPES, BOSSES, RNG, Profile, Leaderboard, UpgradeRules, GameRuntime, RunRecords, RunSnapshot, PerformanceBudget, I18N, sim: BalanceSim });
 
 if (!window.NS_NO_AUTO_BOOT) boot();
