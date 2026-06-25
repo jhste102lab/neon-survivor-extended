@@ -48,12 +48,12 @@ function bindImmediateActionButton(button, action) {
 }
 
 function bindSpeedControls() {
-  const speedControls = $('speedControls');
-  if (speedControls) speedControls.addEventListener('click', event => {
-    const btn = event.target && event.target.closest ? event.target.closest('.speedBtn') : null;
-    if (!btn || !speedControls.contains(btn)) return;
-    AudioFX.ensure(); AudioFX.uiClick();
-    Game.setUserTimeScale(Number(btn.dataset.speed) || 1);
+  document.querySelectorAll('.speedBtn').forEach(btn => {
+    bindImmediateActionButton(btn, () => {
+      if (btn.disabled) return;
+      AudioFX.ensure(); AudioFX.uiClick();
+      Game.setUserTimeScale(Number(btn.dataset.speed) || 1);
+    });
   });
   UI.syncSpeedControls = scale => {
     const slowAllowed = Game.time >= (CFG.slowSpeedUnlockTime || 480);
@@ -75,7 +75,6 @@ function bindPauseButton() {
   let lastPauseTap = 0;
   const togglePause = e => {
     if (e) { e.preventDefault(); e.stopPropagation(); }
-    if (e && e.pointerType && e.isPrimary === false) return;
     const now = performance.now();
     if (now - lastPauseTap < 360) return;
     lastPauseTap = now;
