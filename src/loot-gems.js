@@ -16,6 +16,8 @@ const LootGems = {
     const pr2 = st.pickup * st.pickup;
     for (let i = this.gems.length - 1; i >= 0; i--) {
       const g = this.gems[i];
+      if (g.bossPullT > 0) g.bossPullT -= dt;
+      else g.bossPull = false;
       g.bob += dt * 3;
       if (!g.mag) {
         g.x += g.vx * dt; g.y += g.vy * dt;
@@ -27,6 +29,7 @@ const LootGems = {
         g.x += (p.x - g.x) / d * g.ms * dt;
         g.y += (p.y - g.y) / d * g.ms * dt;
         if (d < 20) {
+          if (g.bossPull) this.spawnText(p.x, p.y - 38, tr('boss.absorb.blocked'), true, '#7dffc1');
           LootOutcomes.removeAt(this.gems, i);
           LootOutcomes.applyAll(this, [LootOutcomes.gemCollectOutcome(g, p, this.combo)]);
         }

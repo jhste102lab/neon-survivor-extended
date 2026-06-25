@@ -3,7 +3,8 @@
 Object.assign(Game, {
   updatePlayerMovement(dt, st) {
     const p = this.player;
-    const mv = Input.moveVec();
+    let mv = Input.moveVec();
+    if (this.transformControlVector) mv = this.transformControlVector(mv);
     if (mv.x || mv.y) { p.moveX = mv.x; p.moveY = mv.y; }
     p.x += mv.x * st.spd * dt;
     p.y += mv.y * st.spd * dt;
@@ -50,4 +51,3 @@ Object.assign(Game, {
     if (this.updateCompanions) this.updateCompanions(dt, st);
   },
 });
-

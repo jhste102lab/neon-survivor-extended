@@ -126,6 +126,7 @@ Object.assign(Game, {
   },
 
   itemDropScale() {
+    if (this.bossDebuffs && this.bossDebuffs.dropSealT > 0) return 0;
     const start = CFG.dropTaperStart || 360;
     if (!this.player || this.time < start) return 1;
     const settle = clamp((this.time - start) / 120, 0, 1);

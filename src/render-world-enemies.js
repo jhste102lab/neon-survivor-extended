@@ -5,9 +5,9 @@ const RenderWorldEnemies = (() => {
   const IMPORTANT_VIEW_PAD = 220;
   const BOSS_VIEW_PAD = 520;
   const MASS_LAYER_ENEMY_THRESHOLD = 120;
-  const MOBILE_MASS_LAYER_ENEMY_THRESHOLD = 70;
+  const MOBILE_MASS_LAYER_ENEMY_THRESHOLD = 96;
   const MASS_LAYER_SCALE = 0.28;
-  const MASS_LAYER_REDRAW_INTERVAL = 45, MOBILE_MASS_LAYER_REDRAW_INTERVAL = 36;
+  const MASS_LAYER_REDRAW_INTERVAL = 32, MOBILE_MASS_LAYER_REDRAW_INTERVAL = 8;
   const SIMPLE_NORMAL_ENEMY_THRESHOLD = 96, MOBILE_SIMPLE_NORMAL_ENEMY_THRESHOLD = 56;
   const SIMPLE_NORMAL_ENEMY_PRESSURE = 0.18;
 
@@ -40,7 +40,14 @@ const RenderWorldEnemies = (() => {
   }
 
   function massLayerRedrawInterval(render, frameContext) {
-    return isMobileFrame(render, frameContext) ? MOBILE_MASS_LAYER_REDRAW_INTERVAL : MASS_LAYER_REDRAW_INTERVAL;
+    const mobile = isMobileFrame(render, frameContext);
+    const base = mobile ? MOBILE_MASS_LAYER_REDRAW_INTERVAL : MASS_LAYER_REDRAW_INTERVAL;
+    const pressure = typeof PerformanceBudget !== 'undefined' ? PerformanceBudget.visualPressure() : 0;
+    const scale = Game && Game.userTimeScale ? Game.userTimeScale : 1;
+    if (mobile && pressure > 0.72) return 12;
+    if (scale >= 2.5) return mobile ? 6 : 14;
+    if (scale >= 1.8) return mobile ? 8 : 18;
+    return base;
   }
 
   function shouldUseMassLayer(render, frameContext) {
@@ -151,8 +158,11 @@ const RenderWorldEnemies = (() => {
   }
 
   function drawNormalEnemyFast(x, e, ms) {
+    const alpha = normalEnemySpawnAlpha(e);
+    if (alpha < 1) { x.save(); x.globalAlpha *= alpha; }
     if (shouldUseSimpleNormalEnemy()) {
       RenderWorldEnemySimple.drawEnemyShape(x, e, e.x, e.y, ms);
+      if (alpha < 1) x.restore();
       return;
     }
     const sprite = Sprites.shape(e.def.shape, e.def.color, e.r);
@@ -163,9 +173,16 @@ const RenderWorldEnemies = (() => {
       x.rotate(Math.atan2(Game.player.y - e.y, Game.player.x - e.x) + Math.PI / 2);
       x.drawImage(sprite, -size / 2, -size / 2, size, size);
       x.restore();
+      if (alpha < 1) x.restore();
       return;
     }
     x.drawImage(sprite, e.x - size / 2, e.y - size / 2, size, size);
+    if (alpha < 1) x.restore();
+  }
+
+  function normalEnemySpawnAlpha(e) {
+    if (!e || e.boss || e.elite || e.special) return 1;
+    return clamp((e.age || 0) / 0.32, 0.25, 1);
   }
 
   function shouldUseSimpleNormalEnemy(render = null, frameContext = null) {
@@ -177,7 +194,10 @@ const RenderWorldEnemies = (() => {
 
   function drawSimpleEnemyOnScreenLayer(x, e, ms, render, frameContext) {
     const pos = enemyScreenPosition(e, render, frameContext);
+    const alpha = normalEnemySpawnAlpha(e);
+    if (alpha < 1) { x.save(); x.globalAlpha *= alpha; }
     RenderWorldEnemySimple.drawEnemyShape(x, e, pos.x, pos.y, ms);
+    if (alpha < 1) x.restore();
   }
 
   function drawEnemyDetailed(x, e, t, ms) {

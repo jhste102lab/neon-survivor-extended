@@ -59,7 +59,8 @@ const DirectorSpawnPolicy = {
 
   shouldSpawnMegaBoss(input) {
     const spawned = Math.max(0, input.spawned || 0);
-    const nextMegaT = input.winTime * (spawned + 1);
+    const interval = Math.max(60, Number(input.interval || 180));
+    const nextMegaT = input.winTime + spawned * interval;
     return !input.playerDead && input.time >= nextMegaT ? spawned + 1 : 0;
   },
 
@@ -73,6 +74,14 @@ const DirectorSpawnPolicy = {
   endlessBossDelay(input) {
     const endlessT = Math.max(0, input.time - input.winTime);
     return Math.max(72, 88 - endlessT / 120);
+  },
+
+  endlessNormalBossDue(input) {
+    const time = Number(input.time || 0);
+    const winTime = Number(input.winTime || 600);
+    const next = Number(input.next || (winTime + 60));
+    if (time < winTime + 60 || time < next) return false;
+    return !input.megaSlot;
   },
 
   endlessBossTier(input) {

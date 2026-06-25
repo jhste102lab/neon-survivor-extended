@@ -54,8 +54,12 @@ Object.assign(Game, {
     // 너무 멀어진 적 텔레포트 (플레이어가 도망만 가는 것 방지)
     if (!e.boss && dist > 1700) {
       const view = GameRuntime.viewportHalf();
-      const a = rand(0, TAU), R = Math.hypot(view.w * 2, view.h * 2) / 2 + 100;
+      const pad = typeof EnemyFactoryPlacement !== 'undefined' && EnemyFactoryPlacement.enemySpawnPad
+        ? EnemyFactoryPlacement.enemySpawnPad(this)
+        : 180;
+      const a = rand(0, TAU), R = Math.hypot(view.w * 2, view.h * 2) / 2 + pad;
       e.x = p.x + Math.cos(a) * R; e.y = p.y + Math.sin(a) * R;
+      e.age = 0;
     }
   },
 });

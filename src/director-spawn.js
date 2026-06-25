@@ -61,9 +61,10 @@ Object.assign(Game, {
     const n = Math.min(Math.ceil(randi(10, 14 + Math.floor(t / 60)) * loopMul), room);
     if (n <= 0) return;
     const base = rand(0, TAU);
+    const radius = EnemyFactoryPlacement.swarmBurstRadius ? EnemyFactoryPlacement.swarmBurstRadius(this) : 640;
     for (let i = 0; i < n; i++) {
       const a = base + i / n * TAU;
-      this.spawnEnemy('swarm', this.player.x + Math.cos(a) * 640, this.player.y + Math.sin(a) * 640);
+      this.spawnEnemy('swarm', this.player.x + Math.cos(a) * radius, this.player.y + Math.sin(a) * radius);
     }
     GameRuntime.banner(tr('banner.swarm'), 'warn');
   },
@@ -98,7 +99,7 @@ Object.assign(Game, {
 
   directMegaBossSpawn(t = this.time) {
     const d = this.dir;
-    const nextCount = DirectorSpawnPolicy.shouldSpawnMegaBoss({ time: t, winTime: CFG.winTime, spawned: d.megaBossCount || 0, playerDead: !!(this.player && this.player.dead) });
+    const nextCount = DirectorSpawnPolicy.shouldSpawnMegaBoss({ time: t, winTime: CFG.winTime, interval: 180, spawned: d.megaBossCount || 0, playerDead: !!(this.player && this.player.dead) });
     if (!nextCount) return;
     const boss = this.spawnMegaBoss ? this.spawnMegaBoss(nextCount) : null;
     if (!boss) return;
@@ -108,23 +109,28 @@ Object.assign(Game, {
   },
 
   directEndlessBossSpawns(dt, t = this.time) {
-    const bossTimes = [180, 360, 540];
     const d = this.dir;
-    if (!this.endless || d.bossIdx < bossTimes.length) return;
-    d.bossT -= dt;
-    if (d.bossT > 0) return;
-    this.resetEndlessBossTimer(t);
+    if (!this.endless) return;
+    const nextNormal = d.nextEndlessBossT || (CFG.winTime + 60);
+    if (t < nextNormal) return;
+    if (typeof BossInteractions !== 'undefined' && BossInteractions.shouldUseMegaSlot(t, CFG.winTime)) {
+      this.advanceBossRushNormalSchedule(t);
+      return;
+    }
+    if (!DirectorSpawnPolicy.endlessNormalBossDue({ time: t, winTime: CFG.winTime, next: nextNormal, megaSlot: false })) return;
+    this.advanceBossRushNormalSchedule(t);
     if (this.activeEvent && this.activeEvent.state === 'active') {
-      d.bossT = 10;
+      d.nextEndlessBossT = Math.min(d.nextEndlessBossT || Infinity, t + 10);
       return;
     }
     if (DirectorSpawnPolicy.shouldSpawnEndlessBoss({
       endless: this.endless,
-      bossIdx: d.bossIdx,
+      bossIdx: 3,
       activeEvent: !!(this.activeEvent && this.activeEvent.state === 'active'),
       activeBossCount: this.activeBossCount(),
       bossCap: this.bossCap(),
     })) this.spawnEndlessBoss(t);
+    else if (this.feedBossRushEnergy) this.feedBossRushEnergy('normal');
   },
 
   resetEndlessBossTimer(t) {
@@ -149,11 +155,12 @@ Object.assign(Game, {
     const candidates = BOSSES.map((boss, idx) => boss && !boss.mega ? idx : -1).filter(idx => idx >= 0);
     const idx = candidates.length ? pick(candidates) : 0;
     const tier = this.endlessBossTier(t);
+    const affix = typeof BossInteractions !== 'undefined' ? BossInteractions.normalAffixForTime(t, CFG.winTime) : 'devour';
     this.spawnBoss(
       idx,
       (2.0 + endlessT / 220 * 0.78) * (1 + Math.min(0.9, lateBoss / 500)),
       1.18 + Math.min(0.42, endlessT / 1300),
-      { defPatch: this.buildEndlessBossPatternPatch(BOSSES[idx], tier) }
+      { kind: 'endless', affixes: [affix], defPatch: this.buildEndlessBossPatternPatch(BOSSES[idx], tier) }
     );
   },
 });

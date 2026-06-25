@@ -53,6 +53,7 @@ const RunSnapshot = {
         frameSeq: game.frameSeq,
         endless: game.endless,
         activeEvent: game.activeEvent,
+        bossDebuffs: game.bossDebuffs,
         nextEventT: game.nextEventT,
         lastBossSpawnT: game.lastBossSpawnT,
         idleT: game.idleT,
@@ -76,15 +77,16 @@ const RunSnapshot = {
     if (!opts.force && now - this.lastSaveMs < this.minSaveIntervalMs) return false;
     const payload = this.build(game);
     if (!payload) return false;
+    let saved = false;
     try {
       localStorage.setItem(this.key, JSON.stringify(payload));
       this.lastSaveMs = now;
       this.lastError = '';
-      return true;
+      saved = true;
     } catch (e) {
       this.noteFailure('save', e);
-      return false;
     }
+    return saved;
   },
 
   schedule(game = Game) {
@@ -103,13 +105,14 @@ const RunSnapshot = {
   },
 
   loadRaw() {
+    let payload = null;
     try {
       const raw = localStorage.getItem(this.key);
-      return raw ? JSON.parse(raw) : null;
+      payload = raw ? JSON.parse(raw) : null;
     } catch (e) {
       this.noteFailure('load', e);
-      return null;
     }
+    return payload;
   },
 
   available() {
@@ -143,6 +146,7 @@ const RunSnapshot = {
     game.levelQueue = run.levelQueue || 0; game.deathT = -1; game.novaSeq = run.novaSeq || 0;
     game.dir = run.dir || game.dir; game.cam = run.cam || game.cam; game.blades = run.blades || game.blades;
     game.frameSeq = run.frameSeq || 0; game.endless = !!run.endless; game.activeEvent = run.activeEvent || null;
+    game.bossDebuffs = run.bossDebuffs || game.bossDebuffs;
     game.nextEventT = run.nextEventT || game.nextEventT; game.lastBossSpawnT = run.lastBossSpawnT || -999;
     game.idleT = run.idleT || 0; game.lastIdleWarnT = run.lastIdleWarnT || -999; game.unlockNotified = !!run.unlockNotified;
     game.metrics = run.metrics || game.metrics; game.player = run.player;

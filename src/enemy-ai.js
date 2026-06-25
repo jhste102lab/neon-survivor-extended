@@ -13,11 +13,13 @@ Object.assign(Game, {
 
   enemyUpdateInterval(e, d2) {
     if (e.boss || e.elite || e.special) return 1;
-    if (d2 < 560 * 560) return 1;
-    if (d2 < 940 * 940) return 2;
-    if (d2 < 1260 * 1260) return 4;
-    if (d2 < 1700 * 1700) return 8;
-    return 10;
+    let interval = 10;
+    if (d2 < 560 * 560) interval = 1;
+    else if (d2 < 940 * 940) interval = 2;
+    else if (d2 < 1260 * 1260) interval = 4;
+    else if (d2 < 1700 * 1700) interval = 8;
+    if ((this.userTimeScale || 1) < 1 && this.time >= CFG.winTime) interval = Math.max(1, Math.ceil(interval * 0.5));
+    return interval;
   },
 
   enemyUpdateDue(e, interval, frame) {

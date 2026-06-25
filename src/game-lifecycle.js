@@ -7,7 +7,7 @@ Object.assign(Game, {
     this.time = initial.time; this.timeScale = initial.timeScale; this.userTimeScale = initial.userTimeScale; this.hitStopT = initial.hitStopT;
     this.enemies.length = 0; this.bullets.length = 0; this.ebullets.length = 0;
     this.gems.length = 0; this.drops.length = 0; this.hazards.length = 0; this.particles.length = 0;
-    this.texts.length = 0; this.novas.length = 0; this.beams.length = 0; this.bolts.length = 0; this.megaAbsorbs.length = 0;
+    this.texts.length = 0; this.novas.length = 0; this.beams.length = 0; this.bolts.length = 0; this.megaAbsorbs.length = 0; this.bossLinks.length = 0;
     this.kills = initial.kills; this.combo = initial.combo; this.comboT = initial.comboT; this.maxCombo = initial.maxCombo;
     this.boss = initial.boss; this.levelQueue = initial.levelQueue; this.deathT = initial.deathT; this.novaSeq = initial.novaSeq;
     this.dir = initial.dir;
@@ -16,6 +16,7 @@ Object.assign(Game, {
     this.frameSeq = initial.frameSeq; this.frameTargets = initial.frameTargets;
     if (typeof Grid !== 'undefined' && Grid.map) Grid.map.clear();
     this.endless = initial.endless; this.st = initial.st; this.activeEvent = initial.activeEvent; this.nextEventT = initial.nextEventT; this.lastBossSpawnT = initial.lastBossSpawnT;
+    this.bossDebuffs = initial.bossDebuffs;
     this.idleT = initial.idleT; this.lastIdleWarnT = initial.lastIdleWarnT;
     this.unlockNotified = initial.unlockNotified;
     this.metrics = initial.metrics;
@@ -24,6 +25,7 @@ Object.assign(Game, {
     this.player = initial.player;
     this.lastWeaponSlotCap = maxWeaponSlotsFor(this);
     this.slotsDirty = true;
+    if (this.resetBossInteractionState) this.resetBossInteractionState();
     if (typeof UI !== 'undefined' && UI.syncSpeedControls) UI.syncSpeedControls(this.userTimeScale || 1);
     GameRuntime.setMusicIntensity(1);
   },
@@ -84,6 +86,7 @@ Object.assign(Game, {
     this.endless = true;
     this.dir.bossIdx = Math.max(this.dir.bossIdx || 0, 3);
     this.dir.bossT = Math.max(this.dir.bossT || 0, 35);
+    this.dir.nextEndlessBossT = Math.max(this.dir.nextEndlessBossT || 0, CFG.winTime + 60);
     this.slotsDirty = true;
     if (showBanner) GameRuntime.banner(tr('banner.endlessEnter'), 'warn');
   },

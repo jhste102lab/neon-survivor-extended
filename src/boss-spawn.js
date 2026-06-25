@@ -16,6 +16,7 @@ Object.assign(Game, {
     const position = EnemyFactoryPlacement.bossPosition(this);
     const boss = BossSpawnEntity.createBoss(def, position, hpMult, spdMult, opts);
     BossSpawnRegistration.registerBoss(this, boss);
+    if (this.prepareBossAfterSpawn) this.prepareBossAfterSpawn(boss, opts);
     BossSpawnEffects.showBossSpawnWarning(this, boss.bossDef);
     return boss;
   },
@@ -40,6 +41,11 @@ Object.assign(Game, {
       defPatch: this.megaBossDifficultyPatch(def, safeTier),
     });
     BossSpawnRegistration.registerBoss(this, boss);
+    if (this.prepareBossAfterSpawn) this.prepareBossAfterSpawn(boss, {
+      kind: 'mega',
+      affixes: typeof BossInteractions !== 'undefined' ? BossInteractions.megaAffixesForTier(safeTier) : ['devour'],
+      initialAbilityT: 3.8,
+    });
     BossSpawnEffects.showBossSpawnWarning(this, boss.bossDef);
     GameRuntime.banner(tr('banner.megaBossForm', { name: boss.bossDef.name, tier: safeTier }), 'warn');
     this.spawnMegaBossFormationFx(position, boss.bossDef);

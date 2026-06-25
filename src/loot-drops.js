@@ -49,7 +49,10 @@ const LootDrops = {
         continue;
       }
       d.bob += dt * 2.5;
+      if (d.bossPullT > 0) d.bossPullT -= dt;
+      else d.bossPull = false;
       if (dist2(d.x, d.y, p.x, p.y) < 42 * 42) {
+        if (d.bossPull) this.spawnText(p.x, p.y - 42, tr('boss.absorb.blocked'), true, '#7dffc1');
         LootOutcomes.removeAt(this.drops, i);
         LootOutcomes.applyAll(this, [LootOutcomes.dropOutcome(d.kind, d)]);
       }

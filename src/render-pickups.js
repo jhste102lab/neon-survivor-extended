@@ -66,6 +66,11 @@ Object.assign(Render, {
       x.save(); x.translate(g.x, g.y); x.rotate(Math.PI / 4);
       x.fillRect(-r * 0.4, -r * 0.4, r * 0.8, r * 0.8);
       x.restore();
+      if (g.bossPull) {
+        x.strokeStyle = '#ff2bd6';
+        x.lineWidth = 1.5 * ms;
+        x.beginPath(); x.arc(g.x, g.y, r + 7 * ms, 0, TAU); x.stroke();
+      }
     }
     x.restore();
   },
@@ -91,6 +96,11 @@ Object.assign(Render, {
       x.globalAlpha = blink * (important ? 1 : 1 - clarity * 0.32);
       x.drawImage(sprite, d.x - 38 * ms, fy - 38 * ms, 76 * ms, 76 * ms);
       x.globalAlpha = 1;
+      if (d.bossPull) {
+        x.strokeStyle = '#ff2bd6';
+        x.lineWidth = 2 * ms;
+        x.beginPath(); x.arc(d.x, fy, 31 * ms, 0, TAU); x.stroke();
+      }
       if ((d.stack || 1) > 1) {
         x.fillStyle = '#07121d';
         x.strokeStyle = DropRenderAssets.colors[d.kind] || '#ffffff';

@@ -48,6 +48,7 @@ const RenderFrame = {
     if (render.drawMegaAbsorbs) render.drawMegaAbsorbs(x, frame);
     render.drawBeams(x, frame);
     render.drawEnemies(x, frame);
+    if (render.drawBossInteractions) render.drawBossInteractions(x, frame);
     render.drawBlades(x, frame);
     if (render.drawDrones) render.drawDrones(x, frame);
     render.drawBullets(x, frame);
