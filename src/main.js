@@ -38,8 +38,28 @@ function boot() {
   bind('btnRandomNick', () => Profile.randomizeInput());
   const focusBtn = $('btnFocusMode');
   if (focusBtn) focusBtn.addEventListener('click', () => {
+    const recallReady = Game.state === 'play'
+      && !!Game.focusMode
+      && typeof Game.hasScoutPickupRecall === 'function'
+      && Game.hasScoutPickupRecall()
+      && typeof Game.focusedPickupCount === 'function'
+      && Game.focusedPickupCount() > 0
+      && typeof Game.consumeFocusPickups === 'function';
+    if (recallReady) {
+      AudioFX.ensure(); AudioFX.uiClick();
+      Game.consumeFocusPickups();
+      return;
+    }
+    if (['play', 'pause', 'levelup'].includes(Game.state)) {
+      AudioFX.ensure(); AudioFX.uiClick();
+      Game.focusMode = !Game.focusMode;
+    }
+  });
+  const dashBtn = $('btnDash');
+  if (dashBtn) dashBtn.addEventListener('click', () => {
+    if (Game.state !== 'play' || typeof Game.tryStartDash !== 'function') return;
+    if (!Game.tryStartDash()) return;
     AudioFX.ensure(); AudioFX.uiClick();
-    if (['play', 'pause', 'levelup'].includes(Game.state)) Game.focusMode = !Game.focusMode;
   });
   const speedControls = $('speedControls');
   if (speedControls) speedControls.addEventListener('click', event => {

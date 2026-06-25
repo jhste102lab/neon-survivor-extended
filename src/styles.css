@@ -63,6 +63,8 @@ canvas#c{position:fixed;inset:0;display:block}
 #dashHud{position:fixed;left:50%;bottom:118px;transform:translateX(-50%);display:flex;align-items:center;gap:12px;pointer-events:none;padding:9px 15px;border-radius:18px;background:linear-gradient(180deg,rgba(14,22,44,.88),rgba(6,10,26,.78));border:1px solid rgba(255,255,255,.14);box-shadow:0 0 24px rgba(25,227,255,.12),inset 0 0 18px rgba(25,227,255,.06);backdrop-filter:blur(6px)}
 #dashHud.active{box-shadow:0 0 30px rgba(125,255,193,.26),inset 0 0 24px rgba(125,255,193,.14)}
 #dashHud.ready{box-shadow:0 0 26px rgba(255,210,61,.22),0 0 42px rgba(25,227,255,.15),inset 0 0 20px rgba(255,210,61,.08)}
+.dashTouchBtn{position:absolute;inset:0;pointer-events:auto;border:0;border-radius:inherit;background:transparent;color:transparent;font-size:0;cursor:pointer}
+.dashTouchBtn:focus-visible{outline:2px solid var(--yl);outline-offset:2px}
 .dashLabel{font-family:var(--font-en);font-size:11px;letter-spacing:2px;color:#9fd9ff;text-shadow:0 0 10px rgba(25,227,255,.28)}
 .dashMeter{position:relative;width:42px;height:42px}
 .dashMeter svg{display:block;width:42px;height:42px;transform:rotate(-90deg)}
@@ -245,7 +247,7 @@ h2.ovtitle{font-family:var(--font-en);font-weight:900;font-size:38px;letter-spac
   .lbStat{grid-column:2;text-align:left;font-size:11px}
   #movePad{display:block;height:calc(150px + env(safe-area-inset-bottom,0px))}
   #slotwrap{left:8px;right:62px;bottom:calc(10px + env(safe-area-inset-bottom,0px));gap:4px;max-width:calc(100vw - 78px)}
-  .focusChip{height:25px;padding:0 10px;font-size:9px}
+  .focusChip{height:32px;padding:0 12px;font-size:10px}
   .weaponCount{font-size:10px;padding:2px 7px;background:rgba(10,14,34,.62)}
   .slotrow{flex-wrap:wrap;gap:4px;max-width:100%}
   .slot{width:36px;height:36px;border-radius:9px;font-size:19px}
