@@ -341,6 +341,31 @@
     drawEnemyBulletCore(x, bullet, metrics, palette);
   }
 
+  function shouldSimplifyEnemyBullets() {
+    const pressure = typeof PerformanceBudget !== 'undefined' ? PerformanceBudget.visualPressure() : 0;
+    return Game.ebullets.length >= 36 || pressure >= 0.16;
+  }
+
+  function drawSimpleEnemyBullet(x, bullet, mobileScale) {
+    const direction = bulletDirection(bullet);
+    const r = Math.max(3, bullet.r * mobileScale);
+    x.strokeStyle = 'rgba(255,77,94,0.46)';
+    x.lineWidth = Math.max(2, r * 0.58);
+    x.lineCap = 'round';
+    x.beginPath();
+    x.moveTo(bullet.x - direction.x * 18 * mobileScale, bullet.y - direction.y * 18 * mobileScale);
+    x.lineTo(bullet.x, bullet.y);
+    x.stroke();
+    x.fillStyle = '#ff4d5e';
+    x.beginPath();
+    x.arc(bullet.x, bullet.y, r, 0, TAU);
+    x.fill();
+    x.fillStyle = 'rgba(255,255,255,0.85)';
+    x.beginPath();
+    x.arc(bullet.x - direction.x * r * 0.3, bullet.y - direction.y * r * 0.3, Math.max(1.4, r * 0.36), 0, TAU);
+    x.fill();
+  }
+
 const RenderCombatProjectiles = {
   drawPlayerBullets(render, x, frame = null) {
     x.save();
@@ -361,9 +386,11 @@ const RenderCombatProjectiles = {
     x.globalCompositeOperation = 'source-over';
     const mobileScale = frame ? frame.mobileScale : render.mobileVisualScale();
     const visible = frame && frame.worldVisible ? frame.worldVisible : (px, py, pad) => render.worldVisible(px, py, pad);
+    const simplified = shouldSimplifyEnemyBullets();
     for (const bullet of Game.ebullets) {
       if (!visible(bullet.x, bullet.y, 100)) continue;
-      drawEnemyBullet(x, bullet, mobileScale);
+      if (simplified) drawSimpleEnemyBullet(x, bullet, mobileScale);
+      else drawEnemyBullet(x, bullet, mobileScale);
     }
     x.restore();
   },

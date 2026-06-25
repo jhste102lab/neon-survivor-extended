@@ -10,23 +10,23 @@ function drawHazardBackdrop(x, h, active, pulse) {
   x.beginPath(); x.arc(h.x, h.y, h.r, 0, TAU); x.fill();
 }
 
-function drawHazardRing(x, h, active, pulse) {
+function drawHazardRing(x, h, active, pulse, simplified = false) {
   x.strokeStyle = active ? h.color : '#ffffff';
-  x.lineWidth = active ? 4 : 2.5;
-  x.setLineDash(active ? [] : [10, 7]);
-  x.globalAlpha = active ? 0.86 : 0.7 + pulse * 0.25;
+  x.lineWidth = simplified ? (active ? 3 : 2) : (active ? 4 : 2.5);
+  x.setLineDash(active || simplified ? [] : [10, 7]);
+  x.globalAlpha = simplified ? (active ? 0.72 : 0.78) : (active ? 0.86 : 0.7 + pulse * 0.25);
   x.beginPath(); x.arc(h.x, h.y, h.r * (active ? 1 : 0.85 + pulse * 0.16), 0, TAU); x.stroke();
   x.setLineDash([]);
 }
 
-function drawHazardWarnProgress(x, h) {
+function drawHazardWarnProgress(x, h, simplified = false) {
   if (h.warn <= 0 || h.maxWarn <= 0) return;
   const k = clamp(1 - h.warn / h.maxWarn, 0, 1);
   x.globalAlpha = 0.92;
   x.strokeStyle = h.color;
-  x.lineWidth = 5;
+  x.lineWidth = simplified ? 3 : 5;
   x.beginPath(); x.arc(h.x, h.y, h.r + 7, -Math.PI / 2, -Math.PI / 2 + TAU * k); x.stroke();
-  if (h.kind === 'idle-missile') drawIdleMissileWarning(x, h, k);
+  if (!simplified && h.kind === 'idle-missile') drawIdleMissileWarning(x, h, k);
 }
 
 function drawIdleMissileWarning(x, h, progress) {
@@ -63,23 +63,29 @@ function drawHazardLabel(x, h, active) {
   x.fillText(h.label, h.x, h.y + 3);
 }
 
-function drawHazard(x, h) {
+function drawHazard(x, h, simplified = false) {
   const active = h.warn <= 0;
   const lifeK = clamp(h.life / h.maxLife, 0, 1);
   const pulse = hazardPulse(active);
   drawHazardBackdrop(x, h, active, pulse);
-  drawHazardRing(x, h, active, pulse);
-  drawHazardWarnProgress(x, h);
+  drawHazardRing(x, h, active, pulse, simplified);
+  drawHazardWarnProgress(x, h, simplified);
   drawActiveHazardFill(x, h, lifeK);
-  drawHazardLabel(x, h, active);
+  if (!simplified) drawHazardLabel(x, h, active);
   x.globalAlpha = 1;
+}
+
+function shouldSimplifyHazards() {
+  const pressure = typeof PerformanceBudget !== 'undefined' ? PerformanceBudget.visualPressure() : 0;
+  return Game.hazards.length >= 6 || pressure >= 0.18;
 }
 
 Object.assign(Render, {
   drawHazards(x) {
     if (!Game.hazards.length) return;
+    const simplified = shouldSimplifyHazards();
     x.save();
-    for (const h of Game.hazards) drawHazard(x, h);
+    for (const h of Game.hazards) drawHazard(x, h, simplified);
     x.restore();
   },
 });

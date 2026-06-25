@@ -8,6 +8,21 @@ const Sprites = {
   cacheRadius(r) {
     return Math.max(0.5, Math.round((Number(r) || 0.5) * 2) / 2);
   },
+  prewarmEnemyShapes(enemyTypes = null, bosses = null) {
+    const defs = [];
+    if (enemyTypes && typeof enemyTypes === 'object') defs.push(...Object.values(enemyTypes));
+    if (Array.isArray(bosses)) defs.push(...bosses);
+    const seen = new Set();
+    for (const def of defs) {
+      if (!def || !def.shape || !def.color || !def.r) continue;
+      const r = this.cacheRadius(def.r);
+      const key = `${def.shape}_${def.color}_${r}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      this.shape(def.shape, def.color, r, false);
+      this.shape(def.shape, def.color, r, true);
+    }
+  },
   // 부드러운 발광 원 (파티클/총알/보석용)
   glowDot(color, r, core = '#ffffff') {
     r = this.cacheRadius(r);

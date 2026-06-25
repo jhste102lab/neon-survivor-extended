@@ -3,13 +3,19 @@
 const RenderCanvasLifecycle = {
   init(render) {
     render.cv = $('c');
-    render.ctx = render.cv.getContext('2d');
+    render.ctx = render.cv.getContext('2d', { alpha: false, desynchronized: true }) || render.cv.getContext('2d');
     const onResize = () => this.resize(render);
     addEventListener('resize', onResize);
     onResize();
     const px = render.ctx;
     render.starPat1 = px.createPattern(Sprites.starTile(90, 0.55), 'repeat');
     render.starPat2 = px.createPattern(Sprites.starTile(40, 0.9), 'repeat');
+    if (typeof Sprites.prewarmEnemyShapes === 'function') {
+      Sprites.prewarmEnemyShapes(
+        typeof ENEMY_TYPES !== 'undefined' ? ENEMY_TYPES : null,
+        typeof BOSSES !== 'undefined' ? BOSSES : null,
+      );
+    }
   },
 
   resize(render) {

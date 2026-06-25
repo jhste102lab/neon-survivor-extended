@@ -4,11 +4,12 @@ const RenderWorldEnemies = (() => {
   const NORMAL_VIEW_PAD = 82;
   const IMPORTANT_VIEW_PAD = 220;
   const BOSS_VIEW_PAD = 520;
-  const MASS_LAYER_ENEMY_THRESHOLD = 220;
+  const MASS_LAYER_ENEMY_THRESHOLD = 120;
   const MOBILE_MASS_LAYER_ENEMY_THRESHOLD = 70;
-  const MASS_LAYER_SCALE = 0.45;
-  const MASS_LAYER_REDRAW_INTERVAL = 30;
-  const MOBILE_MASS_LAYER_REDRAW_INTERVAL = 24;
+  const MASS_LAYER_SCALE = 0.28;
+  const MASS_LAYER_REDRAW_INTERVAL = 45, MOBILE_MASS_LAYER_REDRAW_INTERVAL = 36;
+  const SIMPLE_NORMAL_ENEMY_THRESHOLD = 96, MOBILE_SIMPLE_NORMAL_ENEMY_THRESHOLD = 56;
+  const SIMPLE_NORMAL_ENEMY_PRESSURE = 0.18;
 
   function drawEnemies(render, x, frameContext = null) {
     const t = Game.time;
@@ -79,7 +80,7 @@ const RenderWorldEnemies = (() => {
     lx.clearRect(0, 0, render.w, render.h);
     const drawCandidate = e => {
       if (!enemyVisible(e, view) || e.boss || isImportantEnemy(e)) return;
-      drawNormalEnemyOnScreenLayer(lx, e, ms, render, frameContext);
+      drawSimpleEnemyOnScreenLayer(lx, e, ms, render, frameContext);
     };
     if (typeof Grid !== 'undefined' && Grid.forEachInRect && Grid.map && Grid.map.size) {
       Grid.forEachInRect(view.l - queryPad, view.t - queryPad, view.r + queryPad, view.b + queryPad, drawCandidate);
@@ -149,22 +150,11 @@ const RenderWorldEnemies = (() => {
     };
   }
 
-  function drawNormalEnemyOnScreenLayer(x, e, ms, render, frameContext) {
-    const sprite = Sprites.shape(e.def.shape, e.def.color, e.r);
-    const size = sprite.width * ms;
-    const pos = enemyScreenPosition(e, render, frameContext);
-    if (e.def.shape === 'tri' || e.def.shape === 'diamond') {
-      x.save();
-      x.translate(pos.x, pos.y);
-      x.rotate(Math.atan2(Game.player.y - e.y, Game.player.x - e.x) + Math.PI / 2);
-      x.drawImage(sprite, -size / 2, -size / 2, size, size);
-      x.restore();
+  function drawNormalEnemyFast(x, e, ms) {
+    if (shouldUseSimpleNormalEnemy()) {
+      RenderWorldEnemySimple.drawEnemyShape(x, e, e.x, e.y, ms);
       return;
     }
-    x.drawImage(sprite, pos.x - size / 2, pos.y - size / 2, size, size);
-  }
-
-  function drawNormalEnemyFast(x, e, ms) {
     const sprite = Sprites.shape(e.def.shape, e.def.color, e.r);
     const size = sprite.width * ms;
     if (e.def.shape === 'tri' || e.def.shape === 'diamond') {
@@ -178,17 +168,34 @@ const RenderWorldEnemies = (() => {
     x.drawImage(sprite, e.x - size / 2, e.y - size / 2, size, size);
   }
 
+  function shouldUseSimpleNormalEnemy(render = null, frameContext = null) {
+    const count = Game.enemies ? Game.enemies.length : 0;
+    const threshold = isMobileFrame(render, frameContext) ? MOBILE_SIMPLE_NORMAL_ENEMY_THRESHOLD : SIMPLE_NORMAL_ENEMY_THRESHOLD;
+    const pressure = typeof PerformanceBudget !== 'undefined' ? PerformanceBudget.visualPressure() : 0;
+    return count >= threshold || pressure >= SIMPLE_NORMAL_ENEMY_PRESSURE;
+  }
+
+  function drawSimpleEnemyOnScreenLayer(x, e, ms, render, frameContext) {
+    const pos = enemyScreenPosition(e, render, frameContext);
+    RenderWorldEnemySimple.drawEnemyShape(x, e, pos.x, pos.y, ms);
+  }
+
   function drawEnemyDetailed(x, e, t, ms) {
     const model = RenderWorldEnemyState.buildEnemyRenderModel(e, t, ms);
     Render.drawEnemyRoleTelegraph(x, e, t, ms, model.telegraph);
     if (model.overlays.dashWarning) RenderWorldEnemyOverlays.drawBossDashWarning(x, e, t);
     if (model.overlays.eliteAura) RenderWorldEnemyOverlays.drawEliteAura(x, e, t);
-    RenderWorldEnemySprites.drawEnemySprite(x, e, model.visual);
+    if (shouldUseSimpleDetailedEnemy(e)) RenderWorldEnemySimple.drawEnemyShape(x, e, e.x, e.y, model.visual.scale, model.visual.rotation);
+    else RenderWorldEnemySprites.drawEnemySprite(x, e, model.visual);
     if (model.overlays.vulnerableRing) RenderWorldEnemyOverlays.drawVulnerableRing(x, e, t, model.visual.scale);
     if (model.overlays.healthBar) RenderWorldEnemyOverlays.drawEliteHealthBar(x, e);
   }
 
-
+  function shouldUseSimpleDetailedEnemy(e) {
+    if (!e || !e.boss) return false;
+    const pressure = typeof PerformanceBudget !== 'undefined' ? PerformanceBudget.visualPressure() : 0;
+    return e.r >= 96 || pressure >= 0.16;
+  }
   return { drawEnemies };
 })();
 globalThis.RenderWorldEnemies = RenderWorldEnemies;

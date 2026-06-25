@@ -53,8 +53,9 @@ groupBefore([
 
 groupBefore([
   'src/render-canvas.js','src/render-world-stars.js','src/render-world-grid.js','src/render-world-enemy-role-telegraph.js',
-  'src/render-world-enemy-state.js','src/render-world-enemy-overlays.js','src/render-world-enemy-sprite.js','src/render-world-enemies.js','src/render-world-player.js',
+  'src/render-world-enemy-state.js','src/render-world-enemy-overlays.js','src/render-world-enemy-sprite.js','src/render-world-enemy-simple.js','src/render-world-enemies.js','src/render-world-player.js',
 ], 'src/render-world.js', 'render-world facade delegates to focused helpers');
+before('src/render-world-enemy-simple.js', 'src/render-world-enemies.js', 'enemy renderer uses budget-friendly silhouette helper');
 
 groupBefore([
   'src/render-combat-beams.js','src/render-combat-orbit.js','src/render-combat-drones.js','src/render-combat-projectiles.js','src/render-combat-bolts.js',
