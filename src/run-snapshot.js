@@ -53,6 +53,10 @@ const RunSnapshot = {
         frameSeq: game.frameSeq,
         endless: game.endless,
         focusMode: !!game.focusMode,
+        hiddenWeaponEffects: game.hiddenWeaponEffects || {},
+        fieldTestInvincible: !!game.fieldTestInvincible,
+        fieldTestTouched: !!game.fieldTestTouched,
+        fieldTestRun: !!(game.fieldTestTouched || game.fieldTestRun || game.fieldTestInvincible),
         activeEvent: game.activeEvent,
         bossDebuffs: game.bossDebuffs,
         nextEventT: game.nextEventT,
@@ -151,6 +155,10 @@ const RunSnapshot = {
     game.nextEventT = run.nextEventT || game.nextEventT; game.lastBossSpawnT = run.lastBossSpawnT || -999;
     game.idleT = run.idleT || 0; game.lastIdleWarnT = run.lastIdleWarnT || -999; game.unlockNotified = !!run.unlockNotified;
     game.metrics = run.metrics || game.metrics; game.player = run.player;
+    game.hiddenWeaponEffects = run.hiddenWeaponEffects && typeof run.hiddenWeaponEffects === 'object' ? run.hiddenWeaponEffects : {};
+    game.fieldTestInvincible = !!run.fieldTestInvincible && game.isFieldTestAllowed();
+    game.fieldTestTouched = !!(run.fieldTestTouched || run.fieldTestRun || run.fieldTestInvincible);
+    game.fieldTestRun = !!(game.fieldTestTouched || game.fieldTestInvincible);
 
     for (const key of this.gameplayArrays) {
       game[key].length = 0;

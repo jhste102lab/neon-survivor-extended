@@ -7,5 +7,6 @@ export function isEntryPlausible(entry) {
   if (entry.level > 8 + entry.time / 6) return false;
   if (entry.maxCombo > entry.kills) return false;
   if (entry.ruleset !== RULESET) return false;
+  if (entry.build && entry.build.fieldTest) return false;
   return true;
 }

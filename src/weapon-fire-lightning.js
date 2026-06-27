@@ -30,7 +30,7 @@
       const chainRange = s.chainRange + (evolved ? 35 : 0);
       for (let c = 0; c <= chainLimit && t; c++) {
         hitSet.add(t);
-        this.bolts.push({ x1: prev ? prev.x : t.x, y1: prev ? prev.y : t.y - 560, x2: t.x, y2: t.y, life: evolved ? 0.28 : 0.22, color: evolved ? '#ffe37d' : '#ffd23d' });
+        this.bolts.push({ x1: prev ? prev.x : t.x, y1: prev ? prev.y : t.y - 560, x2: t.x, y2: t.y, life: evolved ? 0.28 : 0.22, color: evolved ? '#ffe37d' : '#ffd23d', source: evolved ? 'weapon:lightning:evolved' : 'weapon:lightning' });
         this.spawnBurst(t.x, t.y, evolved ? '#ffe37d' : '#ffd23d', evolved ? 8 : 6, 130, 5, 0.3);
         this.damageEnemy(t, s.dmg * st.dmg * (evolved ? 1.1 : 1), 0, 0, evolved ? 'weapon:lightning:evolved' : 'weapon:lightning');
         if (evolved) this.applyEvolutionSideEffect('lightning', t);

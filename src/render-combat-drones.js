@@ -6,7 +6,7 @@
   }
 
   function shouldDrawDrones(weapon) {
-    return Boolean(weapon) && !Game.player.dead;
+    return Boolean(weapon) && !Game.player.dead && !(Game.weaponEffectHidden && Game.weaponEffectHidden('drone'));
   }
 
   function droneAim(position, target) {

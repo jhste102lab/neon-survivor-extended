@@ -13,7 +13,7 @@
     const dx = Math.cos(a), dy = Math.sin(a), len = 2200;
     const width = s.width * (evolved ? 1.26 : 1);
     const pierce = s.pierce + (evolved ? 8 : 0);
-    this.beams.push({ x: p.x, y: p.y, a, w: width, life: evolved ? 0.24 : 0.2, maxLife: evolved ? 0.24 : 0.2, color: '#ffffff', len });
+    this.beams.push({ x: p.x, y: p.y, a, w: width, life: evolved ? 0.24 : 0.2, maxLife: evolved ? 0.24 : 0.2, color: '#ffffff', len, source: evolved ? 'weapon:railgun:evolved' : 'weapon:railgun' });
     const victims = [];
     const insertVictim = (e, along) => {
       if (e.hp <= 0) return;

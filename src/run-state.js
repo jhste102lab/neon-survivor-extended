@@ -22,6 +22,7 @@ function createInitialRunState(options = {}) {
     frameTargets: null,
     endless: false,
     focusMode: false,
+    hiddenWeaponEffects: {},
     st: null,
     activeEvent: null,
     bossDebuffs: { controlT: 0, controlMode: '', controlAngle: 0, dropSealT: 0, weaponSilenceT: 0, weaponSilenceId: '', weaponSeals: [] },
@@ -32,7 +33,7 @@ function createInitialRunState(options = {}) {
     unlockNotified: false,
     metrics: {
       damageBySource: {}, killsBySource: {}, specialKills: {}, evolutions: [],
-      lastDamageSource: '', deathSource: '',
+      lastDamageSource: '', deathSource: '', recentDamage: [], deathRecentDamage: [],
       eventOffers: 0, eventStarts: 0, eventSuccess: 0, dropsExpired: 0, dropsTrimmed: 0,
     },
     runId: GameRuntime.runId(),

@@ -46,6 +46,7 @@ Object.assign(Game, {
   pushPlayerBullet(b) {
     if (!b) return false;
     b.source = b.source || (b.kind ? `weapon:${b.kind}` : 'weapon:unknown');
+    b.visualHidden = !!(this.weaponEffectHiddenForSource && this.weaponEffectHiddenForSource(b.source));
     const cap = this.playerBulletCap(b);
     let same = 0;
     for (const x of this.bullets) {

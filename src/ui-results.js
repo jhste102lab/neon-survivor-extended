@@ -19,11 +19,18 @@ Object.assign(UI, {
 
   statsHtml() {
     const G = Game;
+    const build = typeof LeaderboardEntry !== 'undefined' ? LeaderboardEntry.buildSnapshotFromGame(G) : null;
+    const label = source => typeof SourceLabels !== 'undefined' ? SourceLabels.combatSource(source) : source;
+    const topDamage = build && build.damageTop && build.damageTop[0] ? `${label(build.damageTop[0].source)} ${build.damageTop[0].value}` : '-';
+    const lastHit = build && build.lastHit ? label(build.lastHit) : '-';
+    const field = G.fieldTestTouched || G.fieldTestRun || G.fieldTestInvincible ? `<span class="k">FIELD TEST</span><span class="v">INVINCIBLE / no leaderboard</span>` : '';
     return `
       <span class="k">${tr('stats.time')}</span><span class="v">${fmtTime(G.time)}</span>
       <span class="k">${tr('stats.level')}</span><span class="v">Lv. ${G.player.level}</span>
       <span class="k">${tr('stats.kills')}</span><span class="v">${G.kills}</span>
-      <span class="k">${tr('stats.combo')}</span><span class="v">x${G.maxCombo}</span>`;
+      <span class="k">${tr('stats.combo')}</span><span class="v">x${G.maxCombo}</span>
+      <span class="k">최고 피해</span><span class="v">${topDamage}</span>
+      <span class="k">마지막 피격</span><span class="v">${lastHit}</span>${field}`;
   },
 
   saveRecord(won) {

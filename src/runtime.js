@@ -55,6 +55,10 @@ const GameRuntime = {
     if (!this.isHeadless() && typeof UI !== 'undefined') UI.showLevelUp();
   },
 
+  showRewardCard(choice, sourceLabel = '') {
+    if (!this.isHeadless() && typeof UI !== 'undefined' && UI.showRewardCard) UI.showRewardCard(choice, sourceLabel);
+  },
+
   gameOver() {
     const game = this.activeGame();
     if (this.isHeadless()) {

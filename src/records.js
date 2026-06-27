@@ -26,10 +26,11 @@ const RunRecords = {
 
   writeBest(best) {
     try { localStorage.setItem(this.bestKey, JSON.stringify(this.normalizeBest(best))); }
-    catch (e) {}
+    catch (e) { console.warn('Best-record write skipped; local storage unavailable.'); }
   },
 
   saveFromGame(game = Game, won = false) {
+    if (game.fieldTestTouched || game.fieldTestRun || game.fieldTestInvincible) return false;
     const best = this.normalizeBest(game.best);
     const newBest = game.time > best.time;
     if (newBest) best.time = game.time;
@@ -45,6 +46,7 @@ const RunRecords = {
 
   submitLeaderboard(won, game = Game) {
     if (game.test && game.test.headless) return Promise.resolve({ ok: true, skipped: 'headless' });
+    if (game.fieldTestTouched || game.fieldTestRun || game.fieldTestInvincible) return Promise.resolve({ ok: true, skipped: 'field-test' });
     if (typeof Leaderboard === 'undefined') return Promise.resolve({ ok: false, skipped: 'leaderboard unavailable' });
     const entry = Leaderboard.entryFromGame(won);
     return Leaderboard.submit(entry);

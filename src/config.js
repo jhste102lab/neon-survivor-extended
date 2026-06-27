@@ -2,7 +2,7 @@
 // Game-wide configuration and balance constants.
 /* ---------------- 설정/밸런스 ---------------- */
 const CFG = {
-  ruleset: 'phase2-2026-06-20-evolution24',
+  ruleset: 'phase3-2026-06-27-late-rebalance',
   winTime: 600,            // 후반 루프/리더보드 기준 시간; 승리 팝업은 사용하지 않음
   unlockTime: 300,         // 5분부터 진화/동료/추가 슬롯/이벤트 해금
   checkpointInterval: 300, // HUD의 다음 목적지 표시 간격
@@ -59,6 +59,21 @@ const CFG = {
     gradualStart: 45, gradualEvery: 15, topWeaponProtectedCount: 3, topWeaponSealLimit: 1,
   },
   lateXp: {
-    enabled: true, start: 600, directRatio: 0.5, autoSettleAge: 18, autoSettleRatio: 0.5,
+    enabled: true, start: 600, directRatio: 1, autoSettleAge: 0.25, autoSettleRatio: 1,
+    scale10: 0.85, scale13: 0.75, scale16: 0.65,
+  },
+  lateBalance: {
+    dropRampStart: 600, dropRampEnd: 960,
+    chickenDropHighHpScale: 0.30, chickenDropLowHpScale: 1.15,
+    chickenBaseScale10: 0.70, chickenBaseScale16: 0.48,
+    magnetBaseScale10: 0.72, magnetBaseScale16: 0.55,
+    bombBaseScale10: 0.62, bombBaseScale16: 0.42, bombKillDropScale: 0.25,
+    chickenHealMaxHp: 0.10, chickenHealMissingHp: 0.12, chickenRepeatWindow: 8, chickenRepeatScale2: 0.70, chickenRepeatScale3: 0.50,
+    bombDamage: 180, bombBossDamageScale: 0.35,
+  },
+  bossAntiKite: {
+    enabled: true, distance: 580, hold: 2.8, cooldown: 12, telegraph: 2.35, pullDuration: 1.55, pullSpeed: 176,
+    megaSafeExtra: 174, normalSafeExtra: 142,
+    hazardRadius: 58, hazardDamage: 15, hazardLife: 2.05, hazardTick: 0.62,
   },
 };

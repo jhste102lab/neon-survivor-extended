@@ -1,28 +1,36 @@
 'use strict';
 // Pause build-list DTO assembly.
-function pauseBuildSlotDto(className, attributes, icon, badge) {
-  return { className, attributes, icon, badge };
+function pauseBuildSlotDto(className, attributes, icon, badge, detail = null) {
+  return { className, attributes, icon, badge, detail };
 }
 
 function pauseWeaponSlotDto(player, weapon) {
   const evolved = player.evolved && player.evolved[weapon.id];
+  const base = evolved ? EVOLUTIONS[weapon.id] : WEAPONS[weapon.id];
+  const details = UpgradeDescriptions.weaponCurrentStatDetails(weapon.id, weapon.lv);
+  const effectHidden = !!(Game.weaponEffectHidden && Game.weaponEffectHidden(weapon.id));
   return pauseBuildSlotDto(
-    'bslot',
+    `bslot detailSlot effectToggle${effectHidden ? ' effectOff' : ''}`,
     [
-      ['title', evolved ? EVOLUTIONS[weapon.id].name : WEAPONS[weapon.id].name],
+      ['title', base.name],
       ['style', `border-color:${evolved ? 'rgba(255,210,61,.75)' : 'rgba(25,227,255,.3)'}`],
+      ['data-detail-kind', 'weapon'],
+      ['data-detail-id', weapon.id],
     ],
-    evolved ? EVOLUTIONS[weapon.id].icon : WEAPONS[weapon.id].icon,
-    evolved ? 'E' : weapon.lv
+    base.icon,
+    evolved ? 'E' : weapon.lv,
+    { kind: 'weapon', id: weapon.id, effectHidden, icon: base.icon, name: base.name, level: evolved ? '진화 완료' : `Lv.${weapon.lv}`, desc: base.desc, details }
   );
 }
 
 function pausePassiveSlotDto(player, id) {
+  const lv = player.passives[id] || 0;
   return pauseBuildSlotDto(
-    'bslot',
-    [['title', PASSIVES[id].name]],
+    'bslot detailSlot',
+    [['title', PASSIVES[id].name], ['data-detail-kind', 'passive'], ['data-detail-id', id]],
     PASSIVES[id].icon,
-    player.passives[id]
+    lv,
+    { kind: 'passive', id, icon: PASSIVES[id].icon, name: PASSIVES[id].name, level: `Lv.${lv}`, desc: PASSIVES[id].desc, details: UpgradeDescriptions.passiveCurrentStatDetails(id, lv) }
   );
 }
 

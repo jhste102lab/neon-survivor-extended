@@ -4,7 +4,7 @@
 
 **NEON SURVIVOR** is a fast browser bullet-hell survival shooter about one tiny pilot trapped inside a glowing monster storm. You dodge by hand, your weapons fire automatically, and every level-up turns the run into a new build: lightning chains, black holes, drones, mines, lasers, orbitals, evolutions, companions, and boss pressure that keeps escalating past 10 minutes.
 
-No install, no downloads, no account required — open the page and survive as long as you can on PC or mobile. The current v1.1.9 Cloudflare build includes global leaderboard support, 24 weapon evolutions, the 10/13/16-minute endless fusion boss loop, boss affixes such as Devour, Drop Seal, Weapon Silence, and Control Warp, a gentler first 10-minute fusion boss, smoother non-mass-layer dense swarms, 0.5x late-game precision speed, stacked drops, clearer invulnerability feedback, adaptive late-game clarity, and companion Neon card highlighting.
+No install, no downloads, no account required — open the page and survive as long as you can on PC or mobile. The current v1.1.10 Cloudflare build includes global leaderboard support with run-detail drilldowns, 24 weapon evolutions, the 10/13/16-minute endless fusion boss loop, stronger late-game boss pressure, 10-minute XP auto-absorb for clarity, field-event upgrade cards, numeric upgrade deltas, per-weapon FX visibility toggles from pause, field-test invincibility that blocks leaderboard submission, smoother dense swarms, stacked drops, and clearer Korean result labels for top damage and last hit.
 
 ## ▶️ Play online
 

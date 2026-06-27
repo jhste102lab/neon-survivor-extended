@@ -11,6 +11,8 @@ const Game = {
   dir: { spawnT: 1.5, eliteT: 100, burstT: 70, bossIdx: 0 },
   best: { time: 0, kills: 0, level: 0, maxCombo: 0, wins: 0 },
   test: { manualClock: false, headless: false, noFx: false },
+  fieldTestInvincible: false, fieldTestRun: false, fieldTestTouched: false,
+  hiddenWeaponEffects: {},
   frameSeq: 0, frameTargets: null, bossDebuffs: null,
   slotsDirty: true, lastWeaponSlotCap: 5
 };

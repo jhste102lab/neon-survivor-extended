@@ -6,7 +6,7 @@
   }
 
   function shouldDrawOrbitBlades(weapon) {
-    return Boolean(weapon) && !Game.player.dead;
+    return Boolean(weapon) && !Game.player.dead && !(Game.weaponEffectHidden && Game.weaponEffectHidden('orbit'));
   }
 
   function drawOrbitBladeSprite(x, sprite, position) {

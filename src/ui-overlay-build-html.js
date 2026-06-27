@@ -7,8 +7,9 @@ function pauseBuildAttributesHtml(attributes) {
 }
 
 const UIPauseBuildHtml = {
-  renderSlot(slot) {
-    return `<div class="${slot.className}"${pauseBuildAttributesHtml(slot.attributes)}>${slot.icon}<em>${slot.badge}</em></div>`;
+  renderSlot(slot, index = -1) {
+    const detailAttr = slot.detail ? ` data-detail-index="${index}"` : '';
+    return `<div class="${slot.className}"${pauseBuildAttributesHtml(slot.attributes)}${detailAttr}>${slot.icon}<em>${slot.badge}</em></div>`;
   },
 
   renderCompanionRow(row) {
@@ -16,7 +17,7 @@ const UIPauseBuildHtml = {
   },
 
   render(build) {
-    const slotsHtml = build.slots.map(slot => UIPauseBuildHtml.renderSlot(slot)).join('');
+    const slotsHtml = build.slots.map((slot, index) => UIPauseBuildHtml.renderSlot(slot, index)).join('');
     const emptyHtml = `<span style="color:#5e7390">${tr('build.empty')}</span>`;
     const companionInfo = build.companionInfo.map(row => UIPauseBuildHtml.renderCompanionRow(row)).join('');
     return (slotsHtml || emptyHtml) + (companionInfo ? `<div class="companionInfo">${companionInfo}</div>` : '');

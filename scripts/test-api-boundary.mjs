@@ -94,7 +94,7 @@ assert([...e2.LEADERBOARD.map.keys()].some(key => key.startsWith('testenv:sessio
 const entry = entryFor('run-a', session.proof);
 res = await leaderboardApi.onRequestPost({ request: req(JSON.stringify(entry)), env: e2 });
 if (res.status !== 201) throw new Error(`leaderboard submit status ${res.status} ${JSON.stringify(await json(res))}`);
-assert([...e2.LEADERBOARD.map.keys()].some(key => key.startsWith('testenv:entry:phase2-2026-06-20-evolution24:run-a')), 'entry key uses env/ruleset/run prefix');
+assert([...e2.LEADERBOARD.map.keys()].some(key => key.startsWith('testenv:entry:phase3-2026-06-27-late-rebalance:run-a')), 'entry key uses env/ruleset/run prefix');
 
 res = await leaderboardApi.onRequestPost({ request: req(JSON.stringify(entry)), env: e2 });
 assert(res.status === 201, `exact retry status ${res.status}`);
@@ -133,4 +133,4 @@ const statuses = await Promise.all(attempts).then(rs => rs.map(r => r.status));
 assert(statuses.filter(s => s === 201).length <= config.RATE_LIMIT_PER_MINUTE, `too many accepted requests: ${statuses.join(',')}`);
 assert(statuses.filter(s => s === 429).length >= 1, `expected at least one rate-limited request, got ${statuses.join(',')}`);
 
-console.log('API boundary/session/rate/idempotency tests passed.');
+console.log('API boundary/rate/idempotency tests passed.');

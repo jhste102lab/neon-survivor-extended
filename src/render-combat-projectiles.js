@@ -374,6 +374,8 @@ const RenderCombatProjectiles = {
     const mobileScale = frame ? frame.mobileScale : render.mobileVisualScale();
     const visible = frame && frame.worldVisible ? frame.worldVisible : (px, py, pad) => render.worldVisible(px, py, pad);
     for (const bullet of Game.bullets) {
+      if (bullet.visualHidden) continue;
+      if (Game.weaponEffectHiddenForSource && Game.weaponEffectHiddenForSource(bullet.source)) continue;
       if (!visible(bullet.x, bullet.y, bulletVisibilityPad(bullet))) continue;
       drawPlayerBullet(x, bullet, mobileScale);
     }

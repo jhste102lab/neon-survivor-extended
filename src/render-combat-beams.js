@@ -44,6 +44,8 @@ const RenderCombatBeams = {
     x.globalAlpha = 1 - ((Game.clarityK ? Game.clarityK() : 0) * 0.46);
     const segmentVisible = frame && frame.segmentVisible ? frame.segmentVisible : (x1, y1, x2, y2, pad) => render.segmentVisible(x1, y1, x2, y2, pad);
     for (const beam of Game.beams) {
+      if (beam.visualHidden) continue;
+      if (Game.weaponEffectHiddenForSource && Game.weaponEffectHiddenForSource(beam.source)) continue;
       const len = beamLength(beam);
       const x2 = beam.x + Math.cos(beam.a) * len;
       const y2 = beam.y + Math.sin(beam.a) * len;

@@ -21,6 +21,7 @@ export async function entryFingerprint(entry) {
     eventSuccess: entry.eventSuccess,
     bossesKilled: entry.bossesKilled,
     specialKills: entry.specialKills,
+    build: entry.build,
   };
   return shortHash(JSON.stringify(stable));
 }

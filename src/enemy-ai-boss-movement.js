@@ -19,7 +19,7 @@ function getBossMovement(e, dx, dy, dist, enrage) {
   const closeOrbit = getMegaBossCloseOrbitMovement(e, dx, dy, dist);
   if (closeOrbit) return closeOrbit;
   if (e.dashState === 2) {
-    const dashMul = e.bossDef && e.bossDef.mega ? 1.05 : 4.4;
+    const dashMul = e.bossDef && e.bossDef.mega ? 1.16 : 4.4;
     return {
       mvx: Math.cos(e.dashDir) * e.spd * dashMul * (1 + enrage * 0.12),
       mvy: Math.sin(e.dashDir) * e.spd * dashMul * (1 + enrage * 0.12),

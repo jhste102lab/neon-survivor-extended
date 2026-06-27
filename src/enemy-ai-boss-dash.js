@@ -9,7 +9,7 @@ function updateBossDashState(e, dt, dx, dy, enrage) {
     GameRuntime.playSound('missile');
   } else if (e.dashState === 2 && e.dashT <= 0) {
     e.dashState = 0;
-    if (e.bossDef && e.bossDef.mega) e.vulnerableT = Math.max(e.vulnerableT || 0, 1.6);
+    if (e.bossDef && e.bossDef.mega) markBossVulnerable(e, 2.0, 0.22);
     e.dashT = e.bossDef && e.bossDef.mega
       ? rand(Math.max(4.6, 7.2 - enrage * 0.55), Math.max(6.2, 9.2 - enrage * 0.7))
       : rand(Math.max(2.8, 4.5 - enrage * 0.9), Math.max(4.0, 6.5 - enrage));

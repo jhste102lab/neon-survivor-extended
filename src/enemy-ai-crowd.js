@@ -157,12 +157,16 @@ Object.assign(Game, {
   grantStackUnitRewards(e, killed) {
     const xp = Math.round(this.stackUnitXp(e) * killed);
     if (xp > 0) {
-      let v = xp;
-      while (v > 0) {
-        let tier, tv;
-        if (v >= 25) { tier = 2; tv = 25; } else if (v >= 5) { tier = 1; tv = 5; } else { tier = 0; tv = 1; }
-        v -= tv;
-        this.spawnGem(e.x + rand(-16, 16), e.y + rand(-16, 16), tv, tier);
+      if (this.lateXpStarted && this.lateXpStarted() && !e.boss && !e.elite) {
+        this.grantLateNormalXp(xp, e.type || 'stack');
+      } else {
+        let v = xp;
+        while (v > 0) {
+          let tier, tv;
+          if (v >= 25) { tier = 2; tv = 25; } else if (v >= 5) { tier = 1; tv = 5; } else { tier = 0; tv = 1; }
+          v -= tv;
+          this.spawnGem(e.x + rand(-16, 16), e.y + rand(-16, 16), tv, tier);
+        }
       }
     }
     if (e.type === 'swarm') return;
@@ -173,9 +177,21 @@ Object.assign(Game, {
     const dropRolls = Math.min(killed, 12);
     for (let i = 0; i < dropRolls; i++) {
       const roll = RNG.next();
-      const chickenT = (rates.chicken || 0.045) * dropLuck * dropScale;
-      const magnetT = chickenT + (rates.magnet || 0.024) * dropLuck * dropScale;
-      const bombT = magnetT + (rates.bomb || 0.020) * dropLuck * dropScale;
+      const lateCfg = CFG.lateBalance || {};
+      const late = this.time >= (lateCfg.dropRampStart || CFG.winTime);
+      const k = late ? clamp((this.time - (lateCfg.dropRampStart || CFG.winTime)) / Math.max(1, (lateCfg.dropRampEnd || CFG.winTime + 360) - (lateCfg.dropRampStart || CFG.winTime)), 0, 1) : 0;
+      const st = this.st || (typeof this.stat === 'function' ? this.stat() : null);
+      const maxHp = st && st.maxHp ? st.maxHp : CFG.player.hp;
+      const hpRatio = this.player && maxHp ? this.player.hp / maxHp : 1;
+      let chickenScale = late ? lerp(lateCfg.chickenBaseScale10 || 0.70, lateCfg.chickenBaseScale16 || 0.48, k) : 1;
+      if (late && hpRatio >= 0.8) chickenScale *= lateCfg.chickenDropHighHpScale || 0.30;
+      else if (late && hpRatio <= 0.35) chickenScale *= lateCfg.chickenDropLowHpScale || 1.15;
+      const bombKillScale = String(e.lastHitSource || '').startsWith('drop:bomb') ? (lateCfg.bombKillDropScale || 0.25) : 1;
+      const magnetScale = late ? lerp(lateCfg.magnetBaseScale10 || 0.72, lateCfg.magnetBaseScale16 || 0.55, k) : 1;
+      const bombScale = late ? lerp(lateCfg.bombBaseScale10 || 0.62, lateCfg.bombBaseScale16 || 0.42, k) : 1;
+      const chickenT = (rates.chicken || 0.045) * dropLuck * dropScale * chickenScale * bombKillScale;
+      const magnetT = chickenT + (rates.magnet || 0.024) * dropLuck * dropScale * magnetScale * bombKillScale;
+      const bombT = magnetT + (rates.bomb || 0.020) * dropLuck * dropScale * bombScale * bombKillScale;
       if (roll < chickenT) this.spawnDrop('chicken', e.x, e.y);
       else if (roll < magnetT) this.spawnDrop('magnet', e.x, e.y);
       else if (roll < bombT) this.spawnDrop('bomb', e.x, e.y);

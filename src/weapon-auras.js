@@ -24,6 +24,7 @@ Object.assign(Game, {
     globalThis.WeaponAuraOrbitGeometry.advanceAngle(this.blades, s, evolved, dt);
     for (const blade of globalThis.WeaponAuraOrbitGeometry.bladePositions(p, s, evolved, this.blades.angle)) {
       globalThis.WeaponAuraOrbitHits.hitEnemiesNearBlade(this, blade, { stats: s, combatStats: st, evolved, player: p }, hitBlade => {
+        if (this.weaponEffectHidden && this.weaponEffectHidden('orbit')) return;
         globalThis.WeaponAuraOrbitFx.spawnBladeHitFx(this, hitBlade, evolved);
       });
     }
@@ -41,6 +42,6 @@ Object.assign(Game, {
 
     globalThis.WeaponAuraFrostDamageSlow.applyToEnemies(this, p, s, st, evolved, radius, doDamage);
     if (evolved) globalThis.WeaponAuraFrostPickupPull.pullPickups(this, p, radius, dt);
-    globalThis.WeaponAuraFrostFx.maybeSpawnAuraParticle(this, p, radius, evolved);
+    if (!(this.weaponEffectHidden && this.weaponEffectHidden('frost'))) globalThis.WeaponAuraFrostFx.maybeSpawnAuraParticle(this, p, radius, evolved);
   },
 });

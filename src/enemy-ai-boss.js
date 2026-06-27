@@ -47,6 +47,7 @@ function updateBossMegaRingTrap(game, e, dt, enrage, bossDef) {
       color: bossDef.color, source: bossDef.mega ? 'boss:mega-ring' : 'boss:ring-trap', label: bossDef.mega ? 'CORE' : 'BOSS', bypassInvuln: !!bossDef.mega,
     });
   }
+  markBossVulnerable(e, bossDef.mega ? 1.1 : 0.85, bossDef.mega ? 0.16 : 0.12);
   GameRuntime.playSound('shoot');
 }
 
@@ -69,4 +70,5 @@ function updateBossMegaLaneTrap(game, e, dt, enrage, bossDef) {
       color: '#ffd23d', source: bossDef.mega ? 'boss:mega-lane' : 'boss:lane-trap', label: bossDef.mega ? 'CORE' : 'BOSS', bypassInvuln: !!bossDef.mega,
     });
   }
+  markBossVulnerable(e, bossDef.mega ? 1.25 : 0.95, bossDef.mega ? 0.17 : 0.12);
 }

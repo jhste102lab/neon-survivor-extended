@@ -30,7 +30,7 @@
       const ox = t.x, oy = t.y - 560, len = 760;
       const life = s.life * (evolved ? 0.74 : 1);
       const width = s.width * (evolved ? 1.08 : 1);
-      this.beams.push({ x: ox, y: oy, a: Math.PI / 2, w: width, life, maxLife: life, color: '#c39bff', len });
+      this.beams.push({ x: ox, y: oy, a: Math.PI / 2, w: width, life, maxLife: life, color: '#c39bff', len, source: evolved ? 'weapon:satlaser:evolved' : 'weapon:satlaser' });
       Grid.forEachInRect(ox - width * 0.7 - 40, oy, ox + width * 0.7 + 40, oy + len, e => {
         if (e.hp <= 0) return;
         const along = e.y - oy;

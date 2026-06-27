@@ -158,7 +158,7 @@ Object.assign(Game, {
     const affix = typeof BossInteractions !== 'undefined' ? BossInteractions.normalAffixForTime(t, CFG.winTime) : 'devour';
     this.spawnBoss(
       idx,
-      (2.0 + endlessT / 220 * 0.78) * (1 + Math.min(0.9, lateBoss / 500)),
+      (2.35 + endlessT / 220 * 0.90) * (1 + Math.min(0.9, lateBoss / 500)),
       1.18 + Math.min(0.42, endlessT / 1300),
       { kind: 'endless', affixes: [affix], defPatch: this.buildEndlessBossPatternPatch(BOSSES[idx], tier) }
     );

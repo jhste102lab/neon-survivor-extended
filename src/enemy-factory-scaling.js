@@ -19,14 +19,16 @@ const EnemyFactoryScaling = Object.freeze({
       ? 1 + context.endlessT / 180 * 0.45 + Math.pow(context.endlessT / 720, 1.25) * 0.35
       : 1;
     const pressureMul = 1 + context.threat * (elite ? 0.30 : 0.42);
-    return (1 + context.t / 95 * 0.45) * (elite ? 6.2 : 1) * endlessMul * pressureMul;
+    const lateRebalance = context.t >= CFG.winTime ? 1 + Math.min(0.20, context.endlessT / 360 * 0.12 + 0.08) : 1;
+    return (1 + context.t / 95 * 0.45) * (elite ? 6.2 : 1) * endlessMul * pressureMul * (elite ? 1 : lateRebalance);
   },
 
   enemySpeedMultiplier(context, elite, def) {
     const preLoop = Math.min(0.42, context.t / 600 * 0.18 + context.threat * 0.04);
     const pressureRamp = Math.min(0.72, context.pressureT / 480 * 0.42 + context.threat * 0.045);
-    const loopKick = context.t >= CFG.winTime ? 0.18 : 0;
-    const endlessRamp = Math.min(0.48, context.endlessT / 900 * 0.34 + context.threat * 0.035);
+    const loopKick = context.t >= CFG.winTime ? 0.26 : 0;
+    const rebalanceKick = context.t >= CFG.winTime ? Math.min(0.20, 0.08 + context.endlessT / 360 * 0.12) : 0;
+    const endlessRamp = Math.min(0.48, context.endlessT / 900 * 0.34 + context.threat * 0.035 + rebalanceKick);
     const raw = (1 + preLoop + pressureRamp + loopKick + endlessRamp) * (elite ? 0.92 : 1);
     const maxSpeed = context.playerSpeed * (elite ? 1.05 : 1.00);
     return Math.min(raw, maxSpeed / Math.max(1, def.spd));

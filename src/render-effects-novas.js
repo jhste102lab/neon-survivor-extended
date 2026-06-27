@@ -304,6 +304,8 @@ const RenderEffectNovas = {
     x.globalAlpha = 1 - ((Game.clarityK ? Game.clarityK() : 0) * 0.34);
     const visible = frame && frame.worldVisible ? frame.worldVisible : (px, py, pad) => render.worldVisible(px, py, pad);
     for (const nova of Game.novas) {
+      if (nova.visualHidden) continue;
+      if (Game.weaponEffectHiddenForSource && Game.weaponEffectHiddenForSource(nova.source)) continue;
       if (!visible(nova.x, nova.y, novaVisibilityPad(nova))) continue;
       drawNova(x, nova);
     }

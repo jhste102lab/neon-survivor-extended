@@ -53,8 +53,15 @@ const BossInteractionCastHandlers = Object.freeze({
 });
 const BOSS_RUSH_ENERGY = Object.freeze({
   mega: { gain: 0.18, absorb: 12, color: 'mega', burstN: 18, burstR: 9 },
-  normal: { gain: 0.08, absorb: 4, color: 'devour', burstN: 8, burstR: 5 },
+  normal: { gain: 0.05, absorb: 4, color: 'devour', burstN: 8, burstR: 5 },
 });
+
+function markBossVulnerable(boss, duration, bonus = 0.12) {
+  if (!boss || !boss.boss) return false;
+  boss.vulnerableT = Math.max(boss.vulnerableT || 0, duration || 0);
+  boss.vulnerableK = Math.max(boss.vulnerableK || 0, bonus || 0);
+  return true;
+}
 
 Object.assign(Game, {
   ensureBossInteractionState() {
@@ -115,6 +122,7 @@ Object.assign(Game, {
     const energy = BOSS_RUSH_ENERGY[kind] || BOSS_RUSH_ENERGY.normal;
     const maxHpGain = boss.maxHp * energy.gain;
     boss.maxHp += maxHpGain;
+    if (kind === 'normal') this.pulseBossRushPatterns(boss);
     boss.absorbCount = (boss.absorbCount || 0) + energy.absorb;
     const color = BossInteractions.color(energy.color);
     this.spawnBossLink(this.player.x, this.player.y, boss.x, boss.y, color, 0.55, tr('boss.empowered'));
@@ -122,6 +130,14 @@ Object.assign(Game, {
     this.spawnBurst(boss.x, boss.y, color, energy.burstN, 170, energy.burstR, 0.45);
     GameRuntime.updateBossBar(boss);
     return true;
+  },
+
+  pulseBossRushPatterns(boss) {
+    if (!boss) return;
+    if (boss.ringT != null) boss.ringT = Math.min(boss.ringT, 0.8);
+    if (boss.megaTrapT != null && boss.megaTrapT < 90) boss.megaTrapT = Math.min(boss.megaTrapT, 1.2);
+    if (boss.megaLaneT != null && boss.megaLaneT < 90) boss.megaLaneT = Math.min(boss.megaLaneT, 1.4);
+    markBossVulnerable(boss, 0.75, 0.10);
   },
 
   updateBossInteractions(dt, st) {
@@ -132,6 +148,7 @@ Object.assign(Game, {
       if (!boss || !boss.boss) continue;
       this.updateBossCast(boss, dt);
       this.updateBossDropAbsorb(boss, dt);
+      this.updateBossAntiKite(boss, dt);
     }
   },
 
@@ -268,6 +285,64 @@ Object.assign(Game, {
     if (!weapon || !weapon.id) return false;
     const sealed = (this.bossDebuffs.weaponSeals || []).some(seal => seal && seal.id === weapon.id && seal.t > 0);
     return !!(sealed || (this.bossDebuffs.weaponSilenceT > 0 && this.bossDebuffs.weaponSilenceId === weapon.id));
+  },
+
+
+  updateBossAntiKite(boss, dt) {
+    const cfg = CFG.bossAntiKite || {};
+    if (cfg.enabled === false || !boss || !this.player || this.time < CFG.winTime) return;
+    const p = this.player;
+    const d = Math.hypot(p.x - boss.x, p.y - boss.y) || 1;
+    boss.antiKiteCd = Math.max(0, (boss.antiKiteCd || 0) - dt);
+    if (boss.antiKiteCastT > 0) {
+      boss.antiKiteCastT = Math.max(0, boss.antiKiteCastT - dt);
+      if (boss.antiKiteCastT <= 0) {
+        boss.antiKitePullT = cfg.pullDuration || 1.7;
+        boss.antiKiteDashCountered = false;
+        this.spawnText(p.x, p.y - 70, tr('boss.antikite.pull'), true, '#ff4d5e');
+      }
+    }
+    if (boss.antiKitePullT > 0) {
+      boss.antiKitePullT = Math.max(0, boss.antiKitePullT - dt);
+      const dx = boss.x - p.x, dy = boss.y - p.y;
+      const dist = Math.hypot(dx, dy) || 1;
+      const safeExtra = boss.bossKind === 'mega' || boss.bossDef && boss.bossDef.mega ? (cfg.megaSafeExtra || 174) : (cfg.normalSafeExtra || 142);
+      const safe = (boss.r || 60) + safeExtra;
+      if (p.dashActiveT > 0 && !boss.antiKiteDashCountered) {
+        boss.antiKiteDashCountered = true;
+        markBossVulnerable(boss, 1.0, 0.14);
+      }
+      if (dist > safe) {
+        const dashResist = p.dashActiveT > 0 ? 0.28 : 1;
+        const speed = (cfg.pullSpeed || 190) * dashResist;
+        p.x += dx / dist * speed * dt;
+        p.y += dy / dist * speed * dt;
+      }
+      if ((boss.antiKiteFxT || 0) <= 0) {
+        boss.antiKiteFxT = 0.22;
+        this.spawnBossLink(boss.x, boss.y, p.x, p.y, '#ff4d5e', 0.28, 'PULL');
+      } else boss.antiKiteFxT -= dt;
+    }
+    if (d > (cfg.distance || 650)) boss.antiKiteHold = (boss.antiKiteHold || 0) + dt;
+    else boss.antiKiteHold = Math.max(0, (boss.antiKiteHold || 0) - dt * 1.5);
+    if (boss.antiKiteHold < (cfg.hold || 4) || boss.antiKiteCd > 0 || boss.antiKiteCastT > 0 || boss.antiKitePullT > 0) return;
+    if ((this.bossAntiKiteGlobalCdT || 0) > (this.time || 0)) return;
+    boss.antiKiteHold = 0;
+    boss.antiKiteCd = cfg.cooldown || 14;
+    this.bossAntiKiteGlobalCdT = (this.time || 0) + Math.max(4, (cfg.telegraph || 3) + 1.5);
+    boss.antiKiteCastT = cfg.telegraph || 3;
+    const aheadX = p.x + (p.moveX || 0) * 80;
+    const aheadY = p.y + (p.moveY || 0) * 80;
+    if (this.spawnHazard) {
+      this.spawnHazard({
+        kind: 'anti-kite', x: aheadX, y: aheadY, r: cfg.hazardRadius || 62,
+        warn: cfg.telegraph || 3, life: (cfg.telegraph || 3) + (cfg.hazardLife || 2.2),
+        dmg: cfg.hazardDamage || 18, tick: cfg.hazardTick || 0.62,
+        color: '#ff4d5e', source: 'boss:anti-kite', label: 'PULL', bypassInvuln: false,
+      });
+    }
+    this.spawnText(boss.x, boss.y - boss.r - 36, tr('boss.antikite.cast'), true, '#ff4d5e');
+    GameRuntime.banner(tr('boss.antikite.banner'), 'warn');
   },
 
   updateBossDropAbsorb(boss, dt) {

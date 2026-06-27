@@ -6,7 +6,8 @@ const CombatPlayer = (() => {
     return s.startsWith('director:idle') || s.startsWith('boss:mega');
   }
 
-  function playerCanBeHurt(player, source) {
+  function playerCanBeHurt(game, player, source) {
+    if (game && game.fieldTestInvincible) return false;
     return !player.dead && (!(player.invuln > 0) || sourceIgnoresInvulnerability(source));
   }
 
@@ -43,6 +44,26 @@ const CombatPlayer = (() => {
     game.metrics.lastDamageSource = source;
   }
 
+  function classifyDamageSource(source) {
+    const s = String(source || 'unknown');
+    if (s.startsWith('boss:mega') || s.startsWith('boss:')) return s.includes('ring') || s.includes('lane') || s.includes('trap') ? 'boss hazard' : 'boss projectile';
+    if (s.startsWith('enemy:') || s.includes('bullet')) return 'enemy projectile';
+    if (s.includes('contact')) return 'contact';
+    if (s.startsWith('hazard')) return 'hazard';
+    if (s.startsWith('director:')) return 'pressure';
+    return 'other';
+  }
+
+  function recordDamageEvent(game, damage, source) {
+    if (!game.metrics) return;
+    const event = { t: Math.round((game.time || 0) * 10) / 10, source: String(source || 'unknown').slice(0, 48), kind: classifyDamageSource(source), damage: Math.round(damage * 10) / 10 };
+    game.metrics.recentDamage = Array.isArray(game.metrics.recentDamage) ? game.metrics.recentDamage : [];
+    game.metrics.recentDamage.push(event);
+    game.metrics.recentDamage = game.metrics.recentDamage.filter(item => (game.time || 0) - item.t <= 5).slice(-10);
+    game.metrics.damageTakenBySource = game.metrics.damageTakenBySource || {};
+    game.metrics.damageTakenBySource[event.source] = (game.metrics.damageTakenBySource[event.source] || 0) + event.damage;
+  }
+
   function startPlayerInvulnerability(player) {
     player.invuln = CFG.player.invuln;
   }
@@ -50,6 +71,7 @@ const CombatPlayer = (() => {
   function applyPlayerHealthDamage(game, player, damage, source) {
     subtractPlayerHealth(player, damage);
     recordLastDamageSource(game, source);
+    recordDamageEvent(game, damage, source);
     startPlayerInvulnerability(player);
   }
 
@@ -59,6 +81,7 @@ const CombatPlayer = (() => {
 
   function recordDeathSource(game, source) {
     game.metrics.deathSource = source;
+    game.metrics.deathRecentDamage = Array.isArray(game.metrics.recentDamage) ? game.metrics.recentDamage.slice(-10) : [];
   }
 
   function markPlayerDead(game, player) {
@@ -80,7 +103,7 @@ const CombatPlayer = (() => {
   return {
     hurtPlayer(dmg, source = 'unknown') {
       const p = this.player;
-      if (!playerCanBeHurt(p, source)) return;
+      if (!playerCanBeHurt(this, p, source)) return;
 
       dmg = applyBarrierAbsorption(this, p, dmg, source);
       if (dmg <= 0) {

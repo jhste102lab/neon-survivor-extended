@@ -8,7 +8,7 @@
   function fireLaserBeam(game, p, s, st, evolved, ang) {
     const width = s.width * (evolved ? 1.35 : 1);
     const len = 1900;
-    game.beams.push({ x: p.x, y: p.y, a: ang, w: width, life: evolved ? 0.48 : 0.32, maxLife: evolved ? 0.48 : 0.32, color: evolved ? '#c39bff' : '#a36bff', len });
+    game.beams.push({ x: p.x, y: p.y, a: ang, w: width, life: evolved ? 0.48 : 0.32, maxLife: evolved ? 0.48 : 0.32, color: evolved ? '#c39bff' : '#a36bff', len, source: evolved ? 'weapon:laser:evolved' : 'weapon:laser' });
     const dx = Math.cos(ang), dy = Math.sin(ang);
     const hit = e => {
       if (e.hp <= 0) return;

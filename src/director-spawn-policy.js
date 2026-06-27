@@ -90,13 +90,15 @@ const DirectorSpawnPolicy = {
 
   endlessBossPatternPatch(baseDef, tier, pickFn = pick) {
     const patch = { endlessTier: tier };
-    const picks = ['ring'];
+    this.applyEndlessBossPatternPatch(patch, baseDef, 'ring', tier, pickFn);
+
+    const picks = [];
     if (tier >= 2) picks.push('summon');
     if (tier >= 3) picks.push('trap');
     if (tier >= 4) picks.push('lane');
     if (tier >= 5) picks.push('denseRing');
 
-    const count = Math.min(picks.length, 1 + Math.floor((tier - 1) / 2));
+    const count = Math.min(picks.length, Math.floor((tier - 1) / 2));
     for (let i = 0; i < count; i++) {
       const selected = pickFn(picks);
       picks.splice(picks.indexOf(selected), 1);
@@ -108,8 +110,8 @@ const DirectorSpawnPolicy = {
   applyEndlessBossPatternPatch(patch, baseDef, pattern, tier, pickFn = pick) {
     if (pattern === 'ring') {
       patch.ring = true;
-      patch.ringN = Math.max(patch.ringN || 0, (baseDef.ringN || 8) + Math.min(8, tier));
-      patch.ringCd = Math.min(patch.ringCd || 99, Math.max(3.4, (baseDef.ringCd || 5.7) - tier * 0.16));
+      patch.ringN = Math.max(patch.ringN || 0, Math.max(10, baseDef.ringN || 10) + Math.min(8, tier));
+      patch.ringCd = Math.min(patch.ringCd || 99, Math.max(3.2, (baseDef.ringCd || 4.4) - tier * 0.16));
       patch.ringGap = Math.max(patch.ringGap || 0, tier >= 3 ? 2 : 1);
     } else if (pattern === 'denseRing') {
       patch.ring = true;

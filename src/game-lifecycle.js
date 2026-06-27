@@ -2,7 +2,67 @@
 // Game run lifecycle, pause/resume, endless mode, and keyboard state transitions.
 Object.assign(Game, {
   /* ---------- lifecycle / frame orchestration ---------- */
+  isFieldTestAllowed() {
+    if (this.test && this.test.headless) return true;
+    if (typeof location === 'undefined') return false;
+    const host = location.hostname;
+    const params = new URLSearchParams(location.search || '');
+    return host === 'localhost' || host === '127.0.0.1' || params.get('fieldTest') === '1';
+  },
+
+  toggleFieldTestInvincible() {
+    if (!this.isFieldTestAllowed()) return false;
+    this.fieldTestInvincible = !this.fieldTestInvincible;
+    if (this.fieldTestInvincible) this.fieldTestTouched = true;
+    this.fieldTestRun = !!(this.fieldTestTouched || this.fieldTestInvincible);
+    GameRuntime.banner(this.fieldTestInvincible ? 'FIELD TEST: INVINCIBLE ON' : 'FIELD TEST: INVINCIBLE OFF', this.fieldTestInvincible ? 'warn' : 'good');
+    return true;
+  },
+
+  weaponIdFromEffectSource(source) {
+    const text = String(source || '');
+    const m = text.match(/^weapon:([^:]+)/);
+    return m ? m[1] : '';
+  },
+
+  weaponEffectHidden(id) {
+    return !!(id && this.hiddenWeaponEffects && this.hiddenWeaponEffects[id]);
+  },
+
+  weaponEffectHiddenForSource(source) {
+    return this.weaponEffectHidden(this.weaponIdFromEffectSource(source));
+  },
+
+  visualObjectWeaponId(obj) {
+    const fromSource = this.weaponIdFromEffectSource(obj && obj.source);
+    if (fromSource) return fromSource;
+    const kind = String(obj && obj.kind || '');
+    const kindMap = { bolt: 'bolt', missile: 'missile', boom: 'boomerang', lance: 'lance', ice: 'icespear', shotgun: 'shotgun', drone: 'drone', disc: 'ricochet', feather: 'phoenix', saw: 'chainsaw', mine: 'shockmine' };
+    return kindMap[kind] || '';
+  },
+
+  syncWeaponEffectVisibility(id) {
+    const hidden = this.weaponEffectHidden(id);
+    const sync = obj => {
+      if (this.visualObjectWeaponId(obj) === id) obj.visualHidden = hidden;
+    };
+    for (const obj of this.bullets) sync(obj);
+    for (const obj of this.beams) sync(obj);
+    for (const obj of this.bolts) sync(obj);
+    for (const obj of this.novas) sync(obj);
+  },
+
+  toggleWeaponEffectHidden(id) {
+    if (!id || !WEAPONS[id]) return false;
+    this.hiddenWeaponEffects = { ...(this.hiddenWeaponEffects || {}), [id]: !this.weaponEffectHidden(id) };
+    this.syncWeaponEffectVisibility(id);
+    this.slotsDirty = true;
+    GameRuntime.banner(`${WEAPONS[id].icon} ${WEAPONS[id].name} 이펙트 ${this.hiddenWeaponEffects[id] ? 'OFF' : 'ON'}`, this.hiddenWeaponEffects[id] ? 'warn' : 'good');
+    return true;
+  },
+
   reset() {
+    const keepFieldTest = !!this.fieldTestInvincible;
     const initial = createInitialRunState();
     this.time = initial.time; this.timeScale = initial.timeScale; this.userTimeScale = initial.userTimeScale; this.hitStopT = initial.hitStopT;
     this.enemies.length = 0; this.bullets.length = 0; this.ebullets.length = 0;
@@ -20,9 +80,14 @@ Object.assign(Game, {
     this.idleT = initial.idleT; this.lastIdleWarnT = initial.lastIdleWarnT;
     this.unlockNotified = initial.unlockNotified;
     this.metrics = initial.metrics;
+    this.hiddenWeaponEffects = initial.hiddenWeaponEffects;
     this.runId = initial.runId;
     this.runProof = initial.runProof;
     this.player = initial.player;
+    this.fieldTestInvincible = keepFieldTest && this.isFieldTestAllowed();
+    this.fieldTestTouched = !!this.fieldTestInvincible;
+    this.fieldTestRun = !!(this.fieldTestTouched || this.fieldTestInvincible);
+    this.lastChickenHealT = -999; this.chickenHealChain = 0;
     this.lastWeaponSlotCap = maxWeaponSlotsFor(this);
     this.slotsDirty = true;
     if (this.resetBossInteractionState) this.resetBossInteractionState();
@@ -88,6 +153,7 @@ Object.assign(Game, {
     this.dir.bossT = Math.max(this.dir.bossT || 0, 35);
     this.dir.nextEndlessBossT = Math.max(this.dir.nextEndlessBossT || 0, CFG.winTime + 60);
     this.slotsDirty = true;
+    if (typeof this.settleAllLateGems === 'function') this.settleAllLateGems();
     if (showBanner) GameRuntime.banner(tr('banner.endlessEnter'), 'warn');
   },
 
@@ -104,6 +170,7 @@ Object.assign(Game, {
   onKey(k, event = null) {
     if (this.state === 'title' && (k === 'enter' || k === ' ')) { this.start(); return; }
     if (!event || !event.repeat) {
+      if (k === 'f9' && this.toggleFieldTestInvincible()) return;
       if (k === 'tab' && (this.state === 'play' || this.state === 'pause' || this.state === 'levelup')) {
         this.focusMode = !this.focusMode;
         return;

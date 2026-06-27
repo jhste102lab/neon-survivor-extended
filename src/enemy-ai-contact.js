@@ -46,7 +46,9 @@ Object.assign(Game, {
     // 플레이어 접촉 피해
     if (!p.dead && dist < e.r + CFG.player.radius && p.invuln <= 0) {
       const source = e.boss ? 'boss:contact' : e.special ? `special:${e.special}:contact` : `enemy:${e.type}:contact`;
-      this.hurtPlayer(e.dmg * (1 + crowdPressure * 0.12), source);
+      let damage = e.dmg * (1 + crowdPressure * 0.12);
+      if (e.boss && e.bossDef && e.bossDef.mega && e.dashState !== 2 && this.time >= CFG.winTime) damage *= 0.75;
+      this.hurtPlayer(damage, source);
     }
   },
 

@@ -10,7 +10,7 @@ const Explosions = {
   },
 
   spawnExplosionRing(game, x, y, radius, color) {
-    game.novas.push({ x, y, r: 4, maxR: radius, dmg: 0, kb: 0, id: ++game.novaSeq, delay: 0, visualOnly: true, speed: 600, color });
+    game.novas.push({ x, y, r: 4, maxR: radius, dmg: 0, kb: 0, id: ++game.novaSeq, delay: 0, visualOnly: true, speed: 600, color, source: game._explosionVisualSource || 'weapon:explosion', visualHidden: !!(game.weaponEffectHiddenForSource && game.weaponEffectHiddenForSource(game._explosionVisualSource || '')) });
   },
 
   damageExplosionTargets(game, x, y, radius, dmg, source) {
@@ -61,6 +61,11 @@ const Explosions = {
 
 Object.assign(Game, {
   explode(x, y, radius, dmg, source = 'weapon:missile', child = false, color = '#ff7a2b') {
-    Explosions.explode(this, x, y, radius, dmg, source, child, color);
+    this._explosionVisualSource = source;
+    try {
+      Explosions.explode(this, x, y, radius, dmg, source, child, color);
+    } finally {
+      this._explosionVisualSource = '';
+    }
   },
 });

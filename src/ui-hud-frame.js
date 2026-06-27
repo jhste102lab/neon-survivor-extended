@@ -1,6 +1,19 @@
 'use strict';
 // Per-frame HUD refresh orchestration.
 const UIHudFrame = {
+  updateFieldTestBadge(G) {
+    let badge = $('fieldTestBadge');
+    const on = !!(G.fieldTestRun || G.fieldTestInvincible);
+    if (!badge && on) {
+      badge = document.createElement('div');
+      badge.id = 'fieldTestBadge';
+      document.body.appendChild(badge);
+    }
+    if (!badge) return;
+    badge.textContent = G.fieldTestInvincible ? 'FIELD TEST · INVINCIBLE' : 'FIELD TEST';
+    badge.classList.toggle('on', on);
+  },
+
   frame() {
     if (Game.test && Game.test.headless) return;
     const G = Game;
@@ -19,6 +32,7 @@ const UIHudFrame = {
       UIHudKills.updateIfDirty(G);
       if (G.slotsDirty) { UI.refreshSlots(); G.slotsDirty = false; }
       if (G.boss) UI.updateBossBar(G.boss);
+      UIHudFrame.updateFieldTestBadge(G);
     }
   },
 };

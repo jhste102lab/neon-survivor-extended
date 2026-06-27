@@ -32,7 +32,7 @@ Object.assign(Game, {
     this.trimMegaBossProjectilePressure();
     const stat = this.st || (typeof this.stat === 'function' ? this.stat() : null);
     const playerSpeed = stat && stat.spd ? stat.spd : CFG.player.speed;
-    const megaSpeedMult = playerSpeed * 0.62 / Math.max(1, def.spd);
+    const megaSpeedMult = playerSpeed * 0.68 / Math.max(1, def.spd);
 
     const boss = BossSpawnEntity.createBoss(def, position, 1 + (safeTier - 1) * 0.62, megaSpeedMult, {
       absorbedCount: absorption.count,
@@ -62,7 +62,7 @@ Object.assign(Game, {
       megaTier: tier,
       r: Math.max(104, (def.r || 142) * 0.78) + Math.min(24, over * 4),
       ringN: (def.ringN || 24) + Math.min(14, over * 2),
-      ringCd: Math.max(2.85, (def.ringCd || 4.3) - over * 0.2),
+      ringCd: Math.max(2.65, (def.ringCd || 4.3) - over * 0.2),
       summonN: (def.summonN || 8) + Math.min(10, Math.floor(over * 1.4)),
       summonCd: Math.max(4.9, (def.summonCd || 8.2) - over * 0.34),
       trapCd: Math.max(3.9, (def.trapCd || 6.1) - over * 0.22),

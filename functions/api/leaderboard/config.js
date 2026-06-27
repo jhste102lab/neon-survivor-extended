@@ -1,10 +1,10 @@
-export const RULESET = 'phase2-2026-06-20-evolution24';
+export const RULESET = 'phase3-2026-06-27-late-rebalance';
 export const WIN_TIME_SECONDS = 600;
 export const MAX_CLIENT_TIME_SCALE = 3;
 export const SESSION_TIME_GRACE_SECONDS = 10;
 export const PUBLIC_LIMIT = 10;
 export const STORAGE_LIMIT = 40;
-export const POST_PAYLOAD_LIMIT_BYTES = 4096;
+export const POST_PAYLOAD_LIMIT_BYTES = 8192;
 export const SESSION_PAYLOAD_LIMIT_BYTES = 2048;
 export const RATE_LIMIT_PER_MINUTE = 12;
 export const RATE_LIMIT_TTL_SECONDS = 120;

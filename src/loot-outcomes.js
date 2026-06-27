@@ -60,6 +60,10 @@ const LootOutcomes = {
       if (outcome.sound) GameRuntime.playSound(outcome.sound.name, ...(outcome.sound.args || []));
       if (outcome.burst) game.spawnBurst(outcome.burst.x, outcome.burst.y, outcome.burst.color, outcome.burst.count, outcome.burst.speed, outcome.burst.size, outcome.burst.life);
     } else if (outcome.type === 'collectDrop') {
+      if (game.metrics) {
+        game.metrics.dropsCollected = game.metrics.dropsCollected || {};
+        game.metrics.dropsCollected[outcome.kind] = (game.metrics.dropsCollected[outcome.kind] || 0) + (outcome.stack || 1);
+      }
       LootDropEffects.apply(game, outcome.kind, { stack: outcome.stack || 1 });
     } else if (outcome.type === 'dropExpired') {
       game.metrics.dropsExpired = (game.metrics.dropsExpired || 0) + 1;
