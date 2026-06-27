@@ -55,6 +55,8 @@ canvas#c{position:fixed;inset:0;display:block}
 .slot .overlv{position:absolute;top:-7px;right:-7px;min-width:19px;height:19px;padding:0 4px;border-radius:999px;
   background:linear-gradient(135deg,#ff2bd6,#ffd23d);border:1px solid rgba(255,255,255,.7);
   color:#061026;font-family:var(--font-en);font-size:10px;font-weight:900;line-height:18px;box-shadow:0 0 10px rgba(255,43,214,.55)}
+.slot.sealed{filter:saturate(.35) brightness(.72);border-color:rgba(159,125,255,.82);box-shadow:0 0 14px rgba(159,125,255,.34) inset,0 0 12px rgba(159,125,255,.22)}
+.slot .sealbadge{position:absolute;left:-6px;top:-7px;min-width:25px;height:17px;padding:0 4px;border-radius:999px;background:linear-gradient(135deg,#9f7dff,#41f0ff);color:#06101f;font-family:var(--font-en);font-size:9px;font-weight:900;line-height:17px;text-align:center;box-shadow:0 0 10px rgba(159,125,255,.5)}
 #combo{position:fixed;right:7%;top:38%;font-size:48px;color:var(--mg);text-shadow:0 0 18px var(--mg),0 0 44px rgba(255,43,214,.6);
   opacity:0;transform:scale(.6);font-family:var(--font-en);font-weight:900}
 #combo.pop{animation:comboPop .22s ease-out forwards}

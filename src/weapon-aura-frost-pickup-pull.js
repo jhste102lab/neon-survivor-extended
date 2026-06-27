@@ -9,6 +9,7 @@
 
   function magnetizeGemIfNear(player, gem, pull2) {
     if (gem.mag) return;
+    if (gem.bossContested || gem.bossProtectedT > 0) return;
     if (dist2(player.x, player.y, gem.x, gem.y) >= pull2) return;
     const controlScale = CFG.controlEffectScale == null ? 1 : CFG.controlEffectScale;
     gem.mag = true;
@@ -16,6 +17,7 @@
   }
 
   function pullDropIfNear(player, drop, pull2, dt) {
+    if (drop.bossContested || drop.bossProtectedT > 0) return;
     if (dist2(player.x, player.y, drop.x, drop.y) >= pull2) return;
     const distance = Math.hypot(player.x - drop.x, player.y - drop.y) || 1;
     const controlScale = CFG.controlEffectScale == null ? 1 : CFG.controlEffectScale;

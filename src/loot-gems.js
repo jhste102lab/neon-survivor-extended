@@ -7,7 +7,7 @@ const LootGems = {
       LootOutcomes.mergeGemValue(this.gems[0], v);
       return;
     }
-    this.gems.push({ x, y, v, tier, vx: rand(-40, 40), vy: rand(-40, 40), mag: false, ms: 0, bob: rand(0, TAU) });
+    this.gems.push({ x, y, v, tier, vx: rand(-40, 40), vy: rand(-40, 40), mag: false, ms: 0, bob: rand(0, TAU), age: 0 });
   },
 
   updateGems(dt, st) {
@@ -16,6 +16,18 @@ const LootGems = {
     const pr2 = st.pickup * st.pickup;
     for (let i = this.gems.length - 1; i >= 0; i--) {
       const g = this.gems[i];
+      g.age = (g.age || 0) + dt;
+      if (g.bossProtectedT > 0) g.bossProtectedT = Math.max(0, g.bossProtectedT - dt);
+      if (g.bossProtectedT > 0) {
+        g.bob += dt * 3;
+        g.x += (g.vx || 0) * dt;
+        g.y += (g.vy || 0) * dt;
+        g.vx *= 0.9 ** (dt * 60);
+        g.vy *= 0.9 ** (dt * 60);
+        continue;
+      }
+      if (this.tryAutoSettleLateGem && this.tryAutoSettleLateGem(g, i)) continue;
+      if (this.tryBlockBossPickup && this.tryBlockBossPickup(g, 'gem', i)) continue;
       if (this.updateFocusPickup && this.updateFocusPickup(g, dt, 'gem')) { g.mag = false; g.ms = 0; continue; }
       if (g.bossPullT > 0) g.bossPullT -= dt;
       else g.bossPull = false;

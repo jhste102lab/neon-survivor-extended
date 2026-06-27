@@ -11,8 +11,8 @@
     return Math.round(unitXp * count);
   }
 
-  function spawnXpGems(game, e) {
-    let v = rewardXpValue(e);
+  function spawnXpGems(game, e, value = rewardXpValue(e)) {
+    let v = Math.max(0, Math.round(value));
     while (v > 0) {
       let tier, tv;
       if (v >= 25) { tier = 2; tv = 25; } else if (v >= 5) { tier = 1; tv = 5; } else { tier = 0; tv = 1; }
@@ -21,7 +21,22 @@
     }
   }
 
+  function grantOrSpawnXp(game, e) {
+    const value = rewardXpValue(e);
+    const cfg = CFG.lateXp || {};
+    const lateDirect = cfg.enabled !== false && game.time >= (cfg.start || CFG.winTime) && !e.boss && !e.elite;
+    if (!lateDirect) {
+      spawnXpGems(game, e, value);
+      return;
+    }
+    const direct = Math.max(0, Math.round(value * (cfg.directRatio || 0.5)));
+    const gemValue = Math.max(0, value - direct);
+    if (direct > 0 && typeof game.addXp === 'function') game.addXp(direct);
+    spawnXpGems(game, e, gemValue);
+  }
+
   function grantBossRewards(game, e) {
+    if (game.releaseWeaponSeals) game.releaseWeaponSeals('bossKill');
     game.spawnDrop('chest', e.x, e.y, CFG.dropLife.bossChest, true);
     if (e.bossDef && e.bossDef.mega) game.spawnDrop('chest', e.x, e.y + 46, CFG.dropLife.bossChest, true);
     game.spawnDrop('chicken', e.x + 40, e.y);
@@ -61,7 +76,7 @@
 
   Object.assign(Game, {
     grantEnemyDeathRewards(e) {
-      spawnXpGems(this, e);
+      grantOrSpawnXp(this, e);
 
       if (e.boss) {
         grantBossRewards(this, e);

@@ -37,6 +37,8 @@ load('src/director-spawn-policy.js');
 load('src/pressure-pattern-plans.js');
 load('src/loot-outcomes.js');
 load('src/boss-interactions.js');
+load('src/boss-interactions-seals.js');
+load('src/boss-interactions-devour.js');
 load('src/enemy-ai-boss-movement.js');
 load('src/player-runtime.js');
 load('src/loot-drop-bomb-effect.js');
@@ -108,15 +110,34 @@ const Game = get('Game');
     damageEnemy(e, damage) { e.hp -= damage; },
   });
   Game.pullDropsToBoss(boss, 0);
-  assert(boss.hp === 100 && Game.drops.length === 0, 'absorbed drops must not heal bosses');
+  assert(boss.hp > 100 && Game.drops.length === 0, 'absorbed chicken should heal bosses within devour caps');
+  const afterChickenHeal = boss.hp;
   Game.pullGemsToBoss(boss, 0);
-  assert(boss.hp === 100 && Game.gems.length === 0, 'absorbed gems must not heal bosses');
+  assert(boss.hp >= afterChickenHeal && Game.gems.length === 0, 'absorbed gems should be consumed and may heal bosses by XP value');
+  boss.devourHealThisCast = 100;
   Game.drops = [{ kind: 'bomb', x: 0, y: 0, stack: 1 }];
   Game.pullDropsToBoss(boss, 0);
-  assert(boss.hp < 100, 'absorbed bombs should backfire as boss damage');
+  assert(boss.hp < afterChickenHeal, 'absorbed bombs should backfire from current devour healing');
   const afterBomb = boss.hp;
   Game.feedBossRushEnergy('normal');
   assert(boss.hp === afterBomb && boss.maxHp > 200, 'boss rush energy must not restore current boss hp');
+}
+
+{
+  const boss = { x: 0, y: 0, r: 50, hp: 150, maxHp: 200, boss: true, dropAbsorbT: 1 };
+  const drop = { kind: 'chicken', x: 4, y: 0, stack: 1, bossContested: true, bossContestedBoss: boss };
+  Object.assign(Game, {
+    boss,
+    drops: [drop],
+    gems: [],
+    bossLinks: [],
+    player: { x: 0, y: 0 },
+    spawnText(x, y, text) { commands.push(['text', text]); },
+    spawnBurst() {},
+  });
+  assert(Game.updateFocusPickup(drop, 0.016, 'drop') === false, 'contested pickups must not be focus-shelved');
+  assert(Game.tryBlockBossPickup(drop, 'drop', 0) === true, 'direct contact should block active devour pickups');
+  assert(drop.bossProtectedT > 0 && !drop.bossContested, 'blocked pickups should become protected and no longer contested');
 }
 
 {

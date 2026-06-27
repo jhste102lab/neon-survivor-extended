@@ -119,6 +119,10 @@ Object.assign(Game, {
 
   updateFocusPickup(item, dt, kind = 'gem') {
     if (!item) return false;
+    if (this.canRemoteCollectPickup && !this.canRemoteCollectPickup(item)) {
+      item.focusShelved = false;
+      return false;
+    }
     if (!this.focusModeActive() || item.bossPull) {
       item.focusShelved = false;
       return false;
@@ -162,6 +166,7 @@ Object.assign(Game, {
     for (let i = this.gems.length - 1; i >= 0; i--) {
       const g = this.gems[i];
       if (!g.focusShelved) continue;
+      if (this.canRemoteCollectPickup && !this.canRemoteCollectPickup(g)) continue;
       xp += g.v || 0;
       gemsCollected++;
       LootOutcomes.removeAt(this.gems, i);
@@ -169,6 +174,7 @@ Object.assign(Game, {
     for (let i = this.drops.length - 1; i >= 0; i--) {
       const d = this.drops[i];
       if (!d.focusShelved) continue;
+      if (this.canRemoteCollectPickup && !this.canRemoteCollectPickup(d)) continue;
       dropsCollected += Math.max(1, Number(d.stack || 1));
       LootOutcomes.removeAt(this.drops, i);
       LootOutcomes.applyAll(this, [LootOutcomes.dropOutcome(d.kind, d)]);

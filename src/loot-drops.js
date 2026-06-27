@@ -49,6 +49,15 @@ const LootDrops = {
         continue;
       }
       d.bob += dt * 2.5;
+      if (d.bossProtectedT > 0) d.bossProtectedT = Math.max(0, d.bossProtectedT - dt);
+      if (d.vx || d.vy) {
+        d.x += (d.vx || 0) * dt;
+        d.y += (d.vy || 0) * dt;
+        d.vx *= 0.88 ** (dt * 60);
+        d.vy *= 0.88 ** (dt * 60);
+      }
+      if (this.tryBlockBossPickup && this.tryBlockBossPickup(d, 'drop', i)) continue;
+      if (d.bossProtectedT > 0) continue;
       if (this.updateFocusPickup && this.updateFocusPickup(d, dt, 'drop')) continue;
       if (d.bossPullT > 0) d.bossPullT -= dt;
       else d.bossPull = false;

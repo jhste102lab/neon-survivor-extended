@@ -5,6 +5,7 @@ const UpgradeApplyDispatcher = {
     if (!this.hasTarget(game, choice)) return UpgradeApplyResults.missingGameOrChoice();
     const appliedChoice = UpgradeApplyResults.appliedChoice(choice);
     const result = this.applyKnownKind(game, choice);
+    if (result && result.applied && this.isWeaponKind(choice.kind)) this.recordRecentWeaponChoice(game, choice.id);
     return UpgradeApplyResults.finalize(game, result, appliedChoice);
   },
 
@@ -32,5 +33,12 @@ const UpgradeApplyDispatcher = {
 
   isPassiveKind(kind) {
     return kind === 'p' || kind === 'np';
+  },
+
+  recordRecentWeaponChoice(game, id) {
+    if (!game || !game.player || !id) return;
+    const recent = (game.player.recentWeaponIds || []).filter(existing => existing !== id);
+    recent.unshift(id);
+    game.player.recentWeaponIds = recent.slice(0, 8);
   },
 };

@@ -58,6 +58,7 @@ const LootDropEffects = {
     const motionGems = [];
     let xp = 0;
     for (const gem of gems) {
+      if (game.canRemoteCollectPickup && !game.canRemoteCollectPickup(gem)) continue;
       if (keep.has(gem)) {
         gem.mag = true;
         gem.ms = outcome.speed;

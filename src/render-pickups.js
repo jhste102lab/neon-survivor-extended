@@ -102,6 +102,12 @@ Object.assign(Render, {
         x.strokeStyle = '#ff2bd6';
         x.lineWidth = 1.5 * ms;
         x.beginPath(); x.arc(g.x, g.y, r + 7 * ms, 0, TAU); x.stroke();
+      } else if (g.bossContested) {
+        x.strokeStyle = '#ff2bd6';
+        x.lineWidth = 1.2 * ms;
+        x.setLineDash([4 * ms, 3 * ms]);
+        x.beginPath(); x.arc(g.x, g.y, r + 9 * ms, 0, TAU); x.stroke();
+        x.setLineDash([]);
       }
     }
     x.restore();
@@ -134,6 +140,12 @@ Object.assign(Render, {
         x.strokeStyle = '#ff2bd6';
         x.lineWidth = 2 * ms;
         x.beginPath(); x.arc(d.x, fy, 31 * ms, 0, TAU); x.stroke();
+      } else if (d.bossContested) {
+        x.strokeStyle = d.kind === 'bomb' ? '#ff4d5e' : '#ff2bd6';
+        x.lineWidth = 2 * ms;
+        x.setLineDash([5 * ms, 4 * ms]);
+        x.beginPath(); x.arc(d.x, fy, 32 * ms, 0, TAU); x.stroke();
+        x.setLineDash([]);
       }
       if ((d.stack || 1) > 1) {
         x.fillStyle = '#07121d';

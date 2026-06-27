@@ -4,7 +4,7 @@
 
 **NEON SURVIVOR** is a fast browser bullet-hell survival shooter about one tiny pilot trapped inside a glowing monster storm. You dodge by hand, your weapons fire automatically, and every level-up turns the run into a new build: lightning chains, black holes, drones, mines, lasers, orbitals, evolutions, companions, and boss pressure that keeps escalating past 10 minutes.
 
-No install, no downloads, no account required — open the page and survive as long as you can on PC or mobile. The current v1.1.6 Cloudflare build includes global leaderboard support, 24 weapon evolutions, the 10/13/16-minute endless fusion boss loop, boss affixes such as Devour, Drop Seal, Weapon Silence, and Control Warp, a gentler first 10-minute fusion boss, smoother non-mass-layer dense swarms, 0.5x late-game precision speed, stacked drops, clearer invulnerability feedback, adaptive late-game clarity, and companion Neon card highlighting.
+No install, no downloads, no account required — open the page and survive as long as you can on PC or mobile. The current v1.1.9 Cloudflare build includes global leaderboard support, 24 weapon evolutions, the 10/13/16-minute endless fusion boss loop, boss affixes such as Devour, Drop Seal, Weapon Silence, and Control Warp, a gentler first 10-minute fusion boss, smoother non-mass-layer dense swarms, 0.5x late-game precision speed, stacked drops, clearer invulnerability feedback, adaptive late-game clarity, and companion Neon card highlighting.
 
 ## ▶️ Play online
 
@@ -54,6 +54,7 @@ Public deployment: **https://neon-survivor.pages.dev/**. Static hosts work for t
 - **Late-game unlocks at 5 minutes**: expanded weapon/passive slots, weapon evolutions, companions, and field events become available.
 - **24 weapon evolutions**: every weapon can evolve when the weapon is maxed, its recipe passive is trained, and an Evolution Core is available. The 16 added evolutions emphasize damage, crowd control, targeting, and mobility pressure without adding new healing or shield effects.
 - **Endless late loop**: there is no fixed victory screen; enemy speed and density begin ramping from 6 minutes, pressure is noticeable by 7–8 minutes, and after 10 minutes the loop keeps scaling difficulty and boss pressure, including recurring 10-minute Cluster Core fusion boss events.
+- **Endless boss resource contests**: fusion/endless bosses can telegraph devour, mark pickups as contested, heal from chicken and XP gems, suffer bomb backfire from their own devour healing, punish devoured magnets with XP pressure, and temporarily seal multiple weapons with visible lock timers.
 - **Neon companions**: six companion roles can join and later gain rear-line resonance.
 - **Field events**: rift, storm, contract, and supply events add timed risk/reward objectives after unlock.
 - **Enemies and pressure systems**: six base enemy types, five post-unlock special enemies, three scheduled bosses, a recurring and more threatening 10-minute Cluster Core fusion boss, scaling endless bosses with randomized extra patterns, elites, silent idle-pressure missiles, and hazard patterns. Late-game enemy counts are preserved, while mass-enemy rendering is optimized with a low-resolution batching layer so huge swarms still look crowded with less frame hitching.

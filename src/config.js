@@ -45,4 +45,20 @@ const CFG = {
   xpNeed: lv => Math.round(6 + lv * 3.4 + Math.pow(lv, 1.5) + Math.pow(Math.max(0, lv - 40), 2) * 0.9),
   critChance: 0.1, critMult: 1.6,
   controlEffectScale: 0.34, // player/companion push-pull control tuning
+  endlessDevour: {
+    enabled: true, telegraph: 3, duration: 5.8, contestedRadiusDrop: 620, contestedRadiusGem: 520,
+    chickenHealMaxHp: 0.018, gemHealPerXpMaxHp: 0.00008, normalHealCapMaxHp: 0.05, megaHealCapMaxHp: 0.08,
+    normalHealPerMinuteCapMaxHp: 0.15, megaHealPerMinuteCapMaxHp: 0.24, lowHpHealScale: 0.5, lowHpThreshold: 0.15,
+    bombBackfireHealRatio: 0.10, bombBackfireCycleCapMaxHp: 0.08,
+    magnetXpProgressLoss: 0.25, magnetPenaltyCooldown: 30, magnetWeaponSealT: 25,
+    protectedT: 2.6, blockKnockSpeed: 360,
+  },
+  weaponSeals: {
+    enabled: true, minActiveWeapons: 4, megaCount: 6, normalBaseCount: 3, normalMidCount: 4, normalLateCount: 5,
+    normalMidTime: 780, normalLateTime: 1140, normalDuration: 70, megaDuration: 90,
+    gradualStart: 45, gradualEvery: 15, topWeaponProtectedCount: 3, topWeaponSealLimit: 1,
+  },
+  lateXp: {
+    enabled: true, start: 600, directRatio: 0.5, autoSettleAge: 18, autoSettleRatio: 0.5,
+  },
 };

@@ -46,9 +46,9 @@ const BossInteractions = (() => {
 globalThis.BossInteractions = BossInteractions;
 
 const BossInteractionCastHandlers = Object.freeze({
-  devour(game, boss) { game.startBossDropAbsorb(boss, 5.8); },
+  devour(game, boss) { game.startBossDropAbsorb(boss, (CFG.endlessDevour && CFG.endlessDevour.duration) || 5.8); },
   seal(game, boss) { game.applyDropSeal(boss, 7.2); },
-  silence(game, boss) { game.applyWeaponSilence(boss, boss.bossKind === 'mega' ? 5.2 : 4.4); },
+  silence(game, boss) { game.applyWeaponSilence(boss); },
   distort(game, boss) { game.applyControlDistortion(boss, boss.bossKind === 'mega' && game.time >= CFG.winTime + 540 ? 'invert' : 'swirl', boss.bossKind === 'mega' ? 2.7 : 2.2); },
 });
 const BOSS_RUSH_ENERGY = Object.freeze({
@@ -63,13 +63,15 @@ Object.assign(Game, {
         controlT: 0, controlMode: '', controlAngle: 0,
         dropSealT: 0,
         weaponSilenceT: 0, weaponSilenceId: '',
+        weaponSeals: [],
       };
     }
+    if (!Array.isArray(this.bossDebuffs.weaponSeals)) this.bossDebuffs.weaponSeals = [];
     if (!this.bossLinks) this.bossLinks = [];
   },
 
   resetBossInteractionState() {
-    this.bossDebuffs = { controlT: 0, controlMode: '', controlAngle: 0, dropSealT: 0, weaponSilenceT: 0, weaponSilenceId: '' };
+    this.bossDebuffs = { controlT: 0, controlMode: '', controlAngle: 0, dropSealT: 0, weaponSilenceT: 0, weaponSilenceId: '', weaponSeals: [] };
     this.bossLinks = [];
   },
 
@@ -82,7 +84,10 @@ Object.assign(Game, {
     boss.bossAbilityIndex = 0;
     boss.bossAbilityT = opts.initialAbilityT == null ? (boss.bossKind === 'mega' ? 4.2 : 3.2) : opts.initialAbilityT;
     boss.bossCast = null;
-    boss.dropAbsorbT = boss.bossAffixes.includes('devour') ? 2.8 : 0;
+    boss.dropAbsorbT = 0;
+    boss.devourHealThisCast = 0;
+    boss.devourBombDamageThisCast = 0;
+    boss.devourHealWindow = [];
     boss.absorbCount = boss.absorbCount || 0;
     if (boss.bossAffixes.length) {
       boss.bossDef.name = BossInteractions.bossStatusName(boss);
@@ -135,8 +140,46 @@ Object.assign(Game, {
     d.controlT = Math.max(0, d.controlT - dt);
     d.dropSealT = Math.max(0, d.dropSealT - dt);
     d.weaponSilenceT = Math.max(0, d.weaponSilenceT - dt);
+    this.updateWeaponSeals(dt);
     if (d.controlT <= 0) d.controlMode = '';
     if (d.weaponSilenceT <= 0) d.weaponSilenceId = '';
+  },
+
+  updateWeaponSeals(dt) {
+    const d = this.bossDebuffs;
+    const seals = this.bossDebuffs.weaponSeals || [];
+    const cfg = CFG.weaponSeals || {};
+    let changed = false;
+    for (let i = seals.length - 1; i >= 0; i--) {
+      const seal = seals[i];
+      seal.t = Math.max(0, (seal.t || 0) - dt);
+      seal.elapsed = (seal.elapsed || 0) + dt;
+      if (seal.t <= 0) {
+        seals[i] = seals[seals.length - 1];
+        seals.pop();
+        changed = true;
+      }
+    }
+    const gradualStart = cfg.gradualStart || 45;
+    const gradualEvery = cfg.gradualEvery || 15;
+    const gradualDue = seals.length
+      && seals.some(seal => (seal.elapsed || 0) >= gradualStart)
+      && (d.lastWeaponSealGradualReleaseT == null || (this.time || 0) - d.lastWeaponSealGradualReleaseT >= gradualEvery);
+    if (gradualDue) {
+      const oldest = seals.reduce((best, seal) => !best || (seal.elapsed || 0) > (best.elapsed || 0) ? seal : best, null);
+      const idx = seals.indexOf(oldest);
+      if (idx >= 0) {
+        seals[idx] = seals[seals.length - 1];
+        seals.pop();
+        d.lastWeaponSealGradualReleaseT = this.time || 0;
+        changed = true;
+      }
+    }
+    if (changed) {
+      this.bossDebuffs.weaponSeals = seals;
+      this.slotsDirty = true;
+      if (changed && typeof GameRuntime !== 'undefined') GameRuntime.banner(tr('boss.silence.release'), 'good');
+    }
   },
 
   updateBossLinks(dt) {
@@ -159,8 +202,10 @@ Object.assign(Game, {
     boss.bossAbilityT -= dt;
     if (boss.bossAbilityT > 0) return;
     const kind = affixes[boss.bossAbilityIndex++ % affixes.length];
-    boss.bossCast = { kind, t: 1.05, max: 1.05, color: BossInteractions.color(kind) };
+    const telegraph = (CFG.endlessDevour && CFG.endlessDevour.telegraph) || 3;
+    boss.bossCast = { kind, t: telegraph, max: telegraph, color: BossInteractions.color(kind) };
     boss.bossAbilityT = 10 + Math.min(6, affixes.length * 1.4);
+    if (kind === 'devour') this.markBossDevourTargets(boss, telegraph);
     this.spawnText(boss.x, boss.y - boss.r - 24, tr('boss.casting', { name: BossInteractions.label(kind) }), true, BossInteractions.color(kind));
   },
 
@@ -173,7 +218,11 @@ Object.assign(Game, {
   },
 
   startBossDropAbsorb(boss, duration) {
+    this.clearExpiredBossDevourTargets(boss, true);
     boss.dropAbsorbT = Math.max(boss.dropAbsorbT || 0, duration);
+    boss.devourHealThisCast = 0;
+    boss.devourBombDamageThisCast = 0;
+    boss.devourHealWindow = Array.isArray(boss.devourHealWindow) ? boss.devourHealWindow.filter(item => this.time - item.t < 60) : [];
     this.spawnText(boss.x, boss.y - boss.r - 24, tr('boss.devour.start'), true, BossInteractions.color('devour'));
     GameRuntime.banner(tr('boss.devour.banner'), 'warn');
   },
@@ -185,17 +234,15 @@ Object.assign(Game, {
     GameRuntime.banner(tr('boss.seal.banner'), 'warn');
   },
 
-  applyWeaponSilence(boss, duration) {
-    const choices = (this.player.weapons || []).filter(w => w && w.id && w.id !== 'bolt');
-    const fallback = (this.player.weapons || []).filter(w => w && w.id);
-    const target = choices.length ? pick(choices) : pick(fallback);
-    if (!target) return;
-    this.bossDebuffs.weaponSilenceId = target.id;
-    this.bossDebuffs.weaponSilenceT = Math.max(this.bossDebuffs.weaponSilenceT, duration);
-    const name = WEAPONS[target.id] && WEAPONS[target.id].name ? WEAPONS[target.id].name : target.id;
-    this.spawnText(this.player.x, this.player.y - 72, tr('boss.silence.start', { name }), true, BossInteractions.color('silence'));
+  applyWeaponSilence(boss) {
+    const count = this.weaponSealCountForBoss(boss);
+    const duration = boss && boss.bossKind === 'mega' ? ((CFG.weaponSeals && CFG.weaponSeals.megaDuration) || 90) : ((CFG.weaponSeals && CFG.weaponSeals.normalDuration) || 70);
+    const sealed = this.applyWeaponSeals(count, duration, boss && boss.bossKind === 'mega' ? 'mega' : 'normal');
+    if (!sealed.length) return;
+    const names = sealed.map(id => WEAPONS[id] && WEAPONS[id].name ? WEAPONS[id].name : id).join(', ');
+    this.spawnText(this.player.x, this.player.y - 72, tr('boss.silence.multiStart', { count: sealed.length }), true, BossInteractions.color('silence'));
     this.spawnBossLink(boss.x, boss.y, this.player.x, this.player.y, BossInteractions.color('silence'), 0.9, tr('boss.silence.short'));
-    GameRuntime.banner(tr('boss.silence.banner', { name }), 'warn');
+    GameRuntime.banner(tr('boss.silence.multiBanner', { count: sealed.length, names }), 'warn');
   },
 
   applyControlDistortion(boss, mode, duration) {
@@ -218,7 +265,9 @@ Object.assign(Game, {
 
   isWeaponSilenced(weapon) {
     this.ensureBossInteractionState();
-    return !!(weapon && this.bossDebuffs.weaponSilenceT > 0 && this.bossDebuffs.weaponSilenceId === weapon.id);
+    if (!weapon || !weapon.id) return false;
+    const sealed = (this.bossDebuffs.weaponSeals || []).some(seal => seal && seal.id === weapon.id && seal.t > 0);
+    return !!(sealed || (this.bossDebuffs.weaponSilenceT > 0 && this.bossDebuffs.weaponSilenceId === weapon.id));
   },
 
   updateBossDropAbsorb(boss, dt) {
@@ -226,62 +275,7 @@ Object.assign(Game, {
     boss.dropAbsorbT = Math.max(0, boss.dropAbsorbT - dt);
     this.pullDropsToBoss(boss, dt);
     this.pullGemsToBoss(boss, dt);
-  },
-
-  pullDropsToBoss(boss, dt) {
-    for (let i = this.drops.length - 1; i >= 0; i--) {
-      const d = this.drops[i];
-      if (dist2(d.x, d.y, boss.x, boss.y) > 620 * 620) continue;
-      this.pullPickupToBoss(d, boss, dt, 250, 'drop');
-      if (dist2(d.x, d.y, boss.x, boss.y) < Math.max(34, boss.r * 0.55) ** 2) {
-        const stack = Math.max(1, Math.min(CFG.maxDropStack || 3, Math.round(Number(d.stack) || 1)));
-        LootOutcomes.removeAt(this.drops, i);
-        if (d.kind === 'bomb') this.backfireAbsorbedBomb(boss, stack, d.x, d.y);
-        else this.recordBossAbsorb(boss, d.x, d.y, tr('boss.absorb'), '#7dffc1');
-      }
-    }
-  },
-
-  pullGemsToBoss(boss, dt) {
-    for (let i = this.gems.length - 1; i >= 0; i--) {
-      const g = this.gems[i];
-      if (dist2(g.x, g.y, boss.x, boss.y) > 520 * 520) continue;
-      this.pullPickupToBoss(g, boss, dt, 210, 'gem');
-      if (dist2(g.x, g.y, boss.x, boss.y) < Math.max(30, boss.r * 0.5) ** 2) {
-        LootOutcomes.removeAt(this.gems, i);
-        this.recordBossAbsorb(boss, g.x, g.y, tr('boss.absorb'), '#3dff8e');
-      }
-    }
-  },
-
-  pullPickupToBoss(item, boss, dt, speed, type) {
-    const dx = boss.x - item.x, dy = boss.y - item.y;
-    const d = Math.hypot(dx, dy) || 1;
-    item.x += dx / d * speed * dt;
-    item.y += dy / d * speed * dt;
-    item.bossPull = true;
-    item.bossPullT = 0.35;
-    item.bossPullFxT = (item.bossPullFxT || 0) - dt;
-    if (item.bossPullFxT <= 0) {
-      item.bossPullFxT = 0.22;
-      this.spawnBossLink(item.x, item.y, boss.x, boss.y, type === 'gem' ? '#3dff8e' : BossInteractions.color('devour'), 0.28, '');
-    }
-  },
-
-  absorbedBombDamage(stack) {
-    return Math.round(250 * Math.pow(1.3, Math.max(0, stack - 1)));
-  },
-  backfireAbsorbedBomb(boss, stack, x, y) {
-    const damage = this.absorbedBombDamage(stack);
-    this.recordBossAbsorb(boss, x, y, tr('boss.bombBackfire', { value: damage }), '#ff4d5e');
-    if (typeof this.damageEnemy === 'function') this.damageEnemy(boss, damage, 0, 0, 'drop:bomb:boss-absorb');
-    else boss.hp = Math.max(0, boss.hp - damage);
-    if (this.boss === boss && boss.hp > 0) GameRuntime.updateBossBar(boss);
-  },
-  recordBossAbsorb(boss, x, y, text, color = '#7dffc1') {
-    boss.absorbCount = (boss.absorbCount || 0) + 1;
-    this.spawnText(x, y - 16, text, false, color);
-    this.spawnBossLink(x, y, boss.x, boss.y, color, 0.32, '');
+    if (boss.dropAbsorbT <= 0) this.clearExpiredBossDevourTargets(boss, true);
   },
 
   spawnBossLink(x1, y1, x2, y2, color, life = 0.4, label = '') {

@@ -13,8 +13,11 @@ Object.assign(UI, {
       const max = w.lv >= MAX_LV;
       const over = Math.max(0, w.lv - MAX_LV);
       const evolved = p.evolved && p.evolved[w.id];
-      html += `<div class="slot${max ? ' max' : ''}${evolved ? ' evolved' : ''}" title="${evolved ? EVOLUTIONS[w.id].name : WEAPONS[w.id].name}">${evolved ? EVOLUTIONS[w.id].icon : WEAPONS[w.id].icon}
+      const seal = Game.bossDebuffs && Array.isArray(Game.bossDebuffs.weaponSeals) ? Game.bossDebuffs.weaponSeals.find(s => s.id === w.id && s.t > 0) : null;
+      const sealText = seal ? ` ${tr('boss.silence.sealedShort', { seconds: Math.ceil(seal.t) })}` : '';
+      html += `<div class="slot${max ? ' max' : ''}${evolved ? ' evolved' : ''}${seal ? ' sealed' : ''}" title="${evolved ? EVOLUTIONS[w.id].name : WEAPONS[w.id].name}${sealText}">${evolved ? EVOLUTIONS[w.id].icon : WEAPONS[w.id].icon}
         <span class="pips">${Array.from({ length: MAX_LV }, (_, i) => `<i class="${i < Math.min(w.lv, MAX_LV) ? 'on' : ''}"></i>`).join('')}</span>
+        ${seal ? `<span class="sealbadge">🔒${Math.ceil(seal.t)}</span>` : ''}
         ${over ? `<span class="overlv">+${over}</span>` : evolved ? '<span class="overlv">E</span>' : ''}</div>`;
     }
     $('wslots').innerHTML = html;
