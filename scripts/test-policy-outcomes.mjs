@@ -34,6 +34,7 @@ function everyCommandType(commands, type) { return commands.every(command => com
 function someCommandType(commands, type) { return commands.some(command => commandType(command) === type); }
 
 load('src/director-spawn-policy.js');
+load('src/boss-spawn-policy.js');
 load('src/pressure-pattern-plans.js');
 load('src/loot-outcomes.js');
 load('src/boss-interactions.js');
@@ -48,6 +49,7 @@ load('src/loot-drop-magnet-effect.js');
 load('src/loot-drop-effects.js');
 load('src/game-loop-frame.js');
 const DirectorSpawnPolicy = get('DirectorSpawnPolicy');
+const BossSpawnPolicy = get('BossSpawnPolicy');
 const PressurePatternPlans = get('PressurePatternPlans');
 const LootDropEffects = get('LootDropEffects');
 const BossInteractions = get('BossInteractions');
@@ -61,6 +63,9 @@ const Game = get('Game');
   assert(DirectorSpawnPolicy.normalBatchSize(ctx) >= 1, 'normal batch size should be pure and positive');
   assert(DirectorSpawnPolicy.eliteDelay({ time: 700, winTime: 600, endless: true, threat: 5 }) >= 18, 'elite delay should be pure');
   assert(DirectorSpawnPolicy.scheduledBossIndex({ time: 360, bossIdx: 1, hasBoss: false }) === 1, 'scheduled boss policy returns due boss index');
+  assert(DirectorSpawnPolicy.scheduledBossIndex({ time: 360, bossIdx: 1, hasBoss: true }) === 1, 'scheduled bosses should still appear when an earlier boss is alive');
+  assert(DirectorSpawnPolicy.shouldSpawnEndlessBoss({ endless: true, bossIdx: 3, activeEvent: true, activeBossCount: 5, bossCap: 1 }) === true, 'endless bosses should not be blocked by active events or existing bosses');
+  assert(BossSpawnPolicy.canSpawnBoss({ activeEvent: { state: 'active' }, activeBossCount: () => 4, bossCap: () => 1 }) === true, 'boss spawn admission should allow overlap with field events and existing bosses');
   assert(!BossInteractions.NORMAL_AFFIXES.includes('seal'), 'endless boss affix rotation must not block item drops');
   assert(BossInteractions.megaAffixesForTier(3).length === 1, 'mega bosses should keep one affix only');
   const patch = DirectorSpawnPolicy.endlessBossPatternPatch({ ringN: 8, ringCd: 5.7 }, 3, arr => arr[0]);

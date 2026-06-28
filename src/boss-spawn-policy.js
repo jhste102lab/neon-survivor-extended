@@ -18,9 +18,6 @@ const BossSpawnPolicy = Object.freeze({
   },
 
   canSpawnBoss(game) {
-    if (BossSpawnPolicy.activeEventBlocksSpawn(game)) return false;
-    if (BossSpawnPolicy.activeBossCapBlocksSpawn(game)) return false;
     return true;
   },
 });
-

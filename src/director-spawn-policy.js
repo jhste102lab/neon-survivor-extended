@@ -53,7 +53,7 @@ const DirectorSpawnPolicy = {
 
   scheduledBossIndex(input) {
     const bossTimes = input.bossTimes || [180, 360, 540];
-    if (input.bossIdx >= bossTimes.length || input.time < bossTimes[input.bossIdx] || input.hasBoss) return -1;
+    if (input.bossIdx >= bossTimes.length || input.time < bossTimes[input.bossIdx]) return -1;
     return input.bossIdx;
   },
 
@@ -67,8 +67,7 @@ const DirectorSpawnPolicy = {
   shouldSpawnEndlessBoss(input) {
     const bossTimes = input.bossTimes || [180, 360, 540];
     if (!input.endless || input.bossIdx < bossTimes.length) return false;
-    if (input.activeEvent) return false;
-    return input.activeBossCount < input.bossCap;
+    return true;
   },
 
   endlessBossDelay(input) {

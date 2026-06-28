@@ -119,10 +119,6 @@ Object.assign(Game, {
     }
     if (!DirectorSpawnPolicy.endlessNormalBossDue({ time: t, winTime: CFG.winTime, next: nextNormal, megaSlot: false })) return;
     this.advanceBossRushNormalSchedule(t);
-    if (this.activeEvent && this.activeEvent.state === 'active') {
-      d.nextEndlessBossT = Math.min(d.nextEndlessBossT || Infinity, t + 10);
-      return;
-    }
     if (DirectorSpawnPolicy.shouldSpawnEndlessBoss({
       endless: this.endless,
       bossIdx: 3,

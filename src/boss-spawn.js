@@ -24,7 +24,6 @@ Object.assign(Game, {
   spawnMegaBoss(tier = 1) {
     const def = BOSSES.find(b => b && b.mega) || BOSSES[3];
     if (!def) return null;
-    if (this.activeEvent && this.activeEvent.state === 'active') return null;
 
     const position = EnemyFactoryPlacement.bossPosition(this);
     const safeTier = Math.max(1, Math.floor(Number(tier) || 1));
@@ -103,7 +102,8 @@ Object.assign(Game, {
     const important = [];
     const normal = [];
     for (const enemy of this.enemies) {
-      if (enemy.boss || enemy.elite || enemy.special) important.push(enemy);
+      if (enemy.boss) continue;
+      if (enemy.elite || enemy.special) important.push(enemy);
       else normal.push(enemy);
     }
     normal.sort((a, b) => dist2(a.x, a.y, position.x, position.y) - dist2(b.x, b.y, position.x, position.y));
