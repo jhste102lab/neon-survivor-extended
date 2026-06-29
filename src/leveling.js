@@ -5,14 +5,18 @@ Object.assign(Game, {
 
   addXp(v) {
     const p = this.player;
+    const xpMul = this.st ? this.st.xp : 1;
+    v = Math.max(0, Number(v) || 0) * xpMul;
     if (p.xpDebt > 0 && v > 0) {
       const repay = Math.min(p.xpDebt, v);
       p.xpDebt -= repay;
       v -= repay;
-      if (repay > 0 && typeof this.spawnText === 'function') this.spawnText(p.x, p.y - 56, tr('boss.xpDebtPaid', { value: Math.round(repay) }), false, '#41f0ff');
+      if (repay > 0 && typeof this.spawnText === 'function') {
+        this.spawnText(p.x, p.y - 56, tr('boss.xpDebtPaid', { value: Math.round(repay), remaining: Math.ceil(p.xpDebt || 0) }), false, '#41f0ff');
+      }
     }
     if (!(v > 0)) return;
-    p.xp += v * (this.st ? this.st.xp : 1);
+    p.xp += v;
     let ups = 0;
     while (p.xp >= p.xpNeed) {
       p.xp -= p.xpNeed;

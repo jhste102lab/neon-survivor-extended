@@ -5,6 +5,13 @@ function pauseDetailEscape(value) {
 }
 
 const UIPauseOverlay = {
+  termGlossaryHtml() {
+    const rows = ['pierce', 'delay', 'kb', 'cd', 'hitCd']
+      .map(key => `<span>${pauseDetailEscape(tr(`pause.terms.${key}`))}</span>`)
+      .join('');
+    return `<div class="pauseTermCard"><b>${pauseDetailEscape(tr('pause.terms.title'))}</b><div>${rows}</div></div>`;
+  },
+
   detailCardHtml(detail) {
     if (!detail) return '';
     const rows = (detail.details || []).slice(0, 6).map(line => `<span>${pauseDetailEscape(line)}</span>`).join('');
@@ -22,7 +29,8 @@ const UIPauseOverlay = {
     const panel = $('pauseDetail');
     if (!panel) return;
     const details = (build.slots || []).map(slot => slot.detail).filter(Boolean);
-    panel.innerHTML = details.map(detail => this.detailCardHtml(detail)).join('');
+    const hasWeapon = details.some(detail => detail.kind === 'weapon');
+    panel.innerHTML = details.map(detail => this.detailCardHtml(detail)).join('') + (hasWeapon ? this.termGlossaryHtml() : '');
     panel.classList.toggle('hide', !details.length);
   },
 

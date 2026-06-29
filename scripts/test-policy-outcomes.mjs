@@ -15,7 +15,11 @@ const context = vm.createContext({
   clamp: (n, a, b) => Math.min(b, Math.max(a, n)),
   lerp: (a, b, t) => a + (b - a) * t,
   dist2: (x1, y1, x2, y2) => (x1 - x2) ** 2 + (y1 - y2) ** 2,
-  CFG: { winTime: 600, maxDropStack: 3, magnetMotionLimit: 2, slowSpeedUnlockTime: 480, player: { radius: 13 } },
+  CFG: {
+    winTime: 600, maxDropStack: 3, magnetMotionLimit: 2, slowSpeedUnlockTime: 480, player: { radius: 13 },
+    xpNeed: lv => Math.round(6 + lv * 3.4 + Math.pow(lv, 1.5)),
+    endlessDevour: { magnetXpProgressLoss: 0.15, magnetXpDebtCapRatio: 0.5, magnetPenaltyCooldown: 30, magnetWeaponSealT: 25 },
+  },
   UI: { syncSpeedControls: scale => commands.push(['speedSync', scale]) },
   tr: (key, vars = {}) => `${key}${vars.value == null ? '' : `:${vars.value}`}`,
   Game: { time: 0, hitStopT: 0, timeScale: 1, shakeT: 0, test: { noFx: true } },
@@ -40,6 +44,7 @@ load('src/loot-outcomes.js');
 load('src/boss-interactions.js');
 load('src/boss-interactions-seals.js');
 load('src/boss-interactions-devour.js');
+load('src/leveling.js');
 load('src/enemy-ai-boss-movement.js');
 load('src/player-runtime.js');
 load('src/loot-drop-bomb-effect.js');
@@ -143,6 +148,40 @@ const Game = get('Game');
   assert(Game.updateFocusPickup(drop, 0.016, 'drop') === false, 'contested pickups must not be focus-shelved');
   assert(Game.tryBlockBossPickup(drop, 'drop', 0) === true, 'direct contact should block active devour pickups');
   assert(drop.bossProtectedT > 0 && !drop.bossContested, 'blocked pickups should become protected and no longer contested');
+}
+
+{
+  commands.length = 0;
+  Object.assign(Game, {
+    time: 700,
+    levelQueue: 0,
+    test: { noFx: true, headless: true },
+    st: { xp: 1.5 },
+    player: { x: 0, y: 0, level: 20, xp: 0, xpNeed: 160, xpDebt: 30, dead: false },
+    spawnText(x, y, text) { commands.push(['text', text]); },
+    hitStop() {},
+  });
+  Game.addXp(20);
+  assert(Game.player.xpDebt === 0 && Game.player.xp === 0, 'XP multiplier should help repay XP debt before filling the level bar');
+  Game.addXp(120);
+  assert(Game.player.level > 20 && Game.levelQueue > 0, 'XP should resume leveling after debt is repaid');
+
+  const boss = { x: 0, y: 0, r: 50, hp: 100, maxHp: 200, boss: true, absorbCount: 0 };
+  Object.assign(Game, {
+    time: 740,
+    boss,
+    bossLinks: [],
+    st: { xp: 1 },
+    player: { x: 0, y: 0, level: 30, xp: 0, xpNeed: 1000, xpDebt: 490, weapons: [{ id: 'bolt', lv: 5 }] },
+    spawnBossLink() {},
+    spawnText(x, y, text) { commands.push(['text', text]); },
+    sealRecentWeapon(duration, reason) { commands.push(['seal', duration, reason]); },
+  });
+  Game.applyDevouredMagnetPenalty(boss, 0, 0);
+  assert(Game.player.xpDebt === 500, 'devoured magnet XP debt should cap at the configured fraction of current XP need');
+  Game.applyDevouredMagnetPenalty(boss, 0, 0);
+  assert(Game.player.xpDebt === 500, 'devoured magnet XP debt should not grow after the cap is reached');
+  assert(commands.some(command => command[0] === 'text' && String(command[1]).includes('boss.magnetXpDebtCapped')), 'capped debt should use a non-zero-loss feedback label');
 }
 
 {

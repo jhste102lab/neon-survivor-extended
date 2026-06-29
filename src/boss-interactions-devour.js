@@ -177,13 +177,21 @@ Object.assign(Game, {
   applyDevouredMagnetPenalty(boss, x, y) {
     const cfg = this.devourConfig();
     const p = this.player;
-    const loss = Math.max(1, Math.round((p.xpNeed || 1) * (cfg.magnetXpProgressLoss || 0.25)));
+    const lossRatio = cfg.magnetXpProgressLoss == null ? 0.25 : cfg.magnetXpProgressLoss;
+    const debtCapRatio = cfg.magnetXpDebtCapRatio == null ? 0.5 : cfg.magnetXpDebtCapRatio;
+    const loss = Math.max(1, Math.round((p.xpNeed || 1) * lossRatio));
     const actual = Math.min(p.xp || 0, loss);
     p.xp = Math.max(0, (p.xp || 0) - actual);
     const debt = loss - actual;
-    if (debt > 0) p.xpDebt = (p.xpDebt || 0) + debt;
-    this.recordBossAbsorb(boss, x, y, tr('boss.magnetXpLoss', { value: Math.round(loss) }), '#41f0ff');
-    if (debt > 0 && (this.time - (this.lastMagnetPenaltyT || -999)) >= (cfg.magnetPenaltyCooldown || 30)) {
+    const debtCap = Math.max(0, Math.round((p.xpNeed || 1) * debtCapRatio));
+    const debtAdded = debt > 0 ? Math.min(debt, Math.max(0, debtCap - (p.xpDebt || 0))) : 0;
+    if (debtAdded > 0) p.xpDebt = (p.xpDebt || 0) + debtAdded;
+    const applied = actual + debtAdded;
+    const label = applied > 0
+      ? tr('boss.magnetXpLoss', { value: Math.round(applied), debt: Math.ceil(p.xpDebt || 0) })
+      : tr('boss.magnetXpDebtCapped', { debt: Math.ceil(p.xpDebt || 0) });
+    this.recordBossAbsorb(boss, x, y, label, '#41f0ff');
+    if (debtAdded > 0 && (this.time - (this.lastMagnetPenaltyT || -999)) >= (cfg.magnetPenaltyCooldown || 30)) {
       this.lastMagnetPenaltyT = this.time || 0;
       this.sealRecentWeapon(cfg.magnetWeaponSealT || 25, 'magnet');
     }

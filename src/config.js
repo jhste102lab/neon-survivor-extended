@@ -50,7 +50,7 @@ const CFG = {
     chickenHealMaxHp: 0.018, gemHealPerXpMaxHp: 0.00008, normalHealCapMaxHp: 0.05, megaHealCapMaxHp: 0.08,
     normalHealPerMinuteCapMaxHp: 0.15, megaHealPerMinuteCapMaxHp: 0.24, lowHpHealScale: 0.5, lowHpThreshold: 0.15,
     bombBackfireHealRatio: 0.10, bombBackfireCycleCapMaxHp: 0.08,
-    magnetXpProgressLoss: 0.25, magnetPenaltyCooldown: 30, magnetWeaponSealT: 25,
+    magnetXpProgressLoss: 0.15, magnetXpDebtCapRatio: 0.5, magnetPenaltyCooldown: 30, magnetWeaponSealT: 25,
     protectedT: 2.6, blockKnockSpeed: 360,
   },
   weaponSeals: {
