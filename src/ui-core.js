@@ -5,7 +5,7 @@
    ================================================================ */
 function showOverlay(id) {
   if (Game.test && Game.test.headless) return;
-  for (const o of ['titleOv', 'lvOv', 'pauseOv', 'overOv', 'winOv'])
+  for (const o of ['titleOv', 'lvOv', 'pauseOv', 'bestiaryOv', 'overOv', 'winOv'])
     $(o).classList.toggle('hide', o !== id);
 }
 

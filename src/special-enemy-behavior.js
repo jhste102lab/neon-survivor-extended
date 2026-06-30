@@ -6,6 +6,7 @@ const SPECIAL_ENEMY_BEHAVIOR_BY_TYPE = Object.freeze({
   miner: updateSpecialEnemyMiner,
   spawner: updateSpecialEnemySpawner,
   bulwark: updateSpecialEnemyBulwark,
+  bomber: updateSpecialEnemyBomber,
 });
 
 Object.assign(Game, {

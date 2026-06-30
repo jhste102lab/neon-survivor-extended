@@ -25,6 +25,10 @@ Object.assign(Game, {
     }
   },
 
+  updateLateFairnessRewards(dt) {
+    if (this.updateLateSurvivalBonus) this.updateLateSurvivalBonus(dt);
+  },
+
   enterEndlessIfReady(player) {
     if (this.time >= CFG.winTime && !player.dead && !this.endless) this.enterEndlessLoop();
   },

@@ -66,7 +66,7 @@ Object.assign(Game, {
     const initial = createInitialRunState();
     this.time = initial.time; this.timeScale = initial.timeScale; this.userTimeScale = initial.userTimeScale; this.hitStopT = initial.hitStopT;
     this.enemies.length = 0; this.bullets.length = 0; this.ebullets.length = 0;
-    this.gems.length = 0; this.drops.length = 0; this.hazards.length = 0; this.particles.length = 0;
+    this.gems.length = 0; this.drops.length = 0; this.hazards.length = 0; if (this.gravityFields) this.gravityFields.length = 0; this.particles.length = 0;
     this.texts.length = 0; this.novas.length = 0; this.beams.length = 0; this.bolts.length = 0; this.megaAbsorbs.length = 0; this.bossLinks.length = 0;
     this.kills = initial.kills; this.combo = initial.combo; this.comboT = initial.comboT; this.maxCombo = initial.maxCombo;
     this.boss = initial.boss; this.levelQueue = initial.levelQueue; this.deathT = initial.deathT; this.novaSeq = initial.novaSeq;

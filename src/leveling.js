@@ -11,8 +11,16 @@ Object.assign(Game, {
       const repay = Math.min(p.xpDebt, v);
       p.xpDebt -= repay;
       v -= repay;
+      if (this.metrics) this.metrics.xpDebtRepaid = (this.metrics.xpDebtRepaid || 0) + repay;
       if (repay > 0 && typeof this.spawnText === 'function') {
-        this.spawnText(p.x, p.y - 56, tr('boss.xpDebtPaid', { value: Math.round(repay), remaining: Math.ceil(p.xpDebt || 0) }), false, '#41f0ff');
+        const quiet = (this.time - (this.lastXpDebtTextT || -999)) < 0.9 && p.xpDebt > 0;
+        if (!quiet) {
+          this.lastXpDebtTextT = this.time || 0;
+          this.spawnText(p.x, p.y - 56, tr('boss.xpDebtPaid', { value: Math.round(repay), remaining: Math.ceil(p.xpDebt || 0) }), false, '#41f0ff');
+        }
+        if (p.xpDebt <= 0) {
+          this.spawnText(p.x, p.y - 72, tr('boss.xpDebtCleared'), true, '#7dffc1');
+        }
       }
     }
     if (!(v > 0)) return;

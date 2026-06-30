@@ -7,7 +7,7 @@ const RunSnapshot = {
   lastSaveMs: 0,
   pending: false,
   lastError: '',
-  gameplayArrays: Object.freeze(['enemies', 'bullets', 'ebullets', 'gems', 'drops', 'hazards', 'novas']),
+  gameplayArrays: Object.freeze(['enemies', 'bullets', 'ebullets', 'gems', 'drops', 'hazards', 'gravityFields', 'novas']),
   visualArrays: Object.freeze(['particles', 'texts', 'beams', 'bolts', 'megaAbsorbs']),
 
   noteFailure(action, error) {
@@ -72,6 +72,7 @@ const RunSnapshot = {
         gems: game.gems,
         drops: game.drops,
         hazards: game.hazards,
+        gravityFields: game.gravityFields || [],
         novas: game.novas,
       }),
     };
@@ -130,6 +131,7 @@ const RunSnapshot = {
     if (!run.player || run.player.dead || !(run.player.hp > 0)) return null;
     if (!Number.isFinite(run.time) || run.time < 1) return null;
     for (const key of this.gameplayArrays) {
+      if (key === 'gravityFields' && run[key] == null) { run[key] = []; continue; }
       if (!Array.isArray(run[key])) return null;
     }
     return payload;
@@ -161,6 +163,7 @@ const RunSnapshot = {
     game.fieldTestRun = !!(game.fieldTestTouched || game.fieldTestInvincible);
 
     for (const key of this.gameplayArrays) {
+      if (!game[key]) game[key] = [];
       game[key].length = 0;
       game[key].push(...run[key]);
     }

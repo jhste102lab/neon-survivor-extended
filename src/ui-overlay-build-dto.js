@@ -54,12 +54,22 @@ function pauseTranscendLevel(player, id) {
   return { tdmg: player.transcend.dmg, tcd: player.transcend.cd, thp: player.transcend.hp, tspd: player.transcend.spd }[id];
 }
 
-function pauseTranscendSlotDto(transcend, level) {
+function pauseTranscendDetails(player, transcend) {
+  const level = pauseTranscendLevel(player, transcend.id);
+  if (transcend.id === 'tdmg') return [`누적 레벨: ${level}`, `모든 무기 피해: +${level * 8}%p`];
+  if (transcend.id === 'tcd') return [`누적 레벨: ${level}`, `공격 간격 배율: ${Math.pow(0.96, level).toFixed(2)}x`, '최소 공격 간격: 0.30초'];
+  if (transcend.id === 'thp') return [`누적 레벨: ${level}`, `최대 체력: +${level * 20}`, '선택할 때마다 즉시 20 회복'];
+  if (transcend.id === 'tspd') return [`누적 레벨: ${level}`, `이동속도: +${level * 5}%`, '이동속도 상한: 2.3배'];
+  return [`누적 레벨: ${level}`];
+}
+
+function pauseTranscendSlotDto(player, transcend, level) {
   return pauseBuildSlotDto(
-    'bslot',
-    [['style', 'border-color:rgba(255,43,214,.5)']],
+    'bslot detailSlot',
+    [['style', 'border-color:rgba(255,43,214,.5)'], ['data-detail-kind', 'transcend'], ['data-detail-id', transcend.id]],
     transcend.icon,
-    level
+    level,
+    { kind: 'transcend', id: transcend.id, icon: transcend.icon, name: transcend.name, level: `Lv.${level}`, desc: transcend.desc, details: pauseTranscendDetails(player, transcend) }
   );
 }
 
@@ -82,7 +92,7 @@ const UIPauseBuildDto = {
     }
     for (const transcend of TRANSCEND) {
       const level = pauseTranscendLevel(player, transcend.id);
-      if (level > 0) slots.push(pauseTranscendSlotDto(transcend, level));
+      if (level > 0) slots.push(pauseTranscendSlotDto(player, transcend, level));
     }
     return { slots, companionInfo };
   },

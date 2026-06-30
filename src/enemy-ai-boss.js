@@ -8,9 +8,11 @@ Object.assign(Game, {
     const enrage = getBossEnrage(this, e);
     updateBossDashState(e, dt, dx, dy, enrage);
     const movement = getBossMovement(e, dx, dy, dist, enrage);
+    updateBossPatternPhase(this, e, dt);
     updateBossSummonPattern(this, e, dt, enrage, bossDef);
     updateBossRingBulletPattern(this, e, dt, enrage, bossDef);
     updateBossMegaHazardPatterns(this, e, dt, enrage, bossDef);
+    updateBossFairnessLaserPattern(this, e, dt, enrage, bossDef);
     return applyBossFinalMovementModifiers(e, movement);
   },
 });
@@ -26,6 +28,66 @@ function updateBossMegaHazardPatterns(game, e, dt, enrage, bossDef) {
   if (!bossDef || !(game.spawnHazard)) return;
   if (bossDef.mega || bossDef.trap) updateBossMegaRingTrap(game, e, dt, enrage, bossDef);
   if (bossDef.mega || bossDef.laneTrap) updateBossMegaLaneTrap(game, e, dt, enrage, bossDef);
+}
+
+function updateBossPatternPhase(game, e, dt) {
+  e.patternPhaseT = Math.max(0, (e.patternPhaseT || 0) - dt);
+  e.patternWarnT = Math.max(0, (e.patternWarnT || 0) - dt);
+  if (e.patternPhaseT > 0 && game.applyPatternCrowdRelief) {
+    const cfg = CFG.bossPatternPhase || {};
+    game.applyPatternCrowdRelief(game.player, cfg.shoveRadius || 430, (cfg.shoveForce || 150) * dt);
+  }
+}
+
+function startBossPatternPhase(game, e, warn, duration) {
+  const cfg = CFG.bossPatternPhase || {};
+  e.patternWarnT = Math.max(e.patternWarnT || 0, warn || cfg.warn || 1);
+  e.patternPhaseT = Math.max(e.patternPhaseT || 0, (warn || cfg.warn || 1) + (duration || cfg.duration || 5));
+  if (game.markMajorDanger) game.markMajorDanger(e.patternPhaseT + ((CFG.dangerDirector || {}).bossPatternIdleGrace || 1), 'boss-pattern');
+  if (game.metrics) game.metrics.bossPatternPhases = (game.metrics.bossPatternPhases || 0) + 1;
+}
+
+function updateBossFairnessLaserPattern(game, e, dt, enrage, bossDef) {
+  const cfg = CFG.bossPatternPhase || {};
+  if (cfg.enabled === false || !game.spawnLineHazard || game.time < (cfg.start || 300)) return;
+  if (typeof e.fairLaserT !== 'number') e.fairLaserT = rand(6.0, 9.0);
+  e.fairLaserT -= dt;
+  if (e.fairLaserT > 0) return;
+  const hard = game.time >= (cfg.hardStart || CFG.winTime);
+  const cd = bossDef.mega ? (cfg.megaLaserCd || 8.8) : (cfg.laserCd || 12.5);
+  e.fairLaserT = Math.max(5.8, cd / (1 + enrage * 0.12)) * rand(0.88, 1.14);
+  startBossPatternPhase(game, e, cfg.warn || 1, bossDef.mega || hard ? cfg.duration || 5 : 3.2);
+  spawnBossLaserVolley(game, e, bossDef, hard, enrage);
+}
+
+function spawnBossLaserVolley(game, e, bossDef, hard, enrage) {
+  const cfg = CFG.bossPatternPhase || {};
+  const p = game.player;
+  const base = Math.atan2(p.y - e.y, p.x - e.x);
+  const count = bossDef.mega ? (hard ? 3 : 2) : hard ? 2 : 1;
+  const spread = count === 1 ? [0] : count === 2 ? [-0.18, 0.18] : [-0.28, 0, 0.28];
+  const length = bossDef.mega ? 980 : 820;
+  for (const offset of spread) {
+    const a = base + offset;
+    const cx = e.x + Math.cos(a) * length * 0.32;
+    const cy = e.y + Math.sin(a) * length * 0.32;
+    const hx = Math.cos(a) * length;
+    const hy = Math.sin(a) * length;
+    game.spawnLineHazard({
+      kind: bossDef.mega ? 'mega-laser' : 'boss-laser',
+      x1: cx - hx, y1: cy - hy, x2: cx + hx, y2: cy + hy,
+      width: cfg.laserWidth || 28,
+      warn: cfg.warn || 1.0,
+      life: 1.15,
+      dmg: (bossDef.mega ? cfg.megaLaserDamage || 34 : cfg.laserDamage || 22) + Math.floor(enrage * 2),
+      tick: 1.2,
+      color: bossDef.color || '#ff2bd6',
+      source: bossDef.mega ? 'boss:mega-laser' : 'boss:laser',
+      label: 'LASER',
+    });
+  }
+  markBossVulnerable(e, cfg.vulnerability || 1.0, bossDef.mega ? 0.16 : 0.12);
+  GameRuntime.playSound('shoot');
 }
 
 function updateBossMegaRingTrap(game, e, dt, enrage, bossDef) {

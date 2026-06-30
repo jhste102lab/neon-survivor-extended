@@ -35,7 +35,7 @@
 <canvas id="c"></canvas>
 
 <div id="hud">
-  <div id="xpbar"><div id="xpfill"></div></div>
+  <div id="xpbar"><div id="xpdebtfill"></div><div id="xpfill"></div></div>
   <div id="xpdebt" class="hide"></div>
   <div id="hpwrap">
     <div id="lvbadge"><span class="t">LV</span><span class="v" id="lvNum">1</span></div>
@@ -101,6 +101,7 @@
     </div>
     <div class="leaderboard" id="titleLeaderboard"></div>
     <button class="btn primary" id="btnStart" data-i18n="button.start">Start Game</button>
+    <button class="btn ghost" id="btnBestiaryTitle" type="button">적 도감</button>
     <div class="titleControlsHint" data-i18n-html="title.controlsHint"><kbd>SPACE</kbd> Dash · <kbd>TAB</kbd> Focus · Scout Neon + <kbd>E</kbd> Collect</div>
     <button class="btn hide" id="btnContinueRun" data-i18n="button.continueRun">Continue Run</button>
     <div class="help desktopHelp">
@@ -110,7 +111,7 @@
     </div>
     <div class="mobileHelp" data-i18n="help.mobile">Drag the lower screen to move · tap DASH to burst · tap FOCUS to dodge view · the game pauses when hidden</div>
     <div class="tip" data-i18n-html="help.tip">💡 Defeat enemies, collect gems, and build your own weapon combo on level-up!<br>On mobile, drag the lower part of the screen to move, tap DASH to burst, and tap FOCUS to enter dodge view.</div>
-    <div class="wver" data-i18n="app.version">v1.1.10 · Cloudflare build</div>
+    <div class="wver" data-i18n="app.version">v1.2.0 · Cloudflare build</div>
   </div>
 </div>
 
@@ -130,9 +131,23 @@
     <div id="pauseDetail" class="pauseDetail hide"></div>
     <div>
       <button class="btn primary" id="btnResume" data-i18n="button.resume">Resume</button><br>
+      <button class="btn ghost" id="btnBestiaryPause" type="button">적 도감</button>
       <button class="btn ghost" id="btnRestart" data-i18n="button.restart">Restart</button>
       <button class="btn ghost" id="btnQuit" data-i18n="button.quitTitle">Title Screen</button>
     </div>
+  </div>
+</div>
+
+<div id="bestiaryOv" class="overlay hide">
+  <div class="panel bestiaryPanel">
+    <h2 class="ovtitle">적 도감</h2>
+    <div class="sub">적과 위험 요소를 미리 확인하고 대응법을 익힙니다.</div>
+    <div class="bestiaryTabs" id="bestiaryTabs"></div>
+    <div class="bestiaryBody">
+      <div class="bestiaryGrid" id="bestiaryGrid"></div>
+      <div class="bestiaryDetail" id="bestiaryDetail"></div>
+    </div>
+    <button class="btn primary" id="btnBestiaryClose" type="button">닫기</button>
   </div>
 </div>
 
@@ -262,10 +277,12 @@
 <script src="src/special-enemy-miner.js"></script>
 <script src="src/special-enemy-spawner.js"></script>
 <script src="src/special-enemy-bulwark.js"></script>
+<script src="src/special-enemy-bomber.js"></script>
 <script src="src/special-enemy-behavior.js"></script>
 <script src="src/director-spawn-policy.js"></script>
 <script src="src/director-spawn.js"></script>
 <script src="src/director.js"></script>
+<script src="src/danger-director.js"></script>
 <script src="src/pressure-pattern-plans.js"></script>
 <script src="src/pressure-ring.js"></script>
 <script src="src/pressure-lane.js"></script>
@@ -323,6 +340,7 @@
 <script src="src/loot-chest-reward-fallback.js"></script>
 <script src="src/loot-chest.js"></script>
 <script src="src/loot.js"></script>
+<script src="src/late-fairness.js"></script>
 <script src="src/enemy-death-rewards.js"></script>
 <script src="src/combat-ui-fx.js"></script>
 <script src="src/combat-damage.js"></script>
@@ -380,6 +398,7 @@
 <script src="src/render-effects-novas.js"></script>
 <script src="src/render-effects-mega-absorbs.js"></script>
 <script src="src/render-effects-boss-interactions.js"></script>
+<script src="src/render-effects-gravity-fields.js"></script>
 <script src="src/render-effects-particles.js"></script>
 <script src="src/render-effects-floating-texts.js"></script>
 <script src="src/render-effects.js"></script>
@@ -416,6 +435,8 @@
 <script src="src/ui-overlay-build-html.js"></script>
 <script src="src/ui-overlay-pause.js"></script>
 <script src="src/ui-overlay-title.js"></script>
+<script src="src/bestiary-content.js"></script>
+<script src="src/ui-bestiary.js"></script>
 <script src="src/ui-overlays.js"></script>
 <script src="src/leaderboard-controller.js"></script>
 <script src="src/ui-results.js"></script>

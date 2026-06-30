@@ -177,20 +177,34 @@ Object.assign(Game, {
   applyDevouredMagnetPenalty(boss, x, y) {
     const cfg = this.devourConfig();
     const p = this.player;
-    const lossRatio = cfg.magnetXpProgressLoss == null ? 0.25 : cfg.magnetXpProgressLoss;
-    const debtCapRatio = cfg.magnetXpDebtCapRatio == null ? 0.5 : cfg.magnetXpDebtCapRatio;
+    const debtCfg = CFG.xpDebt || {};
+    const lossRatio = debtCfg.magnetLossRatio == null ? (cfg.magnetXpProgressLoss == null ? 0.25 : cfg.magnetXpProgressLoss) : debtCfg.magnetLossRatio;
+    const debtCapRatio = debtCfg.capRatio == null ? (cfg.magnetXpDebtCapRatio == null ? 0.5 : cfg.magnetXpDebtCapRatio) : debtCfg.capRatio;
+    const castCapRatio = debtCfg.perDevourCastCapRatio == null ? debtCapRatio : debtCfg.perDevourCastCapRatio;
     const loss = Math.max(1, Math.round((p.xpNeed || 1) * lossRatio));
     const actual = Math.min(p.xp || 0, loss);
     p.xp = Math.max(0, (p.xp || 0) - actual);
     const debt = loss - actual;
     const debtCap = Math.max(0, Math.round((p.xpNeed || 1) * debtCapRatio));
-    const debtAdded = debt > 0 ? Math.min(debt, Math.max(0, debtCap - (p.xpDebt || 0))) : 0;
+    if (boss._devourCastSeq !== this.devourCastSeq) {
+      boss._devourCastSeq = this.devourCastSeq;
+      boss._magnetDebtThisCast = 0;
+    }
+    const castCap = Math.max(0, Math.round((p.xpNeed || 1) * castCapRatio));
+    const castRemaining = Math.max(0, castCap - (boss._magnetDebtThisCast || 0));
+    const debtAdded = debt > 0 ? Math.min(debt, Math.max(0, debtCap - (p.xpDebt || 0)), castRemaining) : 0;
     if (debtAdded > 0) p.xpDebt = (p.xpDebt || 0) + debtAdded;
+    boss._magnetDebtThisCast = (boss._magnetDebtThisCast || 0) + debtAdded;
+    if (this.metrics) this.metrics.xpDebtAdded = (this.metrics.xpDebtAdded || 0) + debtAdded;
     const applied = actual + debtAdded;
     const label = applied > 0
       ? tr('boss.magnetXpLoss', { value: Math.round(applied), debt: Math.ceil(p.xpDebt || 0) })
       : tr('boss.magnetXpDebtCapped', { debt: Math.ceil(p.xpDebt || 0) });
     this.recordBossAbsorb(boss, x, y, label, '#41f0ff');
+    if (debtAdded > 0 && !this._seenXpDebtTip) {
+      this._seenXpDebtTip = true;
+      if (GameRuntime.banner) GameRuntime.banner(tr('boss.magnetXpDebtTip'), 'warn');
+    }
     if (debtAdded > 0 && (this.time - (this.lastMagnetPenaltyT || -999)) >= (cfg.magnetPenaltyCooldown || 30)) {
       this.lastMagnetPenaltyT = this.time || 0;
       this.sealRecentWeapon(cfg.magnetWeaponSealT || 25, 'magnet');

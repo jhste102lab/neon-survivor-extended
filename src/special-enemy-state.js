@@ -12,6 +12,8 @@ Object.assign(Game, {
     e.spawnT = rand(2.5, 4.5);
     e.mineT = rand(1.8, 3.5);
     e.wardT = rand(2.4, 4.2);
+    e.bomberState = 0;
+    e.bomberWarn = 0;
     return e;
   },
 

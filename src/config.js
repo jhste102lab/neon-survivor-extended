@@ -2,7 +2,7 @@
 // Game-wide configuration and balance constants.
 /* ---------------- 설정/밸런스 ---------------- */
 const CFG = {
-  ruleset: 'phase3-2026-06-27-late-rebalance',
+  ruleset: 'phase4-2026-06-30-late-fairness-patterns',
   winTime: 600,            // 후반 루프/리더보드 기준 시간; 승리 팝업은 사용하지 않음
   unlockTime: 300,         // 5분부터 진화/동료/추가 슬롯/이벤트 해금
   checkpointInterval: 300, // HUD의 다음 목적지 표시 간격
@@ -70,6 +70,29 @@ const CFG = {
     bombBaseScale10: 0.62, bombBaseScale16: 0.42, bombKillDropScale: 0.25,
     chickenHealMaxHp: 0.10, chickenHealMissingHp: 0.12, chickenRepeatWindow: 8, chickenRepeatScale2: 0.70, chickenRepeatScale3: 0.50,
     bombDamage: 180, bombBossDamageScale: 0.35,
+  },
+  xpDebt: {
+    magnetLossRatio: 0.15, capRatio: 1.0, perDevourCastCapRatio: 0.45,
+  },
+  lateMagnetGravity: {
+    enabled: true, start: 600, duration: 5, radius: 125,
+    normalSlow: 0.30, specialSlow: 0.20, bossSlow: 0.08,
+  },
+  lateSurvivalBonus: {
+    enabled: true, start: 600, interval: 20, baseRatio: 0.05, maxRatio: 0.10,
+    minKills: 10, strongKills: 36, minBossDamage: 260, strongBossDamage: 1400, eventHoldSeconds: 2.0,
+  },
+  dangerDirector: {
+    enabled: true, bossPatternIdleGrace: 1.0, eventIdleGrace: 2.5, majorDangerGrace: 1.4,
+    tacticalIdleDecay: 1.6, spawnSuppressionMul: 0.45, swarmSuppressionMul: 0.45,
+  },
+  bossPatternPhase: {
+    enabled: true, start: 300, hardStart: 600, warn: 1.0, duration: 5.0, vulnerability: 1.0,
+    shoveRadius: 430, shoveForce: 150, laserCd: 12.5, megaLaserCd: 8.8, laserDamage: 22, megaLaserDamage: 34,
+    laserWidth: 28, ricochetCd: 15, ricochetDamage: 30,
+  },
+  specialPatterns: {
+    bomberStart: 300, bomberHardStart: 600, bomberWarn: 1.05, bomberRadius: 82, bomberDamage: 24,
   },
   bossAntiKite: {
     enabled: true, distance: 580, hold: 2.8, cooldown: 12, telegraph: 2.35, pullDuration: 1.55, pullSpeed: 176,

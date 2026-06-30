@@ -40,6 +40,7 @@ const GameLoopPhases = (() => {
     game.updateCameraFollow(dt, player);
     game.updateMusicIntensity();
     game.showUnlockNotificationIfReady(player);
+    if (game.updateLateFairnessRewards) game.updateLateFairnessRewards(dt);
     game.enterEndlessIfReady(player);
     game.saveRunSnapshotIfDue();
   }

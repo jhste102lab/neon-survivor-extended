@@ -237,6 +237,9 @@ Object.assign(Game, {
   startBossDropAbsorb(boss, duration) {
     this.clearExpiredBossDevourTargets(boss, true);
     boss.dropAbsorbT = Math.max(boss.dropAbsorbT || 0, duration);
+    this.devourCastSeq = (this.devourCastSeq || 0) + 1;
+    boss._devourCastSeq = this.devourCastSeq;
+    boss._magnetDebtThisCast = 0;
     boss.devourHealThisCast = 0;
     boss.devourBombDamageThisCast = 0;
     boss.devourHealWindow = Array.isArray(boss.devourHealWindow) ? boss.devourHealWindow.filter(item => this.time - item.t < 60) : [];

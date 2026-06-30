@@ -94,7 +94,7 @@ assert([...e2.LEADERBOARD.map.keys()].some(key => key.startsWith('testenv:sessio
 const entry = entryFor('run-a', session.proof);
 res = await leaderboardApi.onRequestPost({ request: req(JSON.stringify(entry)), env: e2 });
 if (res.status !== 201) throw new Error(`leaderboard submit status ${res.status} ${JSON.stringify(await json(res))}`);
-assert([...e2.LEADERBOARD.map.keys()].some(key => key.startsWith('testenv:entry:phase3-2026-06-27-late-rebalance:run-a')), 'entry key uses env/ruleset/run prefix');
+assert([...e2.LEADERBOARD.map.keys()].some(key => key.startsWith(`testenv:entry:${config.RULESET}:run-a`)), 'entry key uses env/ruleset/run prefix');
 
 res = await leaderboardApi.onRequestPost({ request: req(JSON.stringify(entry)), env: e2 });
 assert(res.status === 201, `exact retry status ${res.status}`);

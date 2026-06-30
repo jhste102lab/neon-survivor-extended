@@ -74,6 +74,7 @@ Object.assign(Game, {
       let adjusted;
       if (due || e.cachedMvx == null || e.cachedMvy == null) {
         const mv = this.resolveEnemyVelocity(e, dt, st, p, dx, dy, dist);
+        if (e.hp <= 0) continue;
         adjusted = this.applyEnemyMovementModifiers(e, dt, mv.mvx, mv.mvy, crowdPressure);
         e.cachedMvx = adjusted.mvx;
         e.cachedMvy = adjusted.mvy;

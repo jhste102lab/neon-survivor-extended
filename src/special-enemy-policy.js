@@ -24,8 +24,8 @@ Object.assign(Game, {
   specialTypeCap(typeId) {
     const post8 = this.time >= (CFG.idlePressureStart || 480);
     const base = post8
-      ? { spawner: 2, bulwark: 3, warden: 3, miner: 3, charger: 4 }
-      : { spawner: 1, bulwark: 2, warden: 2, miner: 2, charger: 3 };
+      ? { spawner: 2, bulwark: 3, warden: 3, miner: 3, charger: 4, bomber: 3 }
+      : { spawner: 1, bulwark: 2, warden: 2, miner: 2, charger: 3, bomber: 2 };
     return base[typeId] || 2;
   },
 
@@ -49,6 +49,7 @@ Object.assign(Game, {
       { id: 'warden', w: post8 ? 4.6 : (t > 510 ? 3.8 : 1.5) },
       { id: 'miner', w: post8 ? 4.2 : (t > 560 ? 3.6 : 1.2) },
       { id: 'spawner', w: post8 ? 2.6 + threat * 0.42 : (t > start + 90 ? 2.0 + threat * 0.35 : 0.7) },
+      { id: 'bomber', w: post8 ? 4.0 + threat * 0.2 : (t > ((CFG.specialPatterns && CFG.specialPatterns.bomberStart) || 300) ? 2.8 : 0) },
     ];
     const pool = base.filter(o => this.specialCountByType(o.id) < this.specialTypeCap(o.id));
     return (pool.length ? weightedPick(pool) : weightedPick(base)).id;

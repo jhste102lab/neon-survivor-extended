@@ -3,6 +3,7 @@
 const SourceLabels = {
   enemyNames: {
     mite: '소형 감염체', runner: '러너', swarm: '무리 개체', tank: '탱커', shooter: '궁수', brute: '브루트',
+    bulwark: '불워크', charger: '차저', warden: '워든', miner: '마이너', spawner: '스포너', bomber: '폭발체',
   },
   dropNames: { bomb: '폭탄', chicken: '치킨', magnet: '자석', chest: '상자' },
   kindNames: {

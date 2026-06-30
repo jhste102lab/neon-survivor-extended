@@ -45,6 +45,7 @@ const RenderFrame = {
     render.drawDrops(x, frame);
     if (render.drawHazards) render.drawHazards(x, frame);
     if (render.drawEvents) render.drawEvents(x, frame);
+    if (render.drawGravityFields) render.drawGravityFields(x, frame);
     render.drawNovas(x, frame);
     if (render.drawMegaAbsorbs) render.drawMegaAbsorbs(x, frame);
     if (!focusMode) render.drawBeams(x, frame);

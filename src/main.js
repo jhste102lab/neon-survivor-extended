@@ -132,8 +132,11 @@ function boot() {
   // 버튼
   const bind = (id, fn) => $(id).addEventListener('click', () => { AudioFX.ensure(); AudioFX.uiClick(); fn(); });
   bind('btnStart', () => Game.start());
+  bind('btnBestiaryTitle', () => UI.openBestiary('normal'));
   bind('btnContinueRun', () => Game.restoreLastRun());
   bind('btnResume', () => Game.resume());
+  bind('btnBestiaryPause', () => UI.openBestiary('normal'));
+  bind('btnBestiaryClose', () => UI.closeBestiary());
   bind('btnRestart', () => Game.start());
   bind('btnQuit', () => UI.toTitle());
   bind('btnRetry', () => Game.start());

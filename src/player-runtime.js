@@ -208,7 +208,12 @@ Object.assign(Game, {
   updateIdlePressure(dt, mv) {
     if (this.time >= (CFG.idlePressureStart || 480)) {
       const moving = Math.hypot(mv.x || 0, mv.y || 0) > 0.14;
-      this.idleT = moving ? Math.max(0, (this.idleT || 0) - dt * 2.2) : Math.min(10, (this.idleT || 0) + dt);
+      if (!moving && this.shouldSuppressIdlePressure && this.shouldSuppressIdlePressure()) {
+        this.idleT = Math.max(0, (this.idleT || 0) - dt * ((CFG.dangerDirector && CFG.dangerDirector.tacticalIdleDecay) || 1.6));
+        if (this.metrics) this.metrics.idleSuppressed = (this.metrics.idleSuppressed || 0) + dt;
+      } else {
+        this.idleT = moving ? Math.max(0, (this.idleT || 0) - dt * 2.2) : Math.min(10, (this.idleT || 0) + dt);
+      }
     } else {
       this.idleT = 0;
     }

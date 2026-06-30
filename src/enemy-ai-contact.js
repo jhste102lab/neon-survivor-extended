@@ -10,6 +10,13 @@ Object.assign(Game, {
       const k = 1 - effectiveSlow;
       mvx *= k; mvy *= k;
     }
+    if (this.gravitySlowForEnemy) {
+      const gravitySlow = this.gravitySlowForEnemy(e);
+      if (gravitySlow > 0) {
+        mvx *= 1 - gravitySlow;
+        mvy *= 1 - gravitySlow;
+      }
+    }
     if (crowdPressure > 0 && !e.boss) {
       const crowdMul = 1 + crowdPressure * 0.34;
       mvx *= crowdMul; mvy *= crowdMul;

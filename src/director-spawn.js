@@ -31,7 +31,9 @@ Object.assign(Game, {
   },
 
   normalEnemyEventMultiplier(t) {
-    return this.activeEvent && this.activeEvent.state === 'active' ? (t < CFG.winTime + 240 ? 1.25 : 1.4) : 1;
+    const eventMul = this.activeEvent && this.activeEvent.state === 'active' ? (t < CFG.winTime + 240 ? 1.25 : 1.4) : 1;
+    const pressureMul = this.pressureSpawnMultiplier ? this.pressureSpawnMultiplier() : 1;
+    return eventMul * pressureMul;
   },
 
   normalEnemyMobileMultiplier() {
@@ -58,7 +60,8 @@ Object.assign(Game, {
     const limit = this.enemyLimit ? this.enemyLimit() : CFG.maxEnemies + (this.endless ? 55 : 0);
     const room = Math.max(0, limit - this.enemies.length);
     const loopMul = t >= CFG.winTime ? 1.45 + Math.min(0.5, (t - CFG.winTime) / 1000) : 1;
-    const n = Math.min(Math.ceil(randi(10, 14 + Math.floor(t / 60)) * loopMul), room);
+    const relief = this.pressureSpawnMultiplier ? this.pressureSpawnMultiplier() : 1;
+    const n = Math.min(Math.ceil(randi(10, 14 + Math.floor(t / 60)) * loopMul * relief), room);
     if (n <= 0) return;
     const base = rand(0, TAU);
     const radius = EnemyFactoryPlacement.swarmBurstRadius ? EnemyFactoryPlacement.swarmBurstRadius(this) : 640;

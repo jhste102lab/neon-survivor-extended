@@ -152,10 +152,19 @@ function companionDescription(choice, player) {
   };
 }
 
+function transcendChoiceDetails(id, player) {
+  const t = player.transcend || { dmg: 0, cd: 0, hp: 0, spd: 0 };
+  if (id === 'tdmg') return [`이번 선택: 모든 무기 피해 +8%p`, `현재 누적: +${Math.round((t.dmg || 0) * 8)}%p → +${Math.round(((t.dmg || 0) + 1) * 8)}%p`];
+  if (id === 'tcd') return [`이번 선택: 공격 간격 ×0.96`, `현재 배율: ${Math.pow(0.96, t.cd || 0).toFixed(2)}x → ${Math.pow(0.96, (t.cd || 0) + 1).toFixed(2)}x`, `최소 공격 간격: 0.30초`];
+  if (id === 'thp') return [`이번 선택: 최대 체력 +20`, `즉시 20 회복`, `현재 누적: +${(t.hp || 0) * 20} → +${((t.hp || 0) + 1) * 20}`];
+  if (id === 'tspd') return [`이번 선택: 이동속도 +5%`, `현재 배율: ${(1 + (t.spd || 0) * 0.05).toFixed(2)}x → ${(1 + ((t.spd || 0) + 1) * 0.05).toFixed(2)}x`, `이동속도 상한: 2.3배`];
+  return [];
+}
+
 function transcendDescription(choice) {
   const T = TRANSCEND.find(t => t.id === choice.id);
   if (!T) return null;
-  return { icon: T.icon, name: T.name, level: tr('upgrade.infinite'), description: T.desc, color: '#ff2bd6', tag: tr('upgrade.transcend'), isNew: false };
+  return { icon: T.icon, name: T.name, level: tr('upgrade.infinite'), description: T.desc, details: transcendChoiceDetails(choice.id, Game.player), color: '#ff2bd6', tag: tr('upgrade.transcend'), isNew: false };
 }
 
 const UpgradeDescriptionByKind = {
@@ -186,6 +195,7 @@ const UpgradeDescriptions = {
   weaponStatDetails,
   passiveCurrentStatDetails,
   passiveStatDetails,
+  transcendChoiceDetails,
   upgradeDetailText,
   validateContracts() {
     UpgradeKindContract.validateTables(UpgradeDescriptionByKind, ChestRewardTextByKind);

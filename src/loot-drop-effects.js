@@ -40,6 +40,9 @@ const LootDropEffects = {
       game.spawnText(outcome.x, outcome.y, outcome.text, !!outcome.crit, outcome.color);
     } else if (outcome.type === 'magnetizeGems') {
       this.magnetizeGems(game, outcome);
+    } else if (outcome.type === 'lateMagnetGravity') {
+      const p = game.player || { x: 0, y: 0 };
+      game.spawnLateMagnetGravity(outcome.x == null ? p.x : outcome.x, outcome.y == null ? p.y : outcome.y);
     } else if (outcome.type === 'openChest') {
       game.openChest();
     } else if (outcome.type === 'sound') {

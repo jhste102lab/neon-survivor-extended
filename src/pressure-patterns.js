@@ -10,6 +10,7 @@ Object.assign(Game, {
   directLatePressure(dt) {
     const start = CFG.lateRampStart || 420;
     if (!this.canApplyPressureFrom(start)) return;
+    if (this.tacticalHoldActive && this.tacticalHoldActive()) return;
     const d = this.dir;
     this.ensureLateTrapTimer(d);
     d.trapT -= dt;
@@ -53,6 +54,10 @@ Object.assign(Game, {
   directIdlePressure(dt) {
     const start = CFG.idlePressureStart || 480;
     if (!this.canApplyPressureFrom(start)) return;
+    if (this.shouldSuppressIdlePressure && this.shouldSuppressIdlePressure()) {
+      this.resetIdleMissileTimer(this.dir);
+      return;
+    }
     const idle = this.idleT || 0;
     const d = this.dir;
     if (idle < 2.2) {

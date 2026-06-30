@@ -3,7 +3,7 @@
 const Game = {
 
   state: 'title', time: 0, timeScale: 1, userTimeScale: 1, hitStopT: 0,
-  player: null, enemies: [], bullets: [], ebullets: [], gems: [], drops: [], hazards: [],
+  player: null, enemies: [], bullets: [], ebullets: [], gems: [], drops: [], hazards: [], gravityFields: [],
   particles: [], texts: [], novas: [], beams: [], bolts: [], megaAbsorbs: [], bossLinks: [], blades: { angle: 0 },
   cam: { x: 0, y: 0 }, shakeT: 0, shakeDur: 1, shakeMag: 0,
   kills: 0, combo: 0, comboT: 0, maxCombo: 0,

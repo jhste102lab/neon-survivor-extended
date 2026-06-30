@@ -46,7 +46,7 @@ const LootOutcomes = {
   },
 
   dropOutcome(kind, drop = null) {
-    return { type: 'collectDrop', kind, stack: this.dropStack(drop) };
+    return { type: 'collectDrop', kind, stack: this.dropStack(drop), x: drop && drop.x, y: drop && drop.y };
   },
 
   applyAll(game, outcomes = []) {
@@ -64,7 +64,7 @@ const LootOutcomes = {
         game.metrics.dropsCollected = game.metrics.dropsCollected || {};
         game.metrics.dropsCollected[outcome.kind] = (game.metrics.dropsCollected[outcome.kind] || 0) + (outcome.stack || 1);
       }
-      LootDropEffects.apply(game, outcome.kind, { stack: outcome.stack || 1 });
+      LootDropEffects.apply(game, outcome.kind, { stack: outcome.stack || 1, x: outcome.x, y: outcome.y });
     } else if (outcome.type === 'dropExpired') {
       game.metrics.dropsExpired = (game.metrics.dropsExpired || 0) + 1;
     } else if (outcome.type === 'dropTrimmed') {
