@@ -321,3 +321,8 @@ h2.ovtitle{font-family:var(--font-en);font-weight:900;font-size:38px;letter-spac
 .bestiaryDetail dt{color:#ffd23d;font-weight:900}
 .bestiaryDetail dd{color:#d8ecff}
 @media(max-width:760px){.bestiaryPanel{max-height:94vh}.bestiaryBody{grid-template-columns:1fr}.bestiaryGrid{max-height:34vh;grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}.bestiaryDetail{max-height:34vh}.bestiaryCard{min-height:162px}.bestiaryDetail dl{grid-template-columns:64px 1fr}}
+
+/* ============ 차원 모드 HUD ============ */
+#dimensionHud{position:fixed;left:50%;top:72px;transform:translateX(-50%);z-index:9;min-width:280px;max-width:min(620px,86vw);padding:8px 18px;border-radius:999px;border:1px solid rgba(65,240,255,.42);background:linear-gradient(135deg,rgba(9,14,35,.82),rgba(30,10,45,.70));box-shadow:0 0 22px rgba(65,240,255,.18),inset 0 0 18px rgba(255,43,214,.08);text-align:center;pointer-events:none;backdrop-filter:blur(5px)}
+#dimensionHud b{display:block;font-family:var(--font-en);font-size:13px;letter-spacing:1.4px;color:#eaffff;text-shadow:0 0 12px rgba(65,240,255,.42)}
+#dimensionHud span{display:block;margin-top:2px;font-size:12px;color:#bdefff;text-shadow:0 0 8px rgba(25,227,255,.28)}

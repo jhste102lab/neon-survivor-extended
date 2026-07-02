@@ -77,6 +77,7 @@ Object.assign(Game, {
     if (typeof Grid !== 'undefined' && Grid.map) Grid.map.clear();
     this.endless = initial.endless; this.st = initial.st; this.activeEvent = initial.activeEvent; this.nextEventT = initial.nextEventT; this.lastBossSpawnT = initial.lastBossSpawnT;
     this.bossDebuffs = initial.bossDebuffs;
+    this.dimension = initial.dimension || (typeof this.createDimensionState === 'function' ? this.createDimensionState() : null);
     this.idleT = initial.idleT; this.lastIdleWarnT = initial.lastIdleWarnT;
     this.unlockNotified = initial.unlockNotified;
     this.metrics = initial.metrics;
@@ -91,6 +92,7 @@ Object.assign(Game, {
     this.lastWeaponSlotCap = maxWeaponSlotsFor(this);
     this.slotsDirty = true;
     if (this.resetBossInteractionState) this.resetBossInteractionState();
+    if (this.dimension && this.dimension.mode == null && typeof this.resetDimensionMode === 'function') this.resetDimensionMode();
     if (typeof UI !== 'undefined' && UI.syncSpeedControls) UI.syncSpeedControls(this.userTimeScale || 1);
     GameRuntime.setMusicIntensity(1);
   },

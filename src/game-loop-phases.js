@@ -47,6 +47,7 @@ const GameLoopPhases = (() => {
 
   function runPlayFrame(game, dt, rdt) {
     assertPlayHelpers(game);
+    if (game.isDimensionSpaceActive && game.isDimensionSpaceActive()) return game.runDimensionFrame(dt, rdt);
     game.time += dt;
     const player = game.player;
     const st = game.cacheFrameStats();

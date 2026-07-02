@@ -101,6 +101,10 @@ Object.assign(Game, {
   },
 
   directMegaBossSpawn(t = this.time) {
+    if (this.shouldDelayEndlessForDimension && this.shouldDelayEndlessForDimension()) {
+      if (this.maybeSpawnDimensionGatekeeper) this.maybeSpawnDimensionGatekeeper(t);
+      return;
+    }
     const d = this.dir;
     const nextCount = DirectorSpawnPolicy.shouldSpawnMegaBoss({ time: t, winTime: CFG.winTime, interval: 180, spawned: d.megaBossCount || 0, playerDead: !!(this.player && this.player.dead) });
     if (!nextCount) return;

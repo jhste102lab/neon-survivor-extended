@@ -161,6 +161,13 @@ function transcendChoiceDetails(id, player) {
   return [];
 }
 
+
+function dimensionRewardDescription(choice) {
+  const card = choice.card || (typeof DIMENSION_REWARD_CARDS !== 'undefined' ? DIMENSION_REWARD_CARDS.find(c => c.id === choice.id) : null);
+  if (!card) return null;
+  return { icon: card.icon, name: card.name, level: '차원 보너스', description: card.desc, details: [card.type === 'risk' ? '위험과 보상이 함께 증가합니다.' : '이번 정복 보상으로 즉시 적용됩니다.'], color: card.color || '#41f0ff', tag: 'DIMENSION', isNew: false };
+}
+
 function transcendDescription(choice) {
   const T = TRANSCEND.find(t => t.id === choice.id);
   if (!T) return null;
@@ -176,6 +183,7 @@ const UpgradeDescriptionByKind = {
   ev: evolutionDescription,
   nc: companionDescription,
   t: transcendDescription,
+  dimensionReward: dimensionRewardDescription,
 };
 
 const ChestRewardTextByKind = {
@@ -188,6 +196,7 @@ const ChestRewardTextByKind = {
   nc: choice => `📦 ${typeof companionBannerText === 'function' ? companionBannerText(choice.id) : `${COMPANION_UPGRADES[choice.id].icon} ${COMPANION_UPGRADES[choice.id].name}!`}`,
   t: choice => tr('chest.transcend', { icon: TRANSCEND.find(t => t.id === choice.id).icon }),
   heal: () => tr('chest.heal'),
+  dimensionReward: choice => choice && choice.card ? `${choice.card.icon} ${choice.card.name}` : '차원 보너스',
 };
 
 const UpgradeDescriptions = {

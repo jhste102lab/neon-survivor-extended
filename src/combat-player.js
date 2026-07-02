@@ -105,6 +105,7 @@ const CombatPlayer = (() => {
       const p = this.player;
       if (!playerCanBeHurt(this, p, source)) return;
 
+      if (this.modifyIncomingPlayerDamage) dmg = this.modifyIncomingPlayerDamage(dmg, source);
       dmg = applyBarrierAbsorption(this, p, dmg, source);
       if (dmg <= 0) {
         grantBarrierInvulnerability(p);

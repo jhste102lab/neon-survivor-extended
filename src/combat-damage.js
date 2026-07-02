@@ -22,7 +22,9 @@ const CombatDamage = (() => {
   }
 
   function resolveEnemyDamageAmount(game, enemy, damage) {
-    let resolvedDamage = applyProtectionModifier(game, enemy, damage);
+    let resolvedDamage = damage;
+    if (game.dimensionDamageMultiplierForEnemy) resolvedDamage *= game.dimensionDamageMultiplierForEnemy(enemy);
+    resolvedDamage = applyProtectionModifier(game, enemy, resolvedDamage);
     resolvedDamage = applyVulnerabilityModifier(enemy, resolvedDamage);
     const crit = rollCriticalHit(game);
     resolvedDamage = applyCriticalModifier(resolvedDamage, crit);

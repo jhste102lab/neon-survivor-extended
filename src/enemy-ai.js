@@ -43,6 +43,7 @@ Object.assign(Game, {
   },
 
   resolveEnemyVelocity(e, dt, st, p, dx, dy, dist) {
+    if (e.dimensionStatic) return { mvx: 0, mvy: 0 };
     if (!e.boss && e.special && this.updateSpecialEnemy) {
       const mv = this.updateSpecialEnemy(e, dt, st, dx, dy, dist);
       if (mv) return mv;
@@ -86,10 +87,10 @@ Object.assign(Game, {
       const postDx = p.x - e.x, postDy = p.y - e.y;
       const postD2 = postDx * postDx + postDy * postDy;
       const contactR = e.r + CFG.player.radius;
-      if (!p.dead && p.invuln <= 0 && postD2 < contactR * contactR) {
+      if (!p.dead && p.invuln <= 0 && (!e.dimensionObjective || e.dimensionContact) && postD2 < contactR * contactR) {
         this.applyEnemyContactDamage(e, p, Math.sqrt(postD2) || 1, crowdPressure);
       }
-      if (!e.boss && postD2 > 1700 * 1700) this.teleportFarEnemy(e, p, Math.sqrt(postD2) || 1);
+      if (!e.boss && !e.dimensionEnemy && postD2 > 1700 * 1700) this.teleportFarEnemy(e, p, Math.sqrt(postD2) || 1);
     }
     Grid.rebuild(this.enemies);
     if (this.refreshFrameTargetCache) this.refreshFrameTargetCache();

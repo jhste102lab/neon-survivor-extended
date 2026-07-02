@@ -25,6 +25,16 @@ Object.assign(UI, {
     showOverlay('lvOv');
   },
 
+  showDimensionRewardCards(choices, sourceLabel = '') {
+    if (!choices || !choices.length) return;
+    this.rewardCardMode = true;
+    this.choices = choices;
+    Game.state = 'levelup';
+    this.setLevelOverlayCopy('event.rewardTitle', `${sourceLabel} 정복 보너스 선택`);
+    this.renderChoiceCards(this.choices);
+    showOverlay('lvOv');
+  },
+
   showRewardCard(choice, sourceLabel = '') {
     if (!choice) return;
     this.rewardCardMode = true;

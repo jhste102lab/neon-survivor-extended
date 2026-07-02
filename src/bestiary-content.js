@@ -5,6 +5,7 @@ const BESTIARY_TABS = [
   { id: 'special', name: '특수 적' },
   { id: 'boss', name: '보스' },
   { id: 'hazard', name: '이벤트/위험' },
+  { id: 'dimension', name: '차원' },
 ];
 
 const BESTIARY_ENTRIES = [
@@ -25,6 +26,7 @@ const BESTIARY_ENTRIES = [
   { tab: 'boss', ref: 'boss:0', title: '수호자 헥사', role: '첫 보스', danger: '높음', appears: '03:00', behavior: '대시와 소환으로 기본 보스전을 가르칩니다.', risk: '잡몹과 함께 접근하면 퇴로가 좁아집니다.', tip: '대시 타이밍을 보고 반대 방향으로 빠지세요.' },
   { tab: 'boss', ref: 'boss:1', title: '포식자 옥타', role: '탄막 보스', danger: '높음', appears: '06:00', behavior: '원형 탄막과 소환을 함께 사용합니다.', risk: '탄막 사이 빈틈을 못 보면 연속 피격됩니다.', tip: '탄막은 한 번에 크게 움직이지 말고 틈을 따라 움직이세요.' },
   { tab: 'boss', ref: 'boss:2', title: '심연의 별', role: '강화 패턴 보스', danger: '매우 높음', appears: '09:00', behavior: '강한 소환과 탄막, 레이저 패턴을 사용합니다.', risk: '보스 패턴과 후반 압박이 겹칠 수 있습니다.', tip: '큰 패턴 경고 때는 잡몹보다 안전 경로를 먼저 보세요.' },
+  { tab: 'boss', ref: 'boss:gatekeeper', title: '균열 문지기', role: '10분 차원 관문 보스', danger: '높음', appears: '10:00', behavior: '탄막, 예고 레이저, 장판으로 차원 허브 진입을 시험합니다.', risk: '잡몹 물량보다 패턴 회피를 요구합니다.', tip: '레이저 예고선과 원형 탄막의 빈틈을 먼저 보세요.' },
   { tab: 'boss', ref: 'boss:3', title: '군집 코어', role: '후반 루프 메가 보스', danger: '매우 높음', appears: '10:00 이후 반복', behavior: '탄막, 장판, 레이저, 포식장을 함께 사용합니다.', risk: '자석을 흡수하면 XP 부채가 생깁니다.', tip: '포식 경고가 나오면 자석/폭탄을 우선 차단하거나 회수하세요.' },
 
   { tab: 'hazard', icon: '🛰️', title: '정체 감지', role: '제자리 방지', danger: '중간', appears: '08:00 이후', behavior: '진짜 방치 상태가 길어지면 이동을 유도하는 위험이 생깁니다.', risk: '이벤트/보스 패턴과 겹치면 억울해질 수 있어 이번부터 전술 정지는 유예됩니다.', tip: '이동하거나 전투/이벤트에 참여하면 압박이 줄어듭니다.' },
@@ -34,5 +36,16 @@ const BESTIARY_ENTRIES = [
   { tab: 'hazard', icon: '🌩️', title: '네온 폭풍', role: '탄막 이벤트', danger: '높음', appears: '5분 이후 이벤트', behavior: '주변에서 탄막과 레이저가 들어옵니다.', risk: '멈춰야 하는 안전 공간과 제자리 방지가 충돌하지 않도록 조정됩니다.', tip: '탄막의 빈틈을 따라 짧게 이동하세요.' },
   { tab: 'hazard', icon: '📦', title: '보급품 위험 구역', role: '보상 점유 이벤트', danger: '중간', appears: '5분 이후 이벤트', behavior: '보급 구역을 유지하면 보상을 얻지만 위험 장판이 생깁니다.', risk: '무리하게 중앙을 고집하면 장판에 갇힙니다.', tip: '구역 가장자리에서 장판을 빼며 버티세요.' },
   { tab: 'hazard', icon: '🌀', title: '리프트/이벤트 구역', role: '점유형 이벤트', danger: '중간', appears: '5분 이후 이벤트', behavior: '구역 안에 머물수록 진행도가 오릅니다.', risk: '구역 유지 중 움직임이 적어도 전술 정지로 판정됩니다.', tip: '완전히 멈추기보다 작은 원을 그리며 유지하세요.' },
+
+
+  { tab: 'dimension', ref: 'dimension:bullet_nebula', icon: '🌌', title: '탄막 성운', role: '탄막 회피 + 코어 파괴', danger: '높음', appears: '차원 허브', behavior: '성운 코어와 노드가 원형/나선 탄막을 발사합니다.', risk: '탄막 가독성을 놓치면 연속 피격됩니다.', tip: '코어 우선 타겟팅을 믿고 빈틈을 따라 움직이세요.' },
+  { tab: 'dimension', ref: 'dimension:machine_prison', icon: '⚡', title: '기계 감옥', role: '레이저 회피 + 발전기 파괴', danger: '높음', appears: '차원 허브', behavior: '레이저, 전기벽, 문 패턴 사이에서 발전기를 파괴합니다.', risk: '예고선을 늦게 보면 안전칸을 잃습니다.', tip: '발전기 파괴 후 나오는 보급을 활용하세요.' },
+  { tab: 'dimension', ref: 'dimension:gravity_well', icon: '🕳️', title: '중력 우물', role: '중력 조작 + 웨이브 처치', danger: '매우 높음', appears: '차원 허브', behavior: '끌림과 밀림이 반복되고 앵커 주변에 탄막이 생깁니다.', risk: '중력에 과하게 저항하면 이동 경로가 꼬입니다.', tip: '적이 뭉치는 순간 광역 화력으로 녹이세요.' },
+  { tab: 'dimension', ref: 'dimension:judges_duel', icon: '⚖️', title: '심판자의 결투', role: '느린 패턴 보스전', danger: '매우 높음', appears: '차원 허브', behavior: '십자 레이저, 부채꼴 탄막, 안전지대 장판을 사용합니다.', risk: '빠른 추격은 아니지만 판단 실수가 큰 피해로 이어집니다.', tip: '움직여야 하는 패턴과 멈춰야 하는 패턴을 구분하세요.' },
+  { tab: 'dimension', ref: 'dimension:plague_garden', icon: '🍄', title: '역병 정원', role: '오염 영역 관리', danger: '매우 높음', appears: '차원 허브', behavior: '독성 포자와 둥지가 오염 구역을 퍼뜨립니다.', risk: '한 방향으로만 도망치면 오염에 갇힙니다.', tip: '둥지를 하나씩 정리하며 회복 드롭을 확보하세요.' },
+  { tab: 'dimension', ref: 'dimension:mirror_corridor', icon: '🔷', title: '거울 회랑', role: '진짜/가짜 판단', danger: '높음', appears: '차원 허브', behavior: '진짜 거울핵과 가짜 핵, 반사탄, 프리즘 레이저가 등장합니다.', risk: '가짜 핵을 건드리면 반격 탄막이 늘어납니다.', tip: '시각 단서를 보고 진짜 핵을 우선 파괴하세요.' },
+  { tab: 'dimension', ref: 'dimension:train_battlefield', icon: '🚄', title: '열차 위 전장', role: '이동 전장 + 웨이브 방어', danger: '매우 높음', appears: '차원 허브', behavior: '움직이는 전장에서 드론 습격과 강습선을 막습니다.', risk: '장애물과 적 처치가 겹치면 시야가 흔들립니다.', tip: '화면 중앙을 유지하고 폭탄 드롭을 아끼지 마세요.' },
+  { tab: 'dimension', ref: 'dimension:casino_rift', icon: '🎰', title: '도박장의 균열', role: '계약 선택 전투', danger: '매우 높음', appears: '차원 허브', behavior: '공개된 위험/보상 계약을 고르고 3라운드를 승리합니다.', risk: '고위험 계약을 연속으로 고르면 탄막이 급격히 늘어납니다.', tip: '현재 체력과 빌드에 맞는 계약을 고르세요.' },
+
   { tab: 'hazard', icon: '▧', title: 'XP 부채', role: '성장 지연 상태', danger: '중간', appears: '보스가 자석 흡수 시', behavior: 'XP를 얻으면 먼저 부채를 갚고, 남은 XP가 바를 채웁니다.', risk: '보이지 않으면 XP가 멈춘 것처럼 느껴집니다.', tip: '회색 XP바가 줄어들면 부채가 상환 중이라는 뜻입니다.' },
 ];
