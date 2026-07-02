@@ -6,7 +6,7 @@
     "verify": "node scripts/verify-script-order.mjs && node scripts/verify-i18n-contract.mjs && node scripts/verify-evolution-contract.mjs && node scripts/verify-leaderboard-contract.mjs && node scripts/test-gameplay-outcomes.mjs && node scripts/test-policy-outcomes.mjs && node scripts/test-boss-scheduling-overlap.mjs && node scripts/test-leaderboard-remote.mjs && node scripts/test-audio-contract.mjs && node scripts/test-api-boundary.mjs && node scripts/test-runtime-stability.mjs"
   },
   "name": "neon-survivor_jh",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "NEON SURVIVOR - a free browser bullet hell survival shooting game with neon swarms, auto-attacking weapons, evolutions, bosses, and mobile-friendly controls.",
   "main": "index.js",
   "directories": {
