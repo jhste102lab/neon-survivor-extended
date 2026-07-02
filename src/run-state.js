@@ -36,10 +36,11 @@ function createInitialRunState(options = {}) {
       lastDamageSource: '', deathSource: '', recentDamage: [], deathRecentDamage: [],
       eventOffers: 0, eventStarts: 0, eventSuccess: 0, dropsExpired: 0, dropsTrimmed: 0,
       lateSurvivalBonus: 0, lateSurvivalBonusXp: 0, lateMagnetGravity: 0, xpDebtAdded: 0, xpDebtRepaid: 0,
-      idleSuppressed: 0, bossPatternPhases: 0,
+      idleSuppressed: 0, bossPatternPhases: 0, dimensionConquest: false, dimensionConquestTime: 0,
     },
     runId: GameRuntime.runId(),
     runProof: '',
+    dimension: typeof Game !== 'undefined' && typeof Game.createDimensionState === 'function' ? Game.createDimensionState() : null,
     player: {
       x: 0, y: 0, hp: CFG.player.hp, level: 1, xp: 0, xpNeed: CFG.xpNeed(1),
       invuln: 0, dead: false, moveX: 0, moveY: 1, trailT: 0,

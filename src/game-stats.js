@@ -126,6 +126,7 @@ Object.assign(Game, {
   },
 
   itemDropScale() {
-    return 1;
+    const bonus = this.dimension && this.dimension.bonuses ? Number(this.dimension.bonuses.dropQuality || 0) : 0;
+    return 1 + Math.max(0, bonus);
   },
 });

@@ -40,6 +40,7 @@ const RenderFrame = {
   drawPlayLayers(render, x, frame) {
     const focusMode = !!frame.game.focusMode;
     render.drawGrid(x, frame.width, frame.height, frame);
+    if (render.drawDimensionLayer) render.drawDimensionLayer(x, frame);
     render.drawFrost(x, frame);
     render.drawGems(x, frame);
     render.drawDrops(x, frame);

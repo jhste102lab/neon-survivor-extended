@@ -30,6 +30,7 @@ Object.assign(Game, {
   },
 
   enterEndlessIfReady(player) {
+    if (this.shouldDelayEndlessForDimension && this.shouldDelayEndlessForDimension()) return;
     if (this.time >= CFG.winTime && !player.dead && !this.endless) this.enterEndlessLoop();
   },
 

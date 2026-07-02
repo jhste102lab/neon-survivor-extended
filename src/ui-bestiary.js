@@ -26,8 +26,13 @@ const UIBestiary = {
       if (def) return { shape: def.shape, color: def.color, r: def.r };
     }
     if (entry.ref && entry.ref.startsWith('boss:')) {
-      const boss = BOSSES[Number(entry.ref.slice(5))];
+      const key = entry.ref.slice(5);
+      const boss = key === 'gatekeeper' && typeof DIMENSION_GATEKEEPER !== 'undefined' ? DIMENSION_GATEKEEPER : BOSSES[Number(key)];
       if (boss) return { shape: boss.shape, color: boss.color, r: boss.r };
+    }
+    if (entry.ref && entry.ref.startsWith('dimension:') && typeof DIMENSIONS !== 'undefined') {
+      const def = DIMENSIONS.find(d => d.id === entry.ref.slice(10));
+      if (def) return { icon: def.icon, color: def.color };
     }
     return { icon: entry.icon || '◆', color: '#41f0ff' };
   },
@@ -88,6 +93,31 @@ const UIBestiary = {
     this.renderDetail(selected);
   },
 
+
+
+  statRows(entry) {
+    if (!entry || !entry.ref) return [];
+    if (entry.ref.startsWith('enemy:')) {
+      const def = ENEMY_TYPES[entry.ref.slice(6)];
+      if (!def) return [];
+      return [['체력', def.hp], ['공격력', def.dmg], ['속도', def.spd], ['반경', def.r], ['관통저항', '해당 없음'], ['방어력', '해당 없음']];
+    }
+    if (entry.ref.startsWith('boss:')) {
+      const key = entry.ref.slice(5);
+      const boss = key === 'gatekeeper' && typeof DIMENSION_GATEKEEPER !== 'undefined' ? DIMENSION_GATEKEEPER : BOSSES[Number(key)];
+      if (!boss) return [];
+      const patterns = [boss.ring ? '탄막' : '', boss.dash ? '대시' : '', boss.summon ? '소환' : '', boss.trap || boss.mega ? '장판' : '', boss.laneTrap || boss.mega ? '레이저/차선' : ''].filter(Boolean).join(', ') || '접근';
+      return [['체력', boss.hp], ['공격력', boss.dmg], ['속도', boss.spd], ['반경', boss.r], ['주요 패턴', patterns], ['관통저항', '해당 없음']];
+    }
+    if (entry.ref.startsWith('dimension:') && typeof DIMENSIONS !== 'undefined') {
+      const def = DIMENSIONS.find(d => d.id === entry.ref.slice(10));
+      if (!def) return [];
+      const relic = typeof DIMENSION_RELICS !== 'undefined' ? DIMENSION_RELICS[def.relic] : null;
+      return [['목표', def.goal], ['위험도', '★'.repeat(def.danger || 1)], ['고정 유물', relic ? `${relic.icon} ${relic.name}` : '없음'], ['권장 완료', '게임 시간 120~180초'], ['실패 조건', '체력 0 → 붕괴 탈출']];
+    }
+    return [];
+  },
+
   renderDetail(entry) {
     const detail = $('bestiaryDetail');
     if (!detail || !entry) return;
@@ -96,6 +126,7 @@ const UIBestiary = {
       <p class="bestiaryRole">${bestiaryEscape(entry.role)} · 위험도 ${bestiaryEscape(entry.danger)}</p>
       <dl>
         <dt>등장 시점</dt><dd>${bestiaryEscape(entry.appears)}</dd>
+        ${this.statRows(entry).length ? `<dt>실제 수치</dt><dd>${this.statRows(entry).map(row => `${bestiaryEscape(row[0])}: ${bestiaryEscape(row[1])}`).join(' · ')}</dd>` : ''}
         <dt>행동</dt><dd>${bestiaryEscape(entry.behavior)}</dd>
         <dt>주요 위험</dt><dd>${bestiaryEscape(entry.risk)}</dd>
         <dt>대응법</dt><dd>${bestiaryEscape(entry.tip)}</dd>

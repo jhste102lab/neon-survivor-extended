@@ -20,6 +20,10 @@ const UpgradeApplyDispatcher = {
     if (applicator === 'passive') return PassiveUpgradeApplicator.apply(game, choice);
     if (applicator === 'transcend') return TranscendUpgradeApplicator.apply(game, choice);
     if (applicator === 'heal') return HealUpgradeApplicator.apply(game, choice);
+    if (applicator === 'dimensionReward' && game.pickDimensionReward) {
+      const ok = game.pickDimensionReward(choice);
+      return ok ? UpgradeApplyResults.done() : UpgradeApplyResults.reject(choice, 'dimension reward unavailable');
+    }
     return UpgradeApplyResults.reject(choice, 'unknown upgrade kind');
   },
 

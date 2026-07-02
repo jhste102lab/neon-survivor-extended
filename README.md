@@ -1,78 +1,91 @@
-[English](README.md) · [한국어](README.ko.md) · [简体中文](README.zh-CN.md) · [日本語](README.ja.md)
+[한국어](README.md) | [ENG](README.en.md) | [简体中文](README.zh-CN.md) | [日本語](README.ja.md)
 
-# 🌟 NEON SURVIVOR - Browser Bullet Hell Survival Shooting Game
+# 🌟 NEON SURVIVOR - 웹 탄막 피하기 슈팅 게임
 
-**NEON SURVIVOR** is a fast browser bullet-hell survival shooter about one tiny pilot trapped inside a glowing monster storm. You dodge by hand, your weapons fire automatically, and every level-up turns the run into a new build: lightning chains, black holes, drones, mines, lasers, orbitals, evolutions, companions, and boss pressure that keeps escalating past 10 minutes.
+**NEON SURVIVOR**는 네온 괴물 폭풍 한가운데 갇힌 작은 파일럿이 최대한 오래 버티는 웹 탄막 생존 슈팅 게임입니다. 플레이어는 직접 움직여 피하고, 무기는 자동으로 발사됩니다. 레벨업할 때마다 번개, 블랙홀, 드론, 지뢰, 레이저, 궤도 폭격, 진화 무기, 동료 조합이 붙으면서 매 판 다른 빌드가 됩니다.
 
-No install, no downloads, no account required — open the page and survive as long as you can on PC or mobile. The current v1.2.0 Cloudflare build includes the Late Loop Fairness update: visible XP debt, post-10-minute magnet gravity, combat-based survival XP bonuses, safer boss/event pattern overlap, Korean bestiary, and clearer transcend/overdrive numbers.
+설치도 다운로드도 계정도 필요 없습니다. PC나 모바일에서 페이지를 열고 바로 시작하세요. 현재 v1.2.0 Cloudflare 빌드는 플레이어 피드백을 참고한 **차원 모드 오버홀**을 포함합니다. 10분 균열 문지기, 5초 체류 허브 포털, 자유 왕복 가능한 차원 허브, 8개 선택형 차원, 붕괴 자동 탈출, 차원 유물/보상 카드, 오픈소스 포털 에셋, 실제 수치 도감, 오버클럭 7% 표기 수정이 추가·개선되었습니다.
 
-## ▶️ Play online
+## 📝 v1.2.0 패치노트 — 차원 모드 오버홀
 
-Play now: **https://neon-survivor.pages.dev/**
+플레이어 피드백의 핵심인 “10분 이후 반복감”을 줄이기 위해, 후반 루프 앞에 직접 선택하고 클리어하는 차원 모드를 추가했습니다.
 
-## 🕹️ What kind of game is it?
+- 10분 시점에 균열 문지기 관문 보스가 등장하고, 처치 후 차원 허브 포털이 열립니다.
+- 포털은 안에 5초 머물러야 진입하며, 허브 안에서는 8개 차원을 원하는 순서로 선택할 수 있습니다.
+- 외부 전장과 허브/차원을 자유롭게 왕복할 수 있어, 원하면 밖에서 더 성장한 뒤 다시 도전할 수 있습니다.
+- 탄막 성운, 기계 감옥, 중력 우물, 심판자의 결투, 역병 정원, 거울 회랑, 열차 위 전장, 도박장의 균열을 추가했습니다.
+- 각 차원은 클리어 가능한 목표, 고정 유물, 차원 보상 카드, 낮은 체력 안전 드롭, 붕괴 자동 탈출을 가집니다.
+- Google Noto Emoji SVG 기반 포털 장식 에셋과 라이선스 NOTICE를 추가했습니다.
+- 도감에 차원/균열 문지기/실제 수치 표시를 추가하고, 오버클럭 설명을 실제 `무기 공격 간격 -7%` 효과에 맞췄습니다.
 
-- **Dodge-first action**: movement is the main skill; attacks are automatic so you can focus on threading through neon swarms.
-- **Roguelite build choices**: choose upgrade cards, complete recipe passives, and evolve every weapon in the arsenal.
-- **Escalating survival loop**: enemies speed up from 6 minutes, pressure becomes obvious around 7–8 minutes, and a huge Cluster Core fusion boss returns every 10 minutes.
-- **Short-session web game**: instant restart, local records, optional global leaderboard, keyboard/mouse-free mobile joystick, and 1x/2x/3x speed controls.
+## ▶️ 바로 플레이
 
-## 🌐 Languages
+지금 플레이: **https://neon-survivor.pages.dev/**
 
-- This English README is the default project README.
-- In-game language is auto-detected from the browser/system language, with English as the fallback.
-- Supported in-game languages: **English**, **한국어**, **简体中文**, **日本語**.
-- Language buttons are available on the title screen before starting.
-- UI copy, upgrade cards, weapons, passives, companions, events, records, and leaderboard text are localized.
+## 🕹️ 어떤 게임인가요?
 
-## ▶️ Run locally
+- **피하기 중심 액션**: 공격은 자동이라, 플레이어는 네온 무리 사이를 뚫고 지나가는 움직임에 집중합니다.
+- **로그라이트식 빌드 선택**: 레벨업 카드, 레시피 패시브, 진화 코어로 모든 무기를 진화시킬 수 있습니다.
+- **계속 올라가는 생존 압박**: 6분부터 적 속도와 밀도가 오르고, 7~8분부터 체감 압박이 커지며, 10분마다 거대한 군집 코어 합체 보스가 다시 등장합니다.
+- **짧고 빠른 웹게임**: 즉시 재시작, 로컬 기록, 선택적 글로벌 리더보드, 모바일 조이스틱, 1x/2x/3x 배속을 지원합니다.
 
-Run the game from any static server:
+## 🌐 언어
+
+- 기본 프로젝트 README는 영어(`README.md`)입니다.
+- 게임 언어는 브라우저/시스템 언어를 자동 감지하며, 알 수 없는 언어는 영어로 표시됩니다.
+- 게임 내 지원 언어: **English**, **한국어**, **简体中文**, **日本語**.
+- 시작 전 타이틀 화면에서 언어 버튼으로 직접 변경할 수 있습니다.
+- UI 문구, 강화 카드, 무기, 패시브, 동료, 이벤트, 기록, 리더보드 문구가 현지화되어 있습니다.
+
+## ▶️ 로컬 실행
+
+정적 서버로 실행하세요:
 
 ```bash
 python3 -m http.server
 ```
 
-Then open `http://127.0.0.1:8000/`.
+그다음 `http://127.0.0.1:8000/`을 여세요.
 
-Public deployment: **https://neon-survivor.pages.dev/**. Static hosts work for the game client; Cloudflare Pages Functions power the optional global leaderboard on the Cloudflare build.
+공개 배포 URL: **https://neon-survivor.pages.dev/**. 게임 클라이언트는 정적 호스팅만으로 동작하며, Cloudflare Pages 빌드에서는 선택 사항인 글로벌 리더보드를 Pages Functions로 제공합니다.
 
-## 🎮 Controls
+## 🎮 조작
 
-| Input | Action |
+| 입력 | 동작 |
 |---|---|
-| `WASD` / arrow keys | Move; attacks are automatic |
-| `P` / `ESC` | Pause / resume |
-| `M` | Toggle sound |
-| `1` `2` `3` | Pick a level-up card; during play, use the on-screen `1x`/`2x`/`3x` buttons to change game speed |
-| Mobile | Drag the lower screen for the virtual joystick |
+| `WASD` / 방향키 | 이동; 공격은 자동 |
+| `P` / `ESC` | 일시정지 / 재개 |
+| `M` | 소리 켜기/끄기 |
+| `1` `2` `3` | 레벨업 카드 선택; 플레이 중 화면의 `1x`/`2x`/`3x` 버튼으로 배속 변경 |
+| 모바일 | 화면 하단 드래그로 가상 조이스틱 조작 |
 
-## ⚔️ Features
+## ⚔️ 주요 기능
 
-- **24 weapons** in the current source build: Magic Bolt, Spinning Shuriken, Thunder Lightning, Flame Nova, Homing Missile, Prism Laser, Neon Boomerang, Frost Aura, Plasma Lance, Orbital Strike, Neon Shotgun, Drone Cannon, Black Hole Round, Chain Blade, Neon Arrow Rain, Shock Mine, Ricochet Disc, Time Rift, Railgun, Toxic Mist, Phoenix Feathers, Sonic Bomb, Ice Spear, and Satellite Laser.
-- **8 passives**: Power Core, Overclock, Neon Boots, Reinforced Heart, Magnet Gloves, Nano Regen, Lucky Charm, and Rune of Wisdom.
-- **Late-game unlocks at 5 minutes**: expanded weapon/passive slots, weapon evolutions, companions, and field events become available.
-- **24 weapon evolutions**: every weapon can evolve when the weapon is maxed, its recipe passive is trained, and an Evolution Core is available. The 16 added evolutions emphasize damage, crowd control, targeting, and mobility pressure without adding new healing or shield effects.
-- **Endless late loop**: there is no fixed victory screen; enemy speed and density begin ramping from 6 minutes, pressure is noticeable by 7–8 minutes, and after 10 minutes the loop keeps scaling difficulty and boss pressure, including recurring 10-minute Cluster Core fusion boss events.
-- **Endless boss resource contests**: fusion/endless bosses can telegraph devour, mark pickups as contested, heal from chicken and XP gems, suffer bomb backfire from their own devour healing, punish devoured magnets with XP pressure, and temporarily seal multiple weapons with visible lock timers.
-- **Neon companions**: six companion roles can join and later gain rear-line resonance.
-- **Field events**: rift, storm, contract, and supply events add timed risk/reward objectives after unlock.
-- **Enemies and pressure systems**: six base enemy types, five post-unlock special enemies, three scheduled bosses, a recurring and more threatening 10-minute Cluster Core fusion boss, scaling endless bosses with randomized extra patterns, elites, silent idle-pressure missiles, and hazard patterns. Late-game enemy counts are preserved, while mass-enemy rendering is optimized with a low-resolution batching layer so huge swarms still look crowded with less frame hitching.
-- **Drops, anti-idle pressure, speed controls, and records**: shorter-lived healing chicken, magnet, bomb, and treasure chest drops; magnet and idle-pressure banners are suppressed to reduce notification spam; idle play now reduces regeneration/shield sustain and lets idle missiles pierce barrier/invulnerability; title-screen nickname entry/randomization; in-run 1x/2x/3x speed controls; local records; and optional leaderboard submission.
+- **현재 소스 빌드 기준 무기 24종**: 매직 볼트, 회전 수리검, 천둥 번개, 화염 파동, 유도 미사일, 프리즘 레이저, 네온 부메랑, 냉기 오라, 플라즈마 랜스, 궤도 폭격, 네온 산탄총, 드론 캐논, 블랙홀 탄, 체인 톱날, 네온 화살비, 감전 지뢰, 반사 디스크, 시간 균열, 레일건, 독성 안개, 불사조 깃털, 음파 폭탄, 빙결 창, 위성 레이저.
+- **패시브 8종**: 파워 코어, 오버클럭, 네온 부츠, 강화 심장, 자석 장갑, 나노 재생, 행운의 부적, 지식의 룬.
+- **5분 후 해금**: 무기/패시브 슬롯 확장, 무기 진화, 동료, 필드 이벤트가 열립니다.
+- **무기 진화 24종**: 모든 무기는 무기 만렙, 레시피 패시브 숙련, 진화 코어 조건을 만족하면 진화할 수 있습니다. 추가된 16종은 신규 회복/보호막 효과 없이 피해, 군중 제어, 조준, 이동 압박을 강화합니다.
+- **차원 모드 후반 전환**: 10분 시점에 균열 문지기가 등장하고, 처치 후 차원 허브에서 8개 차원을 선택해 클리어할 수 있습니다. 외부 전장으로 자유 복귀해 파밍한 뒤 재도전할 수 있습니다.
+- **끝없는 후반 루프**: 차원 관문 이후에도 고정 승리 화면 없이 진행되며, 난이도와 보스 압박은 계속 상승합니다.
+- **엔드리스 보스 자원 쟁탈**: 합체/엔드리스 보스가 포식을 예고하고 픽업을 쟁탈 상태로 만들며, 닭과 경험치 보석으로 회복하고, 폭탄 포식 시 회복량 기반 역류 피해를 받습니다. 자석 포식은 XP 부채를 만들지만 XP바 회색 overlay와 배지로 표시되며, 한 번의 포식에서 과도하게 누적되지 않도록 제한됩니다.
+- **네온 동료**: 6개 동료 역할이 합류하고, 이후 후열 공명으로 강화될 수 있습니다.
+- **필드 이벤트와 차원 보상**: 균열, 폭풍, 계약, 보급 이벤트가 해금 이후 제한 시간형 위험/보상 목표를 제공하고, 차원 클리어는 고정 유물과 보상 카드 선택을 제공합니다.
+- **적과 압박 시스템**: 기본 적 6종, 해금 후 특수 적 6종, 예정 보스 3종, 더 위협적인 10분 단위 군집 코어 합체 보스, 엘리트, 경고 레이저, 도탄 레이저, 폭발체, 위험 장판 패턴이 있습니다. 제자리 방지는 위험 감독 시스템으로 고도화되어 이벤트/보스 큰 패턴 중 전술적 정지를 처벌하지 않도록 조율합니다.
+- **도감, 드롭, 배속, 기록**: 시작 화면과 일시정지 화면에서 한글 적 도감을 열 수 있고, 실제 게임 도형 기반 이미지와 대응법을 확인할 수 있습니다. 치킨, 자석, 폭탄, 보물상자, 플레이 중 1x/2x/3x 배속, 타이틀 닉네임 입력/랜덤 생성, 로컬 기록, 선택적 리더보드 제출을 지원합니다.
 
-## 🛠️ Tech notes
+## 🛠️ 기술 메모
 
-The current local build is split into responsibility-focused browser modules under `src/`, while `index.html` remains the DOM shell and classic-script entrypoint.
+현재 로컬 빌드는 `src/` 아래 책임별 브라우저 모듈로 분리되어 있으며, `index.html`은 DOM 셸과 classic script 진입점 역할을 합니다.
 
-- **Rendering**: Canvas 2D, pre-rendered glow sprites, additive blending, split render modules, trimmed enemy glow sprite bounds, and a reusable mass-enemy layer for late-game swarm rendering without reducing enemy counts.
-- **Audio**: Web Audio API synthesis for effects and music, with separate modules for graph lifecycle, mute persistence, music sequencing, and named SFX recipes.
-- **Game logic**: separate modules for lifecycle, loop phases, stats, weapons, projectiles, evolutions, companions, events, hazards, upgrades, combat, loot, and UI.
-- **Localization**: `src/i18n*.js` owns language detection, title-screen language buttons, DOM text updates, and localized game-content patches.
-- **Leaderboard**: localStorage by default; Cloudflare Pages Functions can enable `/api/session` and `/api/leaderboard` for a global leaderboard.
+- **렌더링**: Canvas 2D, 사전 렌더링 글로우 스프라이트, additive blending, 분리된 렌더 모듈, 적 글로우 스프라이트 여백 축소, 적 수를 줄이지 않는 후반 대량몹 재사용 레이어.
+- **오디오**: 효과음과 음악을 Web Audio API로 합성하며, 그래프 생명주기, 음소거 저장, 음악 시퀀싱, SFX 레시피가 분리되어 있습니다.
+- **게임 로직**: 생명주기, 루프 단계, 스탯, 무기, 투사체, 진화, 동료, 이벤트, 위험 요소, 강화, 전투, 전리품, UI가 모듈별로 나뉘어 있습니다.
+- **현지화**: `src/i18n*.js`가 언어 감지, 타이틀 화면 언어 버튼, DOM 문구 갱신, 게임 콘텐츠 현지화 패치를 담당합니다.
+- **리더보드**: 기본은 localStorage이며, Cloudflare Pages Functions로 `/api/session`과 `/api/leaderboard` 기반 글로벌 리더보드를 활성화할 수 있습니다.
 
-## ✅ Local verification
+## ✅ 로컬 검증
 
-Repo-local checks cover syntax, classic-script loader order, i18n safety, leaderboard contract drift, gameplay outcomes, audio behavior, and API boundaries:
+저장소 내 검사는 문법, classic script 로더 순서, i18n 안전성, 리더보드 계약 드리프트, 게임플레이 결과, 오디오 동작, API 경계를 확인합니다.
 
 ```bash
 npm run check:syntax
@@ -80,25 +93,25 @@ npm run verify
 npx --yes wrangler pages functions build --outdir=/tmp/neon-survivor-functions-build
 ```
 
-Browser smoke can be run with Playwright available in the invoking environment:
+호출 환경에 Playwright가 있으면 브라우저 스모크 테스트도 실행할 수 있습니다.
 
 ```bash
 NEON_ROOT=$PWD node scripts/smoke-browser.mjs
 ```
 
-## 🏆 Leaderboard deployment notes
+## 🏆 리더보드 배포 메모
 
-- On static hosts such as GitHub Pages, global record validation is not available, so the game uses a **local unofficial leaderboard**.
-- On Cloudflare Pages, `functions/api/session.js` and `functions/api/leaderboard.js` can serve the GLOBAL leaderboard flow.
-- Bind a KV namespace as `LEADERBOARD` on the Pages project and redeploy.
-- Set `LEADERBOARD_PREFIX` per environment, for example `prod`, `preview-$CF_PAGES_BRANCH`, or `staging`, so session, rate-limit, and entry keys do not collide when environments share a KV namespace.
-- For local Cloudflare Functions testing, run `npx wrangler pages dev . --kv=LEADERBOARD --compatibility-date=2026-06-19` and open with `?remoteLb=1` to force the global API path.
-- Optional custom remote clients can set `window.NS_LEADERBOARD_API` and, if needed, `window.NS_LEADERBOARD_SESSION_API`; otherwise the session endpoint is derived from the leaderboard endpoint.
-- The server validates session token, play time, nickname/score bounds, submit limits, proof idempotency, rate limits, and ruleset version. Full cheat resistance would still require server-authoritative simulation or replay verification.
+- GitHub Pages 같은 정적 호스트에서는 글로벌 기록 검증을 사용할 수 없으므로 **로컬 비공식 리더보드**를 사용합니다.
+- Cloudflare Pages에서는 `functions/api/session.js`와 `functions/api/leaderboard.js`가 GLOBAL 리더보드 흐름을 제공합니다.
+- Pages 프로젝트에 KV namespace를 `LEADERBOARD`로 바인딩하고 다시 배포하세요.
+- 여러 환경이 같은 KV namespace를 공유한다면 `prod`, `preview-$CF_PAGES_BRANCH`, `staging` 같은 `LEADERBOARD_PREFIX`를 환경별로 설정해 세션, rate-limit, 기록 키 충돌을 막으세요.
+- 로컬 Cloudflare Functions 테스트는 `npx wrangler pages dev . --kv=LEADERBOARD --compatibility-date=2026-06-19`로 실행하고, `?remoteLb=1`을 붙여 글로벌 API 경로를 강제할 수 있습니다.
+- 커스텀 원격 클라이언트는 `window.NS_LEADERBOARD_API`와 필요 시 `window.NS_LEADERBOARD_SESSION_API`를 설정할 수 있습니다. 설정하지 않으면 리더보드 엔드포인트에서 세션 엔드포인트를 유도합니다.
+- 서버는 세션 토큰, 플레이 시간, 닉네임/점수 범위, 제출 제한, proof 중복, rate limit, ruleset 버전을 검증합니다. 완전한 치트 방지는 서버 권위 시뮬레이션 또는 리플레이 검증이 추가로 필요합니다.
 
-## 📄 License
+## 📄 라이선스
 
-[MIT](LICENSE) — free to modify, redistribute, and build on. Issues and PRs are welcome.
+[MIT](LICENSE) — 자유롭게 수정, 재배포, 활용할 수 있습니다. 이슈와 PR을 환영합니다.
 
 ---
 

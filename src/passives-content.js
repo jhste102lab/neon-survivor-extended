@@ -3,7 +3,7 @@
 /* ----- 패시브 정의 ----- */
 const PASSIVES = {
   power:   { name: '파워 코어',  icon: '💪', color: '#ff6b6b', desc: '모든 무기의 위력이 강해집니다.',         per: '모든 무기의 위력이 강해집니다.' },
-  haste:   { name: '오버클럭',  icon: '⏱️', color: '#19e3ff', desc: '무기를 더 빠르게 사용할 수 있습니다.',    per: '무기를 더 빠르게 사용합니다.' },
+  haste:   { name: '오버클럭',  icon: '⏱️', color: '#19e3ff', desc: '무기 공격 간격이 레벨당 7% 감소합니다.',    per: '무기 공격 간격 -7%' },
   boots:   { name: '네온 부츠', icon: '👟', color: '#3dff8e', desc: '이동이 더욱 민첩해집니다.',              per: '이동이 더욱 민첩해집니다.' },
   vitality:{ name: '강화 심장', icon: '❤️', color: '#ff4d8e', desc: '최대 체력이 늘고 즉시 회복합니다.',       per: '최대 체력이 늘고 즉시 회복합니다.' },
   magnet:  { name: '자석 장갑', icon: '🧲', color: '#ffd23d', desc: '멀리 있는 보석도 더 쉽게 끌어옵니다.',    per: '보석을 더 쉽게 끌어옵니다.' },

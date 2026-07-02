@@ -102,10 +102,12 @@
 
   Object.assign(Game, {
     grantEnemyDeathRewards(e) {
+      if (e.dimensionNoRewards) return;
       grantOrSpawnXp(this, e);
 
       if (e.boss) {
         grantBossRewards(this, e);
+        if (e.dimensionGatekeeper && this.openDimensionHubPortal) this.openDimensionHubPortal(e.x, e.y);
       } else if (e.elite) {
         this.spawnDrop('chest', e.x, e.y);
       } else if (e.type !== 'swarm') {

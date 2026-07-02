@@ -32,6 +32,7 @@ const UIHudFrame = {
       UIHudKills.updateIfDirty(G);
       if (G.slotsDirty) { UI.refreshSlots(); G.slotsDirty = false; }
       if (G.boss) UI.updateBossBar(G.boss);
+      if (UI.updateDimensionHud) UI.updateDimensionHud(G);
       UIHudFrame.updateFieldTestBadge(G);
     }
   },

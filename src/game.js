@@ -13,7 +13,7 @@ const Game = {
   test: { manualClock: false, headless: false, noFx: false },
   fieldTestInvincible: false, fieldTestRun: false, fieldTestTouched: false,
   hiddenWeaponEffects: {},
-  frameSeq: 0, frameTargets: null, bossDebuffs: null,
+  frameSeq: 0, frameTargets: null, bossDebuffs: null, dimension: null,
   slotsDirty: true, lastWeaponSlotCap: 5
 };
 

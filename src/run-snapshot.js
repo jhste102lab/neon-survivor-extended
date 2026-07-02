@@ -66,6 +66,7 @@ const RunSnapshot = {
         unlockNotified: game.unlockNotified,
         metrics: game.metrics,
         player: game.player,
+        dimension: game.dimension,
         enemies: game.enemies,
         bullets: game.bullets,
         ebullets: game.ebullets,
@@ -157,6 +158,7 @@ const RunSnapshot = {
     game.nextEventT = run.nextEventT || game.nextEventT; game.lastBossSpawnT = run.lastBossSpawnT || -999;
     game.idleT = run.idleT || 0; game.lastIdleWarnT = run.lastIdleWarnT || -999; game.unlockNotified = !!run.unlockNotified;
     game.metrics = run.metrics || game.metrics; game.player = run.player;
+    game.dimension = run.dimension || (typeof game.createDimensionState === 'function' ? game.createDimensionState() : null);
     game.hiddenWeaponEffects = run.hiddenWeaponEffects && typeof run.hiddenWeaponEffects === 'object' ? run.hiddenWeaponEffects : {};
     game.fieldTestInvincible = !!run.fieldTestInvincible && game.isFieldTestAllowed();
     game.fieldTestTouched = !!(run.fieldTestTouched || run.fieldTestRun || run.fieldTestInvincible);
