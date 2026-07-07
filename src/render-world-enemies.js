@@ -203,6 +203,7 @@ const RenderWorldEnemies = (() => {
     if (model.overlays.eliteAura) RenderWorldEnemyOverlays.drawEliteAura(x, e, t);
     if (shouldUseSimpleDetailedEnemy(e)) RenderWorldEnemySimple.drawEnemyShape(x, e, e.x, e.y, model.visual.scale, model.visual.rotation);
     else RenderWorldEnemySprites.drawEnemySprite(x, e, model.visual);
+    if (RenderWorldEnemyOverlays.drawFortifyRing) RenderWorldEnemyOverlays.drawFortifyRing(x, e, t, model.visual.scale);
     if (model.overlays.vulnerableRing) RenderWorldEnemyOverlays.drawVulnerableRing(x, e, t, model.visual.scale);
     if (model.overlays.healthBar) RenderWorldEnemyOverlays.drawEliteHealthBar(x, e);
   }

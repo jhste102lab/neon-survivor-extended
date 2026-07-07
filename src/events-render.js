@@ -45,7 +45,9 @@ Object.assign(Render, {
   drawEvents(x) {
     const ev = Game.activeEvent;
     if (!ev) return;
-    const info = FIELD_EVENTS[ev.type];
+    const info = ev.type === 'rift' && typeof DimensionRiftRules !== 'undefined'
+      ? { ...FIELD_EVENTS.rift, ...DimensionRiftRules.get(ev.dimension), hint: '들어가면 랜덤 차원 시련 시작', activeHint: '버티기 → 약한 보상 2개 중 선택', role: 'benefit' }
+      : FIELD_EVENTS[ev.type];
     const pulse = 0.5 + Math.sin(Game.time * 5 + ev.pulse) * 0.5;
     x.save();
     x.globalCompositeOperation = 'source-over';
@@ -56,7 +58,7 @@ Object.assign(Render, {
     x.beginPath(); x.arc(ev.x, ev.y, ev.r + pulse * 7, 0, TAU); x.fill(); x.stroke();
     x.setLineDash([]);
     if (ev.state === 'active' && (ev.type === 'rift' || ev.type === 'supply')) {
-      const need = ev.type === 'rift' ? 8.5 : 6;
+      const need = ev.type === 'rift' && typeof DimensionRiftRules !== 'undefined' ? (DimensionRiftRules.get(ev.dimension).holdGoal || 8.5) : 6;
       const k = clamp(ev.hold / need, 0, 1);
       x.strokeStyle = '#ffffff';
       x.lineWidth = 5;

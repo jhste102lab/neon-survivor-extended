@@ -106,7 +106,9 @@ const PlayerBulletCollision = {
     outcomes.push(this.damageProjectileTargetOutcome(b, e));
     outcomes.push(...this.projectileHitFeedbackOutcomes(b));
     if (b.healOnHit) outcomes.push(this.healOnHitOutcome(b));
-    const consume = this.consumedAfterProjectileHitResult(b, remainingPierce);
+    const pierceTax = e.fortifiedT > 0 && remainingPierce > 0 ? 1 : 0;
+    if (pierceTax) outcomes.push({ type: 'decrementPierce', bullet: b, amount: pierceTax });
+    const consume = this.consumedAfterProjectileHitResult(b, Math.max(0, remainingPierce - pierceTax));
     outcomes.push(...consume.outcomes);
     return { consumed: consume.consumed, decrementPierce: consume.decrementPierce, outcomes };
   },

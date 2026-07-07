@@ -25,7 +25,7 @@ const LootDropEffects = {
   applyOutcome(game, outcome) {
     if (!outcome || !outcome.type) return;
     if (outcome.type === 'damageVisibleEnemies') {
-      this.damageVisibleEnemies(game, outcome.damage, outcome.source);
+      this.damageVisibleEnemies(game, outcome.damage, outcome.source, outcome.bombStacks || 0);
     } else if (outcome.type === 'healPlayer') {
       const before = game.player.hp;
       game.player.hp = Math.min(game.stat().maxHp, game.player.hp + outcome.amount);
@@ -92,7 +92,7 @@ const LootDropEffects = {
     }
   },
 
-  damageVisibleEnemies(game, damage, source) {
+  damageVisibleEnemies(game, damage, source, bombStacks = 0) {
     const view = GameRuntime.viewportHalf(100);
     const W = view.w, H = view.h;
     if (game.metrics) game.metrics.bombsUsed = (game.metrics.bombsUsed || 0) + 1;
@@ -108,8 +108,21 @@ const LootDropEffects = {
           dealt = Math.max(scaled, floor);
           markBossVulnerable(e, 1.2, 0.18);
         }
-        game.damageEnemy(e, dealt, 0, 0, source);
+        if (bombStacks > 0) this.applyBombStackExecution(game, e, bombStacks);
+        if (e.hp > 0) game.damageEnemy(e, dealt, 0, 0, source);
       }
     }
+  },
+
+  applyBombStackExecution(game, enemy, stacks) {
+    if (!enemy || enemy.boss) {
+      if (enemy && enemy.boss) markBossVulnerable(enemy, 0.85, 0.08);
+      return false;
+    }
+    enemy.bombHits = Math.max(0, enemy.bombHits || 0) + Math.max(1, stacks || 1);
+    const needed = (CFG.bombExecution && CFG.bombExecution.normalStacks) || 8;
+    if (enemy.bombHits < needed) return false;
+    game.damageEnemy(enemy, Math.max(enemy.hp + 1, enemy.maxHp || 1), 0, 0, 'drop:bomb:execute');
+    return true;
   },
 };

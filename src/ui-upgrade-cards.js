@@ -36,9 +36,10 @@ Object.assign(UI, {
   },
 
   showRewardCard(choice, sourceLabel = '') {
-    if (!choice) return;
+    const choices = Array.isArray(choice) ? choice.filter(Boolean) : [choice].filter(Boolean);
+    if (!choices.length) return;
     this.rewardCardMode = true;
-    this.choices = [choice];
+    this.choices = choices.slice(0, 3);
     Game.state = 'levelup';
     const sub = sourceLabel ? tr('event.rewardChooseNamed', { name: sourceLabel }) : tr('event.rewardChoose');
     this.setLevelOverlayCopy('event.rewardTitle', sub);

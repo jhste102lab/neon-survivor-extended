@@ -326,3 +326,11 @@ h2.ovtitle{font-family:var(--font-en);font-weight:900;font-size:38px;letter-spac
 #dimensionHud{position:fixed;left:50%;top:72px;transform:translateX(-50%);z-index:9;min-width:280px;max-width:min(620px,86vw);padding:8px 18px;border-radius:999px;border:1px solid rgba(65,240,255,.42);background:linear-gradient(135deg,rgba(9,14,35,.82),rgba(30,10,45,.70));box-shadow:0 0 22px rgba(65,240,255,.18),inset 0 0 18px rgba(255,43,214,.08);text-align:center;pointer-events:none;backdrop-filter:blur(5px)}
 #dimensionHud b{display:block;font-family:var(--font-en);font-size:13px;letter-spacing:1.4px;color:#eaffff;text-shadow:0 0 12px rgba(65,240,255,.42)}
 #dimensionHud span{display:block;margin-top:2px;font-size:12px;color:#bdefff;text-shadow:0 0 8px rgba(25,227,255,.28)}
+
+/* Feedback update: start-run drop filters and shield readability */
+.dropPrefBox{margin:0 auto 8px;max-width:440px;padding:9px 14px;border:1px solid rgba(255,210,61,.22);border-radius:16px;background:rgba(255,210,61,.035);text-align:center}
+.dropPrefChoices{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.dropPrefChip{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;border:1px solid rgba(125,255,193,.35);background:rgba(125,255,193,.07);color:#dffaff;font-size:12px;cursor:pointer;transition:filter .12s,opacity .12s,border-color .12s,background .12s}
+.dropPrefChip input{accent-color:#7dffc1}.dropPrefChip.off{opacity:.56;filter:saturate(.45);border-color:rgba(255,77,94,.45);background:rgba(255,77,94,.07)}
+.shieldText{min-width:62px;height:24px;padding:3px 9px;border-radius:999px;border:1px solid rgba(125,255,193,.48);background:rgba(8,24,31,.76);color:#d7ffec;font-family:var(--font-en);font-size:12px;font-weight:800;letter-spacing:.5px;text-align:center;box-shadow:0 0 12px rgba(125,255,193,.18)}
+.bestiaryStats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:9px 0 8px}.bestiaryStats span{padding:6px 8px;border-radius:9px;background:rgba(25,227,255,.055);border:1px solid rgba(25,227,255,.18);color:#8fa3c8;font-size:11px}.bestiaryStats b{float:right;color:#fff;font-family:var(--font-en)}.bestiaryStats.bossStats span{border-color:rgba(255,77,94,.22);background:rgba(255,77,94,.055)}.bestiaryScaleNote{margin:-1px 0 8px;color:#ffd23d;font-size:11px;line-height:1.35}

@@ -6,7 +6,7 @@ const LootDropBombEffect = {
     const baseDamage = game.time >= CFG.winTime ? ((CFG.lateBalance && CFG.lateBalance.bombDamage) || 180) : 250;
     const damage = Math.round(baseDamage * Math.pow(1.3, stack - 1));
     return [
-      { type: 'damageVisibleEnemies', damage, source: 'drop:bomb' },
+      { type: 'damageVisibleEnemies', damage, source: 'drop:bomb', bombStacks: stack },
       { type: 'flash', id: 'lvlfx', duration: 0.6 },
       { type: 'sound', name: 'boom' },
       { type: 'shake', amount: 12, duration: 0.5 },

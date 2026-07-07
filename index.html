@@ -40,6 +40,7 @@
   <div id="hpwrap">
     <div id="lvbadge"><span class="t">LV</span><span class="v" id="lvNum">1</span></div>
     <div id="hpbar"><div id="hpfill"></div><div id="hptext">120 / 120</div></div>
+    <div id="shieldText" class="shieldText hide">🛡 0</div>
   </div>
   <div id="timer" aria-label="Survival time and next checkpoint" data-i18n-aria-label="aria.timer">
     <span class="clockline"><span id="timeNow">00:00</span><span id="timeGoal"> / 05:00</span></span>
@@ -98,6 +99,11 @@
         <button class="miniBtn" id="btnRandomNick" type="button" data-i18n="profile.random">Random</button>
       </div>
       <div class="profileHint" data-i18n="profile.hint">Example: BraveOtter1234@ · duplicate names are allowed</div>
+    </div>
+    <div class="dropPrefBox">
+      <div class="profileTitle">일반 적 드롭 허용</div>
+      <div class="dropPrefChoices" id="dropPrefChoices"></div>
+      <div class="profileHint">꺼둔 아이템은 일반 적에게서 나오지 않습니다. 보스 보상은 유지됩니다.</div>
     </div>
     <div class="leaderboard" id="titleLeaderboard"></div>
     <button class="btn primary" id="btnStart" data-i18n="button.start">Start Game</button>
@@ -221,6 +227,7 @@
 <script src="src/dimensions-content.js"></script>
 <script src="src/grid.js"></script>
 <script src="src/game.js"></script>
+<script src="src/drop-preferences.js"></script>
 <script src="src/run-state.js"></script>
 <script src="src/game-lifecycle.js"></script>
 <script src="src/game-stats.js"></script>
@@ -372,6 +379,7 @@
 <script src="src/upgrade-apply-passives.js"></script>
 <script src="src/upgrade-apply-transcend.js"></script>
 <script src="src/upgrade-apply-heal.js"></script>
+<script src="src/upgrade-apply-minor.js"></script>
 <script src="src/upgrade-apply-specials.js"></script>
 <script src="src/upgrade-apply-dispatcher.js"></script>
 <script src="src/upgrade-apply.js"></script>
@@ -405,6 +413,7 @@
 <script src="src/render-effects-particles.js"></script>
 <script src="src/render-effects-floating-texts.js"></script>
 <script src="src/render-effects.js"></script>
+<script src="src/dimension-rifts.js"></script>
 <script src="src/field-events.js"></script>
 <script src="src/hazards.js"></script>
 <script src="src/event-rewards.js"></script>

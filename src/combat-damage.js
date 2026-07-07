@@ -9,6 +9,10 @@ const CombatDamage = (() => {
     return game.enemyProtected && game.enemyProtected(enemy) ? damage * 0.55 : damage;
   }
 
+  function applyFortifyModifier(enemy, damage) {
+    return enemy.fortifiedT > 0 ? damage * (1 - clamp(enemy.armorK || 0.3, 0, 0.75)) : damage;
+  }
+
   function applyVulnerabilityModifier(enemy, damage) {
     return enemy.vulnerableT > 0 ? damage * (1 + (enemy.vulnerableK || 0.12)) : damage;
   }
@@ -25,6 +29,7 @@ const CombatDamage = (() => {
     let resolvedDamage = damage;
     if (game.dimensionDamageMultiplierForEnemy) resolvedDamage *= game.dimensionDamageMultiplierForEnemy(enemy);
     resolvedDamage = applyProtectionModifier(game, enemy, resolvedDamage);
+    resolvedDamage = applyFortifyModifier(enemy, resolvedDamage);
     resolvedDamage = applyVulnerabilityModifier(enemy, resolvedDamage);
     const crit = rollCriticalHit(game);
     resolvedDamage = applyCriticalModifier(resolvedDamage, crit);

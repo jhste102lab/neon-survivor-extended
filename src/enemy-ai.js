@@ -9,6 +9,7 @@ Object.assign(Game, {
     e.orbitCd = Math.max(0, e.orbitCd - dt);
     e.boomCd = Math.max(0, e.boomCd - dt);
     e.vulnerableT = Math.max(0, (e.vulnerableT || 0) - dt);
+    e.fortifiedT = Math.max(0, (e.fortifiedT || 0) - dt);
   },
 
   enemyUpdateInterval(e, d2) {

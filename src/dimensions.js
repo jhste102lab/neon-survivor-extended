@@ -276,11 +276,11 @@
     },
 
     shouldDelayEndlessForDimension() {
-      const dim = ensureDimensionState(this);
-      return !dim.gatekeeperDefeated;
+      return false;
     },
 
     maybeSpawnDimensionGatekeeper(t = this.time) {
+      return false;
       const dim = ensureDimensionState(this);
       if (dim.gatekeeperSpawned || dim.gatekeeperDefeated || t < CFG.winTime) return false;
       if (this.boss && !this.boss.dimensionGatekeeper) {

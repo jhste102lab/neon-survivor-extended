@@ -168,6 +168,19 @@ function dimensionRewardDescription(choice) {
   return { icon: card.icon, name: card.name, level: '차원 보너스', description: card.desc, details: [card.type === 'risk' ? '위험과 보상이 함께 증가합니다.' : '이번 정복 보상으로 즉시 적용됩니다.'], color: card.color || '#41f0ff', tag: 'DIMENSION', isNew: false };
 }
 
+function minorRewardDescription(choice) {
+  const rows = {
+    minor_heal: { icon: '🍗', name: '응급 배급', level: '소형 보상', description: '체력을 조금 회복합니다.', details: ['즉시 체력 +24'], color: '#ff4d8e', tag: '차원 보상' },
+    minor_barrier: { icon: '🛡️', name: '보호막 충전', level: '소형 보상', description: '보호막을 즉시 보충합니다.', details: ['보호막 +26', '최대 58까지 저장'], color: '#7dffc1', tag: '차원 보상' },
+    minor_xp: { icon: '✨', name: '압축 경험', level: '소형 보상', description: '다음 성장을 조금 앞당깁니다.', details: ['현재 필요 경험치의 약 32%'], color: '#41f0ff', tag: '차원 보상' },
+    minor_power: { icon: '🔥', name: '차원 화력', level: '42초', description: '잠시 모든 무기 피해가 증가합니다.', details: ['모든 무기 피해 ×1.25', '일반 레벨업보다 약한 임시 보상'], color: '#ff7a2b', tag: '차원 보상' },
+    minor_speed: { icon: '👟', name: '차원 가속', level: '42초', description: '잠시 이동 속도가 증가합니다.', details: ['이동속도 ×1.25', '회피와 포지셔닝 보상'], color: '#41f0ff', tag: '차원 보상' },
+    casino_gamble: { icon: '🎰', name: '도박장 거래', level: '위험 보상', description: '현재 체력 절반을 내고 무작위 능력 하나를 60초간 2배로 만듭니다.', details: ['공격력/이동속도/재생 중 하나 ×2', '체력은 최소 1 남음', '영구 강화가 아닌 임시 강화'], color: '#ffd23d', tag: '도박장' },
+  };
+  const dto = rows[choice && choice.id] || rows.minor_heal;
+  return { ...dto, isNew: false };
+}
+
 function transcendDescription(choice) {
   const T = TRANSCEND.find(t => t.id === choice.id);
   if (!T) return null;
@@ -184,6 +197,7 @@ const UpgradeDescriptionByKind = {
   nc: companionDescription,
   t: transcendDescription,
   dimensionReward: dimensionRewardDescription,
+  minor: minorRewardDescription,
 };
 
 const ChestRewardTextByKind = {
@@ -197,6 +211,7 @@ const ChestRewardTextByKind = {
   t: choice => tr('chest.transcend', { icon: TRANSCEND.find(t => t.id === choice.id).icon }),
   heal: () => tr('chest.heal'),
   dimensionReward: choice => choice && choice.card ? `${choice.card.icon} ${choice.card.name}` : '차원 보너스',
+  minor: choice => `✨ ${minorRewardDescription(choice).name}`,
 };
 
 const UpgradeDescriptions = {

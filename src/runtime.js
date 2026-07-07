@@ -59,6 +59,10 @@ const GameRuntime = {
     if (!this.isHeadless() && typeof UI !== 'undefined' && UI.showRewardCard) UI.showRewardCard(choice, sourceLabel);
   },
 
+  showRewardChoices(choices, sourceLabel = '') {
+    this.showRewardCard(choices, sourceLabel);
+  },
+
   gameOver() {
     const game = this.activeGame();
     if (this.isHeadless()) {
@@ -102,6 +106,12 @@ const GameRuntime = {
 
   resumeForVisibleDocument(game = this.activeGame()) {
     if (!game || game.state !== 'pause') this.resumeAudio();
+    this.refreshRenderFrame();
+  },
+
+  refreshRenderFrame() {
+    if (this.isHeadless()) return;
+    if (typeof Render !== 'undefined' && Render.forceRefresh) Render.forceRefresh();
   },
 
   startMusic() {

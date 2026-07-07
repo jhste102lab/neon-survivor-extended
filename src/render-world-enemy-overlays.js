@@ -17,6 +17,16 @@ const RenderWorldEnemyOverlays = (() => {
     x.restore();
   }
 
+  function drawFortifyRing(x, e, t, scale) {
+    if (!(e.fortifiedT > 0)) return;
+    x.save();
+    x.strokeStyle = `rgba(255,210,61,${0.34 + Math.sin(t * 9) * 0.14})`;
+    x.lineWidth = 2.4;
+    x.setLineDash([7, 5]);
+    x.beginPath(); x.arc(e.x, e.y, e.r * scale + 12, 0, TAU); x.stroke();
+    x.restore();
+  }
+
   function drawVulnerableRing(x, e, t, scale) {
     if (!(e.vulnerableT > 0)) return;
     x.save();
@@ -38,6 +48,7 @@ const RenderWorldEnemyOverlays = (() => {
   return {
     drawBossDashWarning,
     drawEliteAura,
+    drawFortifyRing,
     drawVulnerableRing,
     drawEliteHealthBar,
   };

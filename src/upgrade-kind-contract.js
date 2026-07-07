@@ -12,6 +12,7 @@ const UpgradeKindContract = (() => {
     t: Object.freeze({ description: 'transcend', chestText: true, applicator: 'transcend' }),
     heal: Object.freeze({ description: 'heal', chestText: true, applicator: 'heal' }),
     dimensionReward: Object.freeze({ description: 'dimension reward', chestText: false, applicator: 'dimensionReward' }),
+    minor: Object.freeze({ description: 'minor field reward', chestText: true, applicator: 'minor' }),
   });
 
   function get(kind) {

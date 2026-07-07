@@ -12,7 +12,11 @@ Object.assign(Game, {
     updateBossSummonPattern(this, e, dt, enrage, bossDef);
     updateBossRingBulletPattern(this, e, dt, enrage, bossDef);
     updateBossMegaHazardPatterns(this, e, dt, enrage, bossDef);
+    updateBossSlimeTrailPattern(this, e, dt, bossDef);
+    updateBossFortifySpawnPattern(this, e, dt, enrage, bossDef);
+    updateBossTankForgePattern(this, e, dt);
     updateBossFairnessLaserPattern(this, e, dt, enrage, bossDef);
+    updateBossVertexLaserPattern(this, e, dt, enrage, bossDef);
     return applyBossFinalMovementModifiers(e, movement);
   },
 });
@@ -133,4 +137,96 @@ function updateBossMegaLaneTrap(game, e, dt, enrage, bossDef) {
     });
   }
   markBossVulnerable(e, bossDef.mega ? 1.25 : 0.95, bossDef.mega ? 0.17 : 0.12);
+}
+
+function updateBossFortifySpawnPattern(game, e, dt, enrage, bossDef) {
+  const cfg = CFG.bossFortifySpawn || {};
+  if (cfg.enabled === false || game.time < (cfg.start || CFG.winTime)) return;
+  if (typeof e.fortifySpawnT !== 'number') e.fortifySpawnT = rand(10, 15);
+  e.fortifySpawnT -= dt;
+  if (e.fortifySpawnT > 0) return;
+  e.fortifySpawnT = Math.max(22, (cfg.cooldown || 34) / (1 + enrage * 0.12));
+  game.bossFortifySpawnT = Math.max(game.bossFortifySpawnT || 0, cfg.duration || 16);
+  markBossVulnerable(e, 1.3, 0.14);
+  game.spawnText(e.x, e.y - e.r - 34, '방어 오라', true, '#ffd23d');
+}
+
+function updateBossTankForgePattern(game, e, dt) {
+  const cfg = CFG.bossTankForge || {};
+  if (cfg.enabled === false || game.time < (cfg.start || CFG.winTime + 60)) return;
+  e.tankForgeT = Math.max(0, (e.tankForgeT || 0) - dt);
+  if (e.tankForgeT > 0) return;
+  const radius = cfg.radius || 170;
+  const tanks = game.enemies.filter(enemy => enemy && !enemy.boss && !enemy.elite && enemy.type === 'tank' && dist2(enemy.x, enemy.y, e.x, e.y) < radius * radius)
+    .sort((a, b) => dist2(a.x, a.y, e.x, e.y) - dist2(b.x, b.y, e.x, e.y));
+  if (tanks.length < (cfg.count || 7)) return;
+  e.tankForgeT = cfg.cooldown || 16;
+  const consume = tanks.slice(0, Math.min(cfg.consume || 5, tanks.length));
+  let hp = 0, x = 0, y = 0;
+  for (const tank of consume) { hp += Math.max(0, tank.hp || tank.maxHp || 0); x += tank.x; y += tank.y; }
+  x = x / consume.length; y = y / consume.length;
+  for (const tank of consume) {
+    const idx = game.enemies.indexOf(tank);
+    if (idx >= 0) game.enemies.splice(idx, 1);
+  }
+  const mini = game.spawnEnemy('brute', x, y, true);
+  if (mini) {
+    mini.hp += hp * 0.42;
+    mini.maxHp += hp * 0.42;
+    mini.fortifiedT = 10;
+    mini.armorK = 0.22;
+    game.spawnText(mini.x, mini.y - mini.r - 20, '탱커 응집체', true, '#a36bff');
+    game.spawnBurst(mini.x, mini.y, '#a36bff', 14, 160, 7, 0.4);
+  }
+  markBossVulnerable(e, 1.4, 0.16);
+}
+
+function updateBossSlimeTrailPattern(game, e, dt, bossDef) {
+  if (!bossDef.slimeTrail || !game.spawnHazard) return;
+  e.slimeTrailT = Math.max(0, (e.slimeTrailT || 0) - dt);
+  if (e.slimeTrailT > 0) return;
+  e.slimeTrailT = bossDef.mega ? 0.9 : 1.25;
+  game.spawnHazard({ kind: 'boss-slime', x: e.x, y: e.y, r: bossDef.mega ? 46 : 34, warn: 0.05, life: 16, dmg: bossDef.mega ? 8 : 4, tick: 0.95, slow: 0.38, color: '#7dffc1', source: 'boss:slime', label: 'SLOW' });
+}
+
+function updateBossVertexLaserPattern(game, e, dt, enrage, bossDef) {
+  const cfg = CFG.bossPatternPhase || {};
+  if (cfg.enabled === false || !game.spawnLineHazard || game.time < (cfg.hardStart || CFG.winTime)) return;
+  if (typeof e.vertexLaserT !== 'number') e.vertexLaserT = rand(8, 13);
+  e.vertexLaserT -= dt;
+  if (e.vertexLaserT > 0) return;
+  e.vertexLaserT = Math.max(11, (cfg.vertexLaserCd || 18) / (1 + enrage * 0.10)) * rand(0.92, 1.16);
+  startBossPatternPhase(game, e, cfg.warn || 1, 3.4);
+  spawnBossVertexLaserVolley(game, e, bossDef, enrage);
+}
+
+function bossVertexCount(bossDef) {
+  if (bossDef.shape === 'oct') return 8;
+  if (bossDef.shape === 'star') return 5;
+  if (bossDef.shape === 'hex') return 6;
+  return 5;
+}
+
+function spawnBossVertexLaserVolley(game, e, bossDef, enrage) {
+  const cfg = CFG.bossPatternPhase || {};
+  const n = bossVertexCount(bossDef);
+  const step = Math.max(1, Math.floor(n / (bossDef.mega ? 4 : 3)));
+  const base = (e.wobble || 0) + rand(0, TAU / n);
+  const length = bossDef.mega ? 820 : 680;
+  for (let i = 0; i < n; i += step) {
+    const a = base + i / n * TAU;
+    const ox = e.x + Math.cos(a) * (e.r * 0.9);
+    const oy = e.y + Math.sin(a) * (e.r * 0.9);
+    const aim = Math.atan2(game.player.y - oy, game.player.x - ox) + rand(-0.16, 0.16);
+    game.spawnLineHazard({
+      kind: 'boss-vertex-laser',
+      x1: ox, y1: oy,
+      x2: ox + Math.cos(aim) * length, y2: oy + Math.sin(aim) * length,
+      width: Math.max(18, (cfg.laserWidth || 28) * 0.72), warn: cfg.warn || 1.0, life: 0.95,
+      dmg: (cfg.vertexLaserDamage || 18) + Math.floor(enrage * 2), tick: 1.1,
+      color: bossDef.color || '#ff2bd6', source: 'boss:vertex-laser', label: 'EDGE',
+    });
+  }
+  markBossVulnerable(e, 1.0, bossDef.mega ? 0.16 : 0.13);
+  GameRuntime.playSound('shoot');
 }

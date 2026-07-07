@@ -49,6 +49,8 @@ const GameLoopPhases = (() => {
     assertPlayHelpers(game);
     if (game.isDimensionSpaceActive && game.isDimensionSpaceActive()) return game.runDimensionFrame(dt, rdt);
     game.time += dt;
+    if (game.updateTemporaryBuffs) game.updateTemporaryBuffs(dt);
+    if (game.updateBossFortifySpawn) game.updateBossFortifySpawn(dt);
     const player = game.player;
     const st = game.cacheFrameStats();
     game.refreshWeaponSlotCap(player);

@@ -5,17 +5,52 @@ Object.assign(Game, {
 
   stat() {
     const p = this.player.passives, t = this.player.transcend;
+    const temp = this.temporaryBuffStats ? this.temporaryBuffStats() : { dmgMul: 1, cdMul: 1, spdMul: 1, regenMul: 1, regenFlat: 0 };
+    const baseRegen = 0.65 * (p.regen || 0);
     return {
-      dmg: 1 + 0.12 * (p.power || 0) + 0.08 * t.dmg,
-      cd: Math.max(0.3, Math.pow(0.93, p.haste || 0) * Math.pow(0.96, t.cd)),
-      spd: CFG.player.speed * Math.min(2.3, (1 + 0.08 * (p.boots || 0)) * (1 + 0.05 * t.spd)),
+      dmg: (1 + 0.12 * (p.power || 0) + 0.08 * t.dmg) * temp.dmgMul,
+      cd: Math.max(0.3, Math.pow(0.93, p.haste || 0) * Math.pow(0.96, t.cd) * temp.cdMul),
+      spd: CFG.player.speed * Math.min(2.3, (1 + 0.08 * (p.boots || 0)) * (1 + 0.05 * t.spd) * temp.spdMul),
       maxHp: CFG.player.hp + 20 * (p.vitality || 0) + 20 * t.hp,
       pickup: CFG.player.pickup * (1 + 0.4 * (p.magnet || 0)),
-      regen: 0.65 * (p.regen || 0),
+      regen: baseRegen * temp.regenMul + temp.regenFlat,
       crit: Math.min(0.6, CFG.critChance + 0.03 * (p.luck || 0)),
       luck: 1 + 0.3 * (p.luck || 0),
       xp: 1 + 0.1 * (p.wisdom || 0),
     };
+  },
+
+  applyTemporaryBuff(buff) {
+    if (!buff || !buff.id) return false;
+    this.temporaryBuffs = Array.isArray(this.temporaryBuffs) ? this.temporaryBuffs : [];
+    const next = { ...buff, t: Math.max(0.1, Number(buff.t || buff.max || 1)), max: Math.max(0.1, Number(buff.max || buff.t || 1)) };
+    const idx = this.temporaryBuffs.findIndex(existing => existing && existing.id === next.id);
+    if (idx >= 0) this.temporaryBuffs[idx] = next;
+    else this.temporaryBuffs.push(next);
+    if (this.player) this.player.tempBuffs = this.temporaryBuffs;
+    GameRuntime.banner(`✨ ${next.label || '차원 버프'} ${Math.round(next.t)}초`, 'good');
+    return true;
+  },
+
+  updateTemporaryBuffs(dt) {
+    const buffs = Array.isArray(this.temporaryBuffs) ? this.temporaryBuffs : [];
+    for (let i = buffs.length - 1; i >= 0; i--) {
+      buffs[i].t = Math.max(0, (buffs[i].t || 0) - dt);
+      if (buffs[i].t <= 0) buffs.splice(i, 1);
+    }
+    if (this.player) this.player.tempBuffs = buffs;
+  },
+
+  temporaryBuffStats() {
+    const out = { dmgMul: 1, cdMul: 1, spdMul: 1, regenMul: 1, regenFlat: 0 };
+    for (const buff of this.temporaryBuffs || []) {
+      out.dmgMul *= buff.dmgMul || 1;
+      out.cdMul *= buff.cdMul || 1;
+      out.spdMul *= buff.spdMul || 1;
+      out.regenMul *= buff.regenMul || 1;
+      out.regenFlat += buff.regenFlat || 0;
+    }
+    return out;
   },
 
   isMobileRuntime() {
@@ -128,5 +163,19 @@ Object.assign(Game, {
   itemDropScale() {
     const bonus = this.dimension && this.dimension.bonuses ? Number(this.dimension.bonuses.dropQuality || 0) : 0;
     return 1 + Math.max(0, bonus);
+  },
+});
+
+Object.assign(Game, {
+  updateBossFortifySpawn(dt) {
+    this.bossFortifySpawnT = Math.max(0, (this.bossFortifySpawnT || 0) - dt);
+  },
+
+  applySpawnFortifyToEnemy(enemy) {
+    if (!(this.bossFortifySpawnT > 0) || !enemy || enemy.boss || enemy.elite) return false;
+    const cfg = CFG.bossFortifySpawn || {};
+    enemy.fortifiedT = Math.max(enemy.fortifiedT || 0, Math.min(30, this.bossFortifySpawnT));
+    enemy.armorK = Math.max(enemy.armorK || 0, cfg.armor || 0.35);
+    return true;
   },
 });

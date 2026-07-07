@@ -75,7 +75,7 @@ Object.assign(Game, {
     this.blades.angle = initial.blades.angle;
     this.frameSeq = initial.frameSeq; this.frameTargets = initial.frameTargets;
     if (typeof Grid !== 'undefined' && Grid.map) Grid.map.clear();
-    this.endless = initial.endless; this.st = initial.st; this.activeEvent = initial.activeEvent; this.nextEventT = initial.nextEventT; this.lastBossSpawnT = initial.lastBossSpawnT;
+    this.endless = initial.endless; this.st = initial.st; this.activeEvent = initial.activeEvent; this.nextEventT = initial.nextEventT; this.nextDimensionRiftT = initial.nextDimensionRiftT; this.dimensionRiftFails = initial.dimensionRiftFails; this.bossFortifySpawnT = initial.bossFortifySpawnT; this.temporaryBuffs = initial.temporaryBuffs; this.lastBossSpawnT = initial.lastBossSpawnT;
     this.bossDebuffs = initial.bossDebuffs;
     this.dimension = initial.dimension || (typeof this.createDimensionState === 'function' ? this.createDimensionState() : null);
     this.idleT = initial.idleT; this.lastIdleWarnT = initial.lastIdleWarnT;
@@ -128,6 +128,7 @@ Object.assign(Game, {
     GameRuntime.showOverlay(null);
     GameRuntime.setHudVisible(true);
     GameRuntime.resumeAudio();
+    GameRuntime.refreshRenderFrame();
     // 일시정지 사이에 밀린 레벨업 처리
     if (this.levelQueue > 0 && !this.player.dead) GameRuntime.showLevelUp();
   },
@@ -145,6 +146,7 @@ Object.assign(Game, {
     GameRuntime.beginLeaderboardRun(this.runId);
     if (this.state === 'pause') GameRuntime.showPause();
     else GameRuntime.showOverlay(null);
+    GameRuntime.refreshRenderFrame();
     return true;
   },
 

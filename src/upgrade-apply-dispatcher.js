@@ -24,6 +24,7 @@ const UpgradeApplyDispatcher = {
       const ok = game.pickDimensionReward(choice);
       return ok ? UpgradeApplyResults.done() : UpgradeApplyResults.reject(choice, 'dimension reward unavailable');
     }
+    if (applicator === 'minor') return MinorRewardApplicator.apply(game, choice);
     return UpgradeApplyResults.reject(choice, 'unknown upgrade kind');
   },
 

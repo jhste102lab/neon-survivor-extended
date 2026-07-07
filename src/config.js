@@ -78,6 +78,13 @@ const CFG = {
     enabled: true, start: 600, duration: 5, radius: 125,
     normalSlow: 0.30, specialSlow: 0.20, bossSlow: 0.08,
   },
+  dimensionRift: {
+    enabled: true, firstCheck: 120, interval: 120, chance: 0.30, pityFails: 3,
+    offerLife: 28, offerRadius: 92, activeLife: 24, activeRadius: 122,
+  },
+  bombExecution: { normalStacks: 8 },
+  bossFortifySpawn: { enabled: true, start: 600, duration: 16, cooldown: 34, armor: 0.35 },
+  bossTankForge: { enabled: true, start: 660, radius: 170, count: 7, consume: 5, cooldown: 16 },
   lateSurvivalBonus: {
     enabled: true, start: 600, interval: 20, baseRatio: 0.05, maxRatio: 0.10,
     minKills: 10, strongKills: 36, minBossDamage: 260, strongBossDamage: 1400, eventHoldSeconds: 2.0,
@@ -89,7 +96,7 @@ const CFG = {
   bossPatternPhase: {
     enabled: true, start: 300, hardStart: 600, warn: 1.0, duration: 5.0, vulnerability: 1.0,
     shoveRadius: 430, shoveForce: 150, laserCd: 12.5, megaLaserCd: 8.8, laserDamage: 22, megaLaserDamage: 34,
-    laserWidth: 28, ricochetCd: 15, ricochetDamage: 30,
+    laserWidth: 28, ricochetCd: 15, ricochetDamage: 30, vertexLaserCd: 18, vertexLaserDamage: 18,
   },
   specialPatterns: {
     bomberStart: 300, bomberHardStart: 600, bomberWarn: 1.05, bomberRadius: 82, bomberDamage: 24,

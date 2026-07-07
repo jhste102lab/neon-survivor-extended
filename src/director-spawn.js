@@ -159,11 +159,13 @@ Object.assign(Game, {
     const idx = candidates.length ? pick(candidates) : 0;
     const tier = this.endlessBossTier(t);
     const affix = typeof BossInteractions !== 'undefined' ? BossInteractions.normalAffixForTime(t, CFG.winTime) : 'devour';
+    const patch = this.buildEndlessBossPatternPatch(BOSSES[idx], tier);
+    if (t >= CFG.winTime + 60 && (typeof RNG !== 'undefined' ? RNG.next() : Math.random()) < 0.35) patch.slimeTrail = true;
     this.spawnBoss(
       idx,
       (2.35 + endlessT / 220 * 0.90) * (1 + Math.min(0.9, lateBoss / 500)),
       1.18 + Math.min(0.42, endlessT / 1300),
-      { kind: 'endless', affixes: [affix], defPatch: this.buildEndlessBossPatternPatch(BOSSES[idx], tier) }
+      { kind: 'endless', affixes: [affix], defPatch: patch }
     );
   },
 });

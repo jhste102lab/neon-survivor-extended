@@ -199,8 +199,9 @@ Object.assign(Game, {
     if (mv.x || mv.y) { p.moveX = mv.x; p.moveY = mv.y; }
     p.moving = moving;
     p.moveRecentT = moving ? 0.75 : Math.max(0, (p.moveRecentT || 0) - dt);
-    p.x += mv.x * st.spd * dt;
-    p.y += mv.y * st.spd * dt;
+    const hazardSlow = this.playerHazardSlowFactor ? this.playerHazardSlowFactor() : 1;
+    p.x += mv.x * st.spd * hazardSlow * dt;
+    p.y += mv.y * st.spd * hazardSlow * dt;
     this.applyPlayerDashMovement(dt);
     return mv;
   },

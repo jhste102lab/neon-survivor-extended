@@ -11,6 +11,7 @@ Object.assign(Game, {
       dmg: opts.dmg == null ? 10 : opts.dmg, tick: 0, tickEvery: opts.tick || 0.55,
       color: opts.color || '#ff4d5e', source: opts.source || 'hazard', label: opts.label || '',
       bypassInvuln: !!opts.bypassInvuln,
+      slow: opts.slow || 0,
     };
     this.hazards.push(h);
     return h;
@@ -29,6 +30,7 @@ Object.assign(Game, {
       dmg: opts.dmg || 18, tick: 0, tickEvery: opts.tick || 1.0,
       color: opts.color || '#ff4d5e', source: opts.source || 'hazard:line', label: opts.label || 'LASER',
       bypassInvuln: !!opts.bypassInvuln,
+      slow: opts.slow || 0,
     };
     this.hazards.push(h);
     if (this.markMajorDanger) this.markMajorDanger((opts.warn || 0) + (opts.life || 1.7), h.source);
@@ -42,6 +44,20 @@ Object.assign(Game, {
     const t = clamp(((px - ax) * dx + (py - ay) * dy) / len2, 0, 1);
     const x = ax + dx * t, y = ay + dy * t;
     return dist2(px, py, x, y);
+  },
+
+  playerHazardSlowFactor() {
+    const p = this.player;
+    if (!p || !this.hazards) return 1;
+    let slow = 0;
+    for (const h of this.hazards) {
+      if (!(h && h.slow > 0) || h.warn > 0) continue;
+      const hit = h.shape === 'line'
+        ? this.pointLineDistance2(p.x, p.y, h) < (h.width * 0.5 + CFG.player.radius) ** 2
+        : dist2(p.x, p.y, h.x, h.y) < (h.r + CFG.player.radius) * (h.r + CFG.player.radius);
+      if (hit) slow = Math.max(slow, h.slow);
+    }
+    return clamp(1 - slow, 0.34, 1);
   },
 
   updateHazards(dt) {

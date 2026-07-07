@@ -88,9 +88,9 @@
     const magnetT = chickenT + (rates.magnet || 0.024) * dropLuck * dropMul * lateDropScale(game, 'magnet', e);
     const bombT = magnetT + (rates.bomb || 0.020) * dropLuck * dropMul * lateDropScale(game, 'bomb', e);
     const specialChestT = bombT + (e.special ? (rates.specialChest || 0.030) * dropLuck * dropScale : 0);
-    if (roll < chickenT) { maybeRecordDropRoll(game, 'chicken', true); game.spawnDrop('chicken', e.x, e.y); }
-    else if (roll < magnetT) { maybeRecordDropRoll(game, 'magnet', true); game.spawnDrop('magnet', e.x, e.y); }
-    else if (roll < bombT) { maybeRecordDropRoll(game, 'bomb', true); game.spawnDrop('bomb', e.x, e.y); }
+    if (roll < chickenT) { if (game.itemDropEnabled && !game.itemDropEnabled('chicken')) maybeRecordDropRoll(game, 'chicken', false); else { maybeRecordDropRoll(game, 'chicken', true); game.spawnDrop('chicken', e.x, e.y); } }
+    else if (roll < magnetT) { if (game.itemDropEnabled && !game.itemDropEnabled('magnet')) maybeRecordDropRoll(game, 'magnet', false); else { maybeRecordDropRoll(game, 'magnet', true); game.spawnDrop('magnet', e.x, e.y); } }
+    else if (roll < bombT) { if (game.itemDropEnabled && !game.itemDropEnabled('bomb')) maybeRecordDropRoll(game, 'bomb', false); else { maybeRecordDropRoll(game, 'bomb', true); game.spawnDrop('bomb', e.x, e.y); } }
     else if (roll < specialChestT) { maybeRecordDropRoll(game, 'chest', true); game.spawnDrop('chest', e.x, e.y, CFG.dropLife.chest); }
     else if (game.time >= ((CFG.lateBalance && CFG.lateBalance.dropRampStart) || CFG.winTime)) maybeRecordDropRoll(game, 'none', false);
   }

@@ -12,6 +12,11 @@ const Render = {
   draw() {
     RenderFrame.draw(this);
   },
+  forceRefresh() {
+    if (typeof RenderCanvasLifecycle !== 'undefined' && this.cv && this.ctx) RenderCanvasLifecycle.resize(this);
+    this.draw();
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(() => this.draw());
+  },
   isMobileView() {
     const coarse = typeof matchMedia === 'undefined' || matchMedia('(pointer: coarse)').matches;
     return coarse && (this.w <= 760 || (this.w <= 920 && this.h <= 520));
