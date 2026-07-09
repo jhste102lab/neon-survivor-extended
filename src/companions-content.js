@@ -5,7 +5,7 @@ const COMPANION_VISIBLE_ROLES = 6;
 const COMPANION_ROLES = {
   guardian: {
     icon: '🛡️', name: '수호 네온', tag: '동료 역할', color: '#7dffc1',
-    desc: '뒤따르는 네온이 주기적으로 보호막을 충전합니다.',
+    desc: '뒤따르는 네온이 주기적으로 보호막 내구도를 충전합니다.',
   },
   scout: {
     icon: '🧲', name: '정찰 네온', tag: '동료 역할', color: '#9ff3ff',

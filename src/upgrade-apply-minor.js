@@ -38,11 +38,13 @@ const MinorRewardApplicator = {
     const p = game.player;
     const cost = Math.max(1, Math.floor(p.hp * 0.5));
     p.hp = Math.max(1, p.hp - cost);
-    const pickId = pick(['casino_power', 'casino_speed', 'casino_regen']);
+    const pickId = pick(['casino_power', 'casino_speed', 'casino_regen', 'casino_barrier', 'casino_crit']);
     const buffs = {
       casino_power: { id: 'casino_power', label: '도박장 화력 2배', t: 60, max: 60, dmgMul: 2, color: '#ff7a2b' },
       casino_speed: { id: 'casino_speed', label: '도박장 속도 2배', t: 60, max: 60, spdMul: 2, color: '#41f0ff' },
       casino_regen: { id: 'casino_regen', label: '도박장 재생 2배', t: 60, max: 60, regenMul: 2, regenFlat: 1.2, color: '#7dffc1' },
+      casino_barrier: { id: 'casino_barrier', label: '도박장 보호막 내구도 2배', t: 60, max: 60, barrierMul: 2, color: '#9ff3ff' },
+      casino_crit: { id: 'casino_crit', label: '도박장 치명타율 1.5배', t: 60, max: 60, critMul: 1.5, color: '#ffd23d' },
     };
     game.applyTemporaryBuff(buffs[pickId]);
     if (typeof game.spawnText === 'function') game.spawnText(p.x, p.y - 62, `HP -${cost} · ${buffs[pickId].label}`, true, buffs[pickId].color);

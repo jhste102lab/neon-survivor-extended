@@ -54,12 +54,15 @@ const RunSnapshot = {
         endless: game.endless,
         focusMode: !!game.focusMode,
         hiddenWeaponEffects: game.hiddenWeaponEffects || {},
+        runSettings: game.runSettings,
         fieldTestInvincible: !!game.fieldTestInvincible,
         fieldTestTouched: !!game.fieldTestTouched,
         fieldTestRun: !!(game.fieldTestTouched || game.fieldTestRun || game.fieldTestInvincible),
         activeEvent: game.activeEvent,
         nextDimensionRiftT: game.nextDimensionRiftT,
         dimensionRiftFails: game.dimensionRiftFails,
+        nextAutoDimensionRiftT: game.nextAutoDimensionRiftT,
+        autoDimensionRiftWarnT: game.autoDimensionRiftWarnT,
         bossFortifySpawnT: game.bossFortifySpawnT,
         temporaryBuffs: game.temporaryBuffs || [],
         bossDebuffs: game.bossDebuffs,
@@ -158,13 +161,14 @@ const RunSnapshot = {
     game.levelQueue = run.levelQueue || 0; game.deathT = -1; game.novaSeq = run.novaSeq || 0;
     game.dir = run.dir || game.dir; game.cam = run.cam || game.cam; game.blades = run.blades || game.blades;
     game.frameSeq = run.frameSeq || 0; game.endless = !!run.endless; game.focusMode = !!run.focusMode; game.activeEvent = run.activeEvent || null;
-    game.nextDimensionRiftT = run.nextDimensionRiftT || game.nextDimensionRiftT; game.dimensionRiftFails = run.dimensionRiftFails || 0; game.bossFortifySpawnT = run.bossFortifySpawnT || 0; game.temporaryBuffs = Array.isArray(run.temporaryBuffs) ? run.temporaryBuffs : [];
+    game.nextDimensionRiftT = run.nextDimensionRiftT || game.nextDimensionRiftT; game.dimensionRiftFails = run.dimensionRiftFails || 0; game.nextAutoDimensionRiftT = run.nextAutoDimensionRiftT || game.nextAutoDimensionRiftT; game.autoDimensionRiftWarnT = run.autoDimensionRiftWarnT || 0; game.bossFortifySpawnT = run.bossFortifySpawnT || 0; game.temporaryBuffs = Array.isArray(run.temporaryBuffs) ? run.temporaryBuffs : [];
     game.bossDebuffs = run.bossDebuffs || game.bossDebuffs;
     game.nextEventT = run.nextEventT || game.nextEventT; game.lastBossSpawnT = run.lastBossSpawnT || -999;
     game.idleT = run.idleT || 0; game.lastIdleWarnT = run.lastIdleWarnT || -999; game.unlockNotified = !!run.unlockNotified;
     game.metrics = run.metrics || game.metrics; game.player = run.player;
     game.dimension = run.dimension || (typeof game.createDimensionState === 'function' ? game.createDimensionState() : null);
     game.hiddenWeaponEffects = run.hiddenWeaponEffects && typeof run.hiddenWeaponEffects === 'object' ? run.hiddenWeaponEffects : {};
+    game.runSettings = run.runSettings || game.runSettings;
     game.fieldTestInvincible = !!run.fieldTestInvincible && game.isFieldTestAllowed();
     game.fieldTestTouched = !!(run.fieldTestTouched || run.fieldTestRun || run.fieldTestInvincible);
     game.fieldTestRun = !!(game.fieldTestTouched || game.fieldTestInvincible);

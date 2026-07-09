@@ -47,6 +47,24 @@ function cleanRows(value, maxRows = 5) {
   })).filter(row => row.source && row.value > 0);
 }
 
+
+function cleanRunSettings(value) {
+  if (!value || typeof value !== 'object') return null;
+  const weaponCapRaw = String(value.weaponCap || 'default');
+  const weaponCap = ['default', '10', '15', '20', 'all'].includes(weaponCapRaw) ? weaponCapRaw : 'default';
+  const enemyMode = value.enemyMode === 'half' ? 'half' : 'default';
+  const dropFilters = value.dropFilters && typeof value.dropFilters === 'object' ? value.dropFilters : {};
+  return {
+    weaponCap,
+    enemyMode,
+    enemyDensity: boundedNumber(value.enemyDensity, 0.25, 1.5, enemyMode === 'half' ? 0.5 : 1),
+    enemyStatMul: boundedNumber(value.enemyStatMul, 0.5, 5, enemyMode === 'half' ? 1.8 : 1),
+    weaponCapBonusDamage: Math.round(boundedNumber(value.weaponCapBonusDamage, 0, 100, 0)),
+    weaponCapBonusThresholds: Array.isArray(value.weaponCapBonusThresholds) ? value.weaponCapBonusThresholds.slice(0, 3).map(v => Math.round(boundedNumber(v, 0, 30, 0))).filter(Boolean) : [],
+    dropFilters: { chicken: dropFilters.chicken !== false, magnet: dropFilters.magnet !== false, bomb: dropFilters.bomb !== false },
+  };
+}
+
 function cleanBuildSnapshot(value) {
   if (!value || typeof value !== 'object') return null;
   return {
@@ -73,6 +91,7 @@ function cleanBuildSnapshot(value) {
       damage: Math.round(boundedNumber(d && d.damage, 0, 100000, 0)),
     })) : [],
     fieldTest: !!value.fieldTest,
+    settings: cleanRunSettings(value.settings),
   };
 }
 

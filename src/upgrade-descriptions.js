@@ -70,7 +70,7 @@ function passiveCurrentStatDetails(id, lv, prefix = '현재') {
     haste: [`${prefix} 공격 간격 배율: ${Math.pow(0.93, lv).toFixed(2)}x`],
     boots: [`${prefix} 이동속도: +${lv * 8}%`],
     vitality: [`${prefix} 최대 HP: +${lv * 20}`],
-    magnet: [`${prefix} 획득 범위: +${lv * 40}%`],
+    magnet: [`${prefix} 획득 범위: +${lv * 40}%`, `10분 이후 자석 중력장: 둔화 +${lv * 3}%p · 범위 +${lv * 4}%`],
     regen: [`${prefix} 초당 재생: ${(lv * 0.65).toFixed(2)}`],
     luck: [`${prefix} 치명타 확률: +${lv * 3}%`, `${prefix} 드랍/행운 배율: ${(1 + lv * 0.3).toFixed(1)}x`],
     wisdom: [`${prefix} 경험치 획득: +${lv * 10}%`],
@@ -84,7 +84,7 @@ function passiveStatDetails(id, fromLv, toLv) {
     haste: [`공격 간격 배율: ${Math.pow(0.93, fromLv).toFixed(2)}x → ${Math.pow(0.93, toLv).toFixed(2)}x (-7%)`],
     boots: [`이동속도: +${fromLv * 8}% → +${toLv * 8}% (+8%p)`],
     vitality: [`최대 HP: +${fromLv * 20} → +${toLv * 20} (+20)`, '즉시 20 회복'],
-    magnet: [`획득 범위: +${fromLv * 40}% → +${toLv * 40}% (+40%p)`],
+    magnet: [`획득 범위: +${fromLv * 40}% → +${toLv * 40}% (+40%p)`, `10분 이후 자석 중력장 둔화: +${fromLv * 3}%p → +${toLv * 3}%p`, `10분 이후 자석 중력장 범위: +${fromLv * 4}% → +${toLv * 4}%`],
     regen: [`초당 재생: ${(fromLv * 0.65).toFixed(2)} → ${(toLv * 0.65).toFixed(2)} (+0.65)`],
     luck: [`치명타 확률: +${fromLv * 3}% → +${toLv * 3}% (+3%p)`, `드랍/행운 배율: ${(1 + fromLv * 0.3).toFixed(1)}x → ${(1 + toLv * 0.3).toFixed(1)}x (+30%)`],
     wisdom: [`경험치 획득: +${fromLv * 10}% → +${toLv * 10}% (+10%p)`],
@@ -171,11 +171,11 @@ function dimensionRewardDescription(choice) {
 function minorRewardDescription(choice) {
   const rows = {
     minor_heal: { icon: '🍗', name: '응급 배급', level: '소형 보상', description: '체력을 조금 회복합니다.', details: ['즉시 체력 +24'], color: '#ff4d8e', tag: '차원 보상' },
-    minor_barrier: { icon: '🛡️', name: '보호막 충전', level: '소형 보상', description: '보호막을 즉시 보충합니다.', details: ['보호막 +26', '최대 58까지 저장'], color: '#7dffc1', tag: '차원 보상' },
+    minor_barrier: { icon: '🛡️', name: '보호막 내구도 충전', level: '소형 보상', description: '보호막 내구도를 즉시 보충합니다.', details: ['보호막 내구도 +26', '최대 58까지 저장'], color: '#7dffc1', tag: '차원 보상' },
     minor_xp: { icon: '✨', name: '압축 경험', level: '소형 보상', description: '다음 성장을 조금 앞당깁니다.', details: ['현재 필요 경험치의 약 32%'], color: '#41f0ff', tag: '차원 보상' },
     minor_power: { icon: '🔥', name: '차원 화력', level: '42초', description: '잠시 모든 무기 피해가 증가합니다.', details: ['모든 무기 피해 ×1.25', '일반 레벨업보다 약한 임시 보상'], color: '#ff7a2b', tag: '차원 보상' },
     minor_speed: { icon: '👟', name: '차원 가속', level: '42초', description: '잠시 이동 속도가 증가합니다.', details: ['이동속도 ×1.25', '회피와 포지셔닝 보상'], color: '#41f0ff', tag: '차원 보상' },
-    casino_gamble: { icon: '🎰', name: '도박장 거래', level: '위험 보상', description: '현재 체력 절반을 내고 무작위 능력 하나를 60초간 2배로 만듭니다.', details: ['공격력/이동속도/재생 중 하나 ×2', '체력은 최소 1 남음', '영구 강화가 아닌 임시 강화'], color: '#ffd23d', tag: '도박장' },
+    casino_gamble: { icon: '🎰', name: '도박장 거래', level: '위험 보상', description: '현재 체력 절반을 내고 무작위 능력 하나를 60초간 크게 강화합니다.', details: ['공격력/이동속도/재생/보호막 내구도 중 하나 ×2', '또는 치명타율 ×1.5', '체력은 최소 1 남음'], color: '#ffd23d', tag: '도박장' },
   };
   const dto = rows[choice && choice.id] || rows.minor_heal;
   return { ...dto, isNew: false };

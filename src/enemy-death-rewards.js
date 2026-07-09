@@ -31,8 +31,18 @@
     game.grantLateNormalXp(value, e.type || 'normal');
   }
 
+  function clearBossFortifyAftermath(game) {
+    game.bossFortifySpawnT = 0;
+    for (const enemy of game.enemies || []) {
+      if (!enemy || enemy.boss) continue;
+      enemy.fortifiedT = 0;
+      enemy.armorK = 0;
+    }
+  }
+
   function grantBossRewards(game, e) {
     if (game.releaseWeaponSeals) game.releaseWeaponSeals('bossKill');
+    clearBossFortifyAftermath(game);
     game.spawnDrop('chest', e.x, e.y, CFG.dropLife.bossChest, true);
     if (e.bossDef && e.bossDef.mega) game.spawnDrop('chest', e.x, e.y + 46, CFG.dropLife.bossChest, true);
     game.spawnDrop('chicken', e.x + 40, e.y);

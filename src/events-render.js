@@ -46,7 +46,7 @@ Object.assign(Render, {
     const ev = Game.activeEvent;
     if (!ev) return;
     const info = ev.type === 'rift' && typeof DimensionRiftRules !== 'undefined'
-      ? { ...FIELD_EVENTS.rift, ...DimensionRiftRules.get(ev.dimension), hint: '들어가면 랜덤 차원 시련 시작', activeHint: '버티기 → 약한 보상 2개 중 선택', role: 'benefit' }
+      ? { ...FIELD_EVENTS.rift, ...DimensionRiftRules.get(ev.dimension), hint: '균열장 안에서 버티면 소형 보상', activeHint: '버티기 → 약한 보상 2개 중 선택', role: 'benefit' }
       : FIELD_EVENTS[ev.type];
     const pulse = 0.5 + Math.sin(Game.time * 5 + ev.pulse) * 0.5;
     x.save();

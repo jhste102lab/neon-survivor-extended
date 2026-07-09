@@ -18,11 +18,17 @@ const CombatPlayer = (() => {
     return 0;
   }
 
+  function barrierDurabilityMultiplier(player) {
+    const buffs = Array.isArray(player && player.tempBuffs) ? player.tempBuffs : [];
+    return buffs.reduce((mul, buff) => mul * (buff && buff.barrierMul ? buff.barrierMul : 1), 1);
+  }
+
   function consumeBarrier(player, damage, source) {
     const blockable = damage * (1 - barrierPierceRatio(source));
-    const block = Math.min(player.barrier, blockable);
-    player.barrier -= block;
-    return damage - block;
+    const durability = Math.max(1, barrierDurabilityMultiplier(player));
+    const blockedDamage = Math.min(blockable, player.barrier * durability);
+    player.barrier -= blockedDamage / durability;
+    return damage - blockedDamage;
   }
 
   function applyBarrierAbsorption(game, player, damage, source) {

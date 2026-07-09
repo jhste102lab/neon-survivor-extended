@@ -4,6 +4,7 @@ Object.assign(Game, {
   updateWorldSystems(dt, st) {
     if (this.updateDangerDirectorTimers) this.updateDangerDirectorTimers(dt);
     if (this.updateExternalDimensionPortal) this.updateExternalDimensionPortal(dt);
+    if (this.updateAutoDimensionRift) this.updateAutoDimensionRift(dt);
     this.director(dt);
     if (this.updateEvents) this.updateEvents(dt, st);
     if (this.updateSupportBuffs) this.updateSupportBuffs(dt, st);

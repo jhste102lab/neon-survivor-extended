@@ -82,6 +82,9 @@ const CFG = {
     enabled: true, firstCheck: 120, interval: 120, chance: 0.30, pityFails: 3,
     offerLife: 28, offerRadius: 92, activeLife: 24, activeRadius: 122,
   },
+  dimensionAutoRift: {
+    enabled: true, start: 600, interval: 165, warn: 1.2, defer: 8,
+  },
   bombExecution: { normalStacks: 8 },
   bossFortifySpawn: { enabled: true, start: 600, duration: 16, cooldown: 34, armor: 0.35 },
   bossTankForge: { enabled: true, start: 660, radius: 170, count: 7, consume: 5, cooldown: 16 },
