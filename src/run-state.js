@@ -23,6 +23,8 @@ function createInitialRunState(options = {}) {
     endless: false,
     focusMode: false,
     hiddenWeaponEffects: {},
+    runSettings: typeof RunSettings !== 'undefined' ? RunSettings.snapshotForRun() : { weaponCap: 'default', enemyMode: 'default', enemyDensity: 1, enemyStatMul: 1, weaponCapBonusCount: 0, weaponCapBonusDamage: 0, weaponCapBonusThresholds: [] },
+    autoDimensionRiftWarnT: 0, nextAutoDimensionRiftT: (CFG.dimensionAutoRift && CFG.dimensionAutoRift.start) || CFG.winTime,
     st: null,
     activeEvent: null,
     nextDimensionRiftT: (CFG.dimensionRift && CFG.dimensionRift.firstCheck) || 120,
@@ -38,7 +40,7 @@ function createInitialRunState(options = {}) {
     metrics: {
       damageBySource: {}, killsBySource: {}, specialKills: {}, evolutions: [],
       lastDamageSource: '', deathSource: '', recentDamage: [], deathRecentDamage: [],
-      eventOffers: 0, eventStarts: 0, eventSuccess: 0, dropsExpired: 0, dropsTrimmed: 0,
+      eventOffers: 0, eventStarts: 0, eventSuccess: 0, dimensionRiftStarts: 0, dimensionRiftClears: 0, dropsExpired: 0, dropsTrimmed: 0,
       lateSurvivalBonus: 0, lateSurvivalBonusXp: 0, lateMagnetGravity: 0, xpDebtAdded: 0, xpDebtRepaid: 0,
       idleSuppressed: 0, bossPatternPhases: 0, dimensionConquest: false, dimensionConquestTime: 0,
     },

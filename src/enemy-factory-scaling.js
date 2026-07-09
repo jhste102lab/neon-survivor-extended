@@ -11,6 +11,7 @@ const EnemyFactoryScaling = Object.freeze({
       threat: game.lateThreat ? game.lateThreat() : 0,
       endless: game.endless,
       playerSpeed: st && st.spd ? st.spd : CFG.player.speed,
+      customStatMul: typeof RunSettings !== 'undefined' ? RunSettings.enemyStatMul(game) : 1,
     };
   },
 
@@ -20,7 +21,8 @@ const EnemyFactoryScaling = Object.freeze({
       : 1;
     const pressureMul = 1 + context.threat * (elite ? 0.30 : 0.42);
     const lateRebalance = context.t >= CFG.winTime ? 1 + Math.min(0.20, context.endlessT / 360 * 0.12 + 0.08) : 1;
-    return (1 + context.t / 95 * 0.45) * (elite ? 6.2 : 1) * endlessMul * pressureMul * (elite ? 1 : lateRebalance);
+    return (1 + context.t / 95 * 0.45) * (elite ? 6.2 : 1) * endlessMul * pressureMul * (elite ? 1 : lateRebalance) * (elite ? 1 : context.customStatMul);
+
   },
 
   enemySpeedMultiplier(context, elite, def) {
@@ -35,7 +37,7 @@ const EnemyFactoryScaling = Object.freeze({
   },
 
   enemyDamageMultiplier(context) {
-    return 1 + Math.min(2.8, context.t / 460 + context.endlessT / 1400 + context.threat * 0.18);
+    return (1 + Math.min(2.8, context.t / 460 + context.endlessT / 1400 + context.threat * 0.18)) * context.customStatMul;
   },
 
   enemyStats(game, def, elite) {

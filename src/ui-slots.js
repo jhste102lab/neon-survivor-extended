@@ -6,8 +6,14 @@
 Object.assign(UI, {
   refreshSlots() {
     const p = Game.player;
+    const settings = typeof RunSettings !== 'undefined' ? RunSettings.load() : { slotHudCollapsed: false };
+    const collapsed = !!settings.slotHudCollapsed;
+    const slotWrap = $('slotwrap');
+    if (slotWrap) slotWrap.classList.toggle('collapsed', collapsed);
+    const collapseBtn = $('btnSlotCollapse');
+    if (collapseBtn) collapseBtn.textContent = collapsed ? '⚔' : '▾';
     const weaponCount = $('weaponCount');
-    if (weaponCount) weaponCount.textContent = tr('hud.weaponCount', { count: p.weapons.length, max: maxWeaponSlotsFor(Game) });
+    if (weaponCount) weaponCount.textContent = collapsed ? `⚔ ${p.weapons.length}/${maxWeaponSlotsFor(Game)}` : tr('hud.weaponCount', { count: p.weapons.length, max: maxWeaponSlotsFor(Game) });
     let html = '';
     for (const w of p.weapons) {
       const max = w.lv >= MAX_LV;

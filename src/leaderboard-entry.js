@@ -35,6 +35,37 @@ const LeaderboardEntry = {
         ? (metrics.deathRecentDamage && metrics.deathRecentDamage.length ? metrics.deathRecentDamage : metrics.recentDamage).slice(-5).map(d => ({ t: Number(d.t) || 0, source: String(d.source || '').slice(0, 48), kind: String(d.kind || '').slice(0, 24), damage: Math.round(Number(d.damage) || 0) }))
         : [],
       fieldTest: !!(game.fieldTestTouched || game.fieldTestRun || game.fieldTestInvincible),
+      settings: this.buildRunSettingsSnapshot(game),
+    };
+  },
+
+  buildRunSettingsSnapshot(game = Game) {
+    const run = game.runSettings || {};
+    const drops = typeof DropPreferences !== 'undefined' ? DropPreferences.load() : {};
+    return {
+      weaponCap: String(run.weaponCap || 'default').slice(0, 12),
+      enemyMode: String(run.enemyMode || 'default').slice(0, 12),
+      enemyDensity: Number(run.enemyDensity || (run.enemyMode === 'half' ? 0.5 : 1)) || 1,
+      enemyStatMul: Number(run.enemyStatMul || (run.enemyMode === 'half' ? 1.8 : 1)) || 1,
+      weaponCapBonusDamage: Math.round(Number(run.weaponCapBonusDamage || ((run.weaponCapBonusCount || 0) * 10)) || 0),
+      weaponCapBonusThresholds: Array.isArray(run.weaponCapBonusThresholds) ? run.weaponCapBonusThresholds.slice(0, 3).map(Number).filter(Boolean) : [],
+      dropFilters: { chicken: drops.chicken !== false, magnet: drops.magnet !== false, bomb: drops.bomb !== false },
+    };
+  },
+
+  normalizeRunSettings(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    const weaponCap = ['default', '10', '15', '20', 'all'].includes(String(raw.weaponCap)) ? String(raw.weaponCap) : 'default';
+    const enemyMode = raw.enemyMode === 'half' ? 'half' : 'default';
+    const dropFilters = raw.dropFilters && typeof raw.dropFilters === 'object' ? raw.dropFilters : {};
+    return {
+      weaponCap,
+      enemyMode,
+      enemyDensity: this.num(raw.enemyDensity, 0.25, 1.5, enemyMode === 'half' ? 0.5 : 1),
+      enemyStatMul: this.num(raw.enemyStatMul, 0.5, 5, enemyMode === 'half' ? 1.8 : 1),
+      weaponCapBonusDamage: Math.round(this.num(raw.weaponCapBonusDamage, 0, 100, 0)),
+      weaponCapBonusThresholds: Array.isArray(raw.weaponCapBonusThresholds) ? raw.weaponCapBonusThresholds.slice(0, 3).map(v => Math.round(this.num(v, 0, 30, 0))).filter(Boolean) : [],
+      dropFilters: { chicken: dropFilters.chicken !== false, magnet: dropFilters.magnet !== false, bomb: dropFilters.bomb !== false },
     };
   },
 
@@ -51,6 +82,7 @@ const LeaderboardEntry = {
       lastHit: String(raw.lastHit || '').slice(0, 48),
       recentDamage: Array.isArray(raw.recentDamage) ? raw.recentDamage.slice(0, 5).map(d => ({ t: this.num(d.t, 0, 21600, 0), source: String(d.source || '').slice(0, 48), kind: String(d.kind || '').slice(0, 24), damage: Math.round(this.num(d.damage, 0, 100000, 0)) })) : [],
       fieldTest: !!raw.fieldTest,
+      settings: this.normalizeRunSettings(raw.settings),
     };
   },
 

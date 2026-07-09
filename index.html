@@ -48,6 +48,7 @@
   </div>
   <div id="killwrap"><span id="killNum">💀 0</span><br><span class="best" id="bestMini"></span></div>
   <div id="slotwrap">
+    <button class="slotCollapseBtn" id="btnSlotCollapse" type="button" title="빌드 HUD 접기/펼치기">▾</button>
     <button class="focusChip" id="btnFocusMode" type="button">FOCUS</button>
     <div id="weaponCount" class="weaponCount">Weapons 1/5</div>
     <div class="slotrow" id="wslots"></div>
@@ -100,10 +101,13 @@
       </div>
       <div class="profileHint" data-i18n="profile.hint">Example: BraveOtter1234@ · duplicate names are allowed</div>
     </div>
-    <div class="dropPrefBox">
-      <div class="profileTitle">일반 적 드롭 허용</div>
-      <div class="dropPrefChoices" id="dropPrefChoices"></div>
-      <div class="profileHint">꺼둔 아이템은 일반 적에게서 나오지 않습니다. 보스 보상은 유지됩니다.</div>
+    <div class="preRunBox">
+      <div class="dropPrefBox">
+        <div class="profileTitle">일반 적 드롭 허용</div>
+        <div class="dropPrefChoices" id="dropPrefChoices"></div>
+        <div class="profileHint">꺼둔 아이템은 일반 적에게서 나오지 않습니다. 보스 보상은 유지됩니다.</div>
+      </div>
+      <div class="runSettingsBox" id="runSettingsBox"></div>
     </div>
     <div class="leaderboard" id="titleLeaderboard"></div>
     <button class="btn primary" id="btnStart" data-i18n="button.start">Start Game</button>
@@ -133,6 +137,9 @@
 <div id="pauseOv" class="overlay hide">
   <div class="panel">
     <h2 class="ovtitle" style="color:#9ff3ff" data-i18n="pause.title">PAUSED</h2>
+    <div class="pauseBuildActions">
+      <button class="miniBtn" id="btnAllWeaponFx" type="button">무기 이펙트 모두 OFF</button>
+    </div>
     <div id="buildList"></div>
     <div id="pauseDetail" class="pauseDetail hide"></div>
     <div>
@@ -227,6 +234,7 @@
 <script src="src/dimensions-content.js"></script>
 <script src="src/grid.js"></script>
 <script src="src/game.js"></script>
+<script src="src/run-settings.js"></script>
 <script src="src/drop-preferences.js"></script>
 <script src="src/run-state.js"></script>
 <script src="src/game-lifecycle.js"></script>

@@ -27,12 +27,19 @@ function weaponStats(id, lv) {
   return base;
 }
 
-function maxWeaponSlotsFor(game) {
+function baseWeaponSlotsFor(game) {
   const interval = CFG.weaponSlotInterval || 300;
   const step = CFG.weaponSlotStep || 5;
   const t = Math.max(0, game && Number.isFinite(game.time) ? game.time : 0);
-  const slots = MAX_WEAPONS + Math.floor(t / interval) * step;
-  return Math.min(ENDLESS_MAX_WEAPONS, slots);
+  return Math.min(ENDLESS_MAX_WEAPONS, MAX_WEAPONS + Math.floor(t / interval) * step);
+}
+
+function selectedWeaponCapFor(game) {
+  return typeof RunSettings !== 'undefined' ? RunSettings.selectedWeaponCap(game) : ENDLESS_MAX_WEAPONS;
+}
+
+function maxWeaponSlotsFor(game) {
+  return Math.min(baseWeaponSlotsFor(game), selectedWeaponCapFor(game));
 }
 
 function maxPassiveSlotsFor(game) {

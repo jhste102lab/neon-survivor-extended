@@ -9,7 +9,7 @@ const EVOLUTIONS = {
   orbit: {
     passive: 'boots', icon: '🛡️', name: '칼날 방벽', color: '#7dffc1',
     tag: '무기 진화',
-    desc: '회전 수리검이 이중 궤도로 변하고 접근전을 버틸 보호막을 남깁니다.',
+    desc: '회전 수리검이 이중 궤도로 변하고 접근전을 버틸 보호막 내구도를 남깁니다.',
   },
   lightning: {
     passive: 'luck', icon: '🌩️', name: '심판 번개', color: '#ffe37d',

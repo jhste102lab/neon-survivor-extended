@@ -52,6 +52,21 @@ Object.assign(Game, {
     for (const obj of this.novas) sync(obj);
   },
 
+
+  toggleAllWeaponEffectsHidden() {
+    const weapons = this.player && this.player.weapons || [];
+    if (!weapons.length) return false;
+    const allHidden = weapons.every(w => this.weaponEffectHidden(w.id));
+    this.hiddenWeaponEffects = { ...(this.hiddenWeaponEffects || {}) };
+    for (const weapon of weapons) {
+      this.hiddenWeaponEffects[weapon.id] = !allHidden;
+      this.syncWeaponEffectVisibility(weapon.id);
+    }
+    this.slotsDirty = true;
+    GameRuntime.banner(`무기 이펙트 전체 ${!allHidden ? 'OFF' : 'ON'}`, !allHidden ? 'warn' : 'good');
+    return true;
+  },
+
   toggleWeaponEffectHidden(id) {
     if (!id || !WEAPONS[id]) return false;
     this.hiddenWeaponEffects = { ...(this.hiddenWeaponEffects || {}), [id]: !this.weaponEffectHidden(id) };
@@ -75,13 +90,14 @@ Object.assign(Game, {
     this.blades.angle = initial.blades.angle;
     this.frameSeq = initial.frameSeq; this.frameTargets = initial.frameTargets;
     if (typeof Grid !== 'undefined' && Grid.map) Grid.map.clear();
-    this.endless = initial.endless; this.st = initial.st; this.activeEvent = initial.activeEvent; this.nextEventT = initial.nextEventT; this.nextDimensionRiftT = initial.nextDimensionRiftT; this.dimensionRiftFails = initial.dimensionRiftFails; this.bossFortifySpawnT = initial.bossFortifySpawnT; this.temporaryBuffs = initial.temporaryBuffs; this.lastBossSpawnT = initial.lastBossSpawnT;
+    this.endless = initial.endless; this.st = initial.st; this.activeEvent = initial.activeEvent; this.nextEventT = initial.nextEventT; this.nextDimensionRiftT = initial.nextDimensionRiftT; this.dimensionRiftFails = initial.dimensionRiftFails; this.nextAutoDimensionRiftT = initial.nextAutoDimensionRiftT; this.autoDimensionRiftWarnT = initial.autoDimensionRiftWarnT; this.bossFortifySpawnT = initial.bossFortifySpawnT; this.temporaryBuffs = initial.temporaryBuffs; this.lastBossSpawnT = initial.lastBossSpawnT;
     this.bossDebuffs = initial.bossDebuffs;
     this.dimension = initial.dimension || (typeof this.createDimensionState === 'function' ? this.createDimensionState() : null);
     this.idleT = initial.idleT; this.lastIdleWarnT = initial.lastIdleWarnT;
     this.unlockNotified = initial.unlockNotified;
     this.metrics = initial.metrics;
     this.hiddenWeaponEffects = initial.hiddenWeaponEffects;
+    this.runSettings = initial.runSettings;
     this.runId = initial.runId;
     this.runProof = initial.runProof;
     this.player = initial.player;
@@ -101,6 +117,8 @@ Object.assign(Game, {
     GameRuntime.ensureProfileName();
     if (typeof RunSnapshot !== 'undefined') RunSnapshot.clear();
     this.reset();
+    this.runSettings = typeof RunSettings !== 'undefined' ? RunSettings.snapshotForRun() : this.runSettings;
+    this.lastWeaponSlotCap = maxWeaponSlotsFor(this);
     if (typeof PerformanceBudget !== 'undefined') PerformanceBudget.reset();
     this.state = 'play';
     GameRuntime.showOverlay(null);

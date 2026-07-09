@@ -55,7 +55,7 @@
 
   function createDimensionState() {
     return {
-      unlocked: false, gatekeeperSpawned: false, gatekeeperDefeated: false,
+      unlocked: false, gatekeeperSpawned: false, gatekeeperDefeated: false, riftAuto: false,
       mode: 'external', localTime: 0, activeId: '', activeDef: null,
       entryPortal: null, exitPortal: null, hubPortals: [], completed: {}, relics: {}, rewardChoices: [], bonuses: {},
       external: null, externalPlayer: null, dimensionCheckpoint: null, challenge: null,
@@ -307,7 +307,7 @@
       BossSpawnRegistration.registerBoss(this, boss);
       if (this.prepareBossAfterSpawn) this.prepareBossAfterSpawn(boss, { kind: 'gatekeeper', affixes: [] });
       BossSpawnEffects.showBossSpawnWarning(this, boss.bossDef);
-      GameRuntime.banner('균열 문지기 등장', 'warn');
+      GameRuntime.banner('차원 균열체 등장', 'warn');
       dim.gatekeeperSpawned = true;
       return true;
     },
@@ -363,6 +363,41 @@
       if (typeof RunSnapshot !== 'undefined') RunSnapshot.save(this, { force: true });
     },
 
+    enterAutomaticDimensionRift() {
+      const dim = ensureDimensionState(this);
+      if (dim.mode !== 'external' || this.isDimensionSpaceActive()) return false;
+      const def = pick(DIMENSIONS);
+      if (!def) return false;
+      dim.external = takeWorldSnapshot(this);
+      dim.externalPlayer = { x: this.player.x, y: this.player.y, camX: this.cam.x, camY: this.cam.y };
+      dim.mode = 'dimension'; dim.activeId = def.id; dim.activeDef = def; dim.localTime = 0; dim.successT = 0; dim.collapseT = 0; dim.riftAuto = true;
+      applyEntrySafety(this);
+      spawnRoomLayout(this, def, dimensionDifficulty(this, def));
+      if (this.metrics) this.metrics.dimensionRiftStarts = (this.metrics.dimensionRiftStarts || 0) + 1;
+      GameRuntime.banner(`차원균열 — ${def.name} 낙하`, 'warn');
+      if (typeof RunSnapshot !== 'undefined') RunSnapshot.save(this, { force: true });
+      return true;
+    },
+
+    updateAutoDimensionRift(dt) {
+      const cfg = CFG.dimensionAutoRift || {};
+      if (cfg.enabled === false || !this.player || this.player.dead || this.endless === false && this.time < (cfg.start || CFG.winTime)) return;
+      const dim = ensureDimensionState(this);
+      if (dim.mode !== 'external') return;
+      if (this.activeEvent || this.boss) { this.nextAutoDimensionRiftT = Math.max(this.nextAutoDimensionRiftT || 0, this.time + (cfg.defer || 8)); return; }
+      if (this.autoDimensionRiftWarnT > 0) {
+        this.autoDimensionRiftWarnT -= dt;
+        if (this.autoDimensionRiftWarnT <= 0) {
+          this.nextAutoDimensionRiftT = this.time + (cfg.interval || 165);
+          this.enterAutomaticDimensionRift();
+        }
+        return;
+      }
+      if (this.time < (this.nextAutoDimensionRiftT || (cfg.start || CFG.winTime))) return;
+      this.autoDimensionRiftWarnT = cfg.warn || 1.2;
+      GameRuntime.banner('차원균열 발생 — 랜덤 차원으로 끌려갑니다', 'warn');
+    },
+
     enterDimensionRoom(id) {
       const dim = ensureDimensionState(this);
       const def = dimensionById(id);
@@ -384,11 +419,25 @@
       const dim = ensureDimensionState(this);
       const def = dim.activeDef;
       if (!def || dim.mode !== 'dimension') return;
-      dim.completed[def.id] = true;
+      const autoRift = !!dim.riftAuto;
+      if (!autoRift) dim.completed[def.id] = true;
       const relic = relicFor(def.relic);
       if (relic) dim.relics[relic.id] = true;
       dim.pendingReward = { def, relic, choices: rewardChoicesForDimension() };
       emptyWorld(this);
+      if (autoRift) {
+        copyArraysFromSnapshot(this, dim.external || {});
+        const pos = dim.externalPlayer || { x: 0, y: 0, camX: 0, camY: 0 };
+        this.player.x = pos.x; this.player.y = pos.y; this.cam.x = pos.camX; this.cam.y = pos.camY;
+        this.player.hp = Math.max(this.player.hp, this.stat().maxHp * 0.50);
+        dim.mode = 'external'; dim.activeId = ''; dim.activeDef = null; dim.challenge = null; dim.localTime = 0; dim.riftAuto = false;
+        if (this.metrics) this.metrics.dimensionRiftClears = (this.metrics.dimensionRiftClears || 0) + 1;
+        if (relic) GameRuntime.banner(`차원균열 클리어 · ${relic.icon} ${relic.name} 획득`, 'good');
+        else GameRuntime.banner('차원균열 클리어 — 원래 전장 복귀', 'good');
+        this.showDimensionRewardChoices();
+        if (typeof RunSnapshot !== 'undefined') RunSnapshot.save(this, { force: true });
+        return;
+      }
       dim.mode = 'hub'; dim.activeId = ''; dim.activeDef = null; dim.challenge = null; dim.localTime = 0;
       buildHubPortals(dim);
       this.player.x = 0; this.player.y = 0; this.cam.x = 0; this.cam.y = 0;
@@ -427,6 +476,16 @@
 
     finishDimensionCollapse() {
       const dim = ensureDimensionState(this);
+      if (dim.riftAuto) {
+        copyArraysFromSnapshot(this, dim.external || {});
+        const pos = dim.externalPlayer || { x: 0, y: 0, camX: 0, camY: 0 };
+        this.player.x = pos.x; this.player.y = pos.y; this.cam.x = pos.camX; this.cam.y = pos.camY;
+        dim.mode = 'external'; dim.activeId = ''; dim.activeDef = null; dim.challenge = null; dim.collapseT = 0; dim.localTime = 0; dim.riftAuto = false;
+        this.player.dead = false; this.deathT = -1; this.player.hp = Math.max(1, this.stat().maxHp * 0.30); this.player.invuln = 1.8;
+        GameRuntime.banner('차원균열 붕괴 — 원래 전장 복귀', 'warn');
+        if (typeof RunSnapshot !== 'undefined') RunSnapshot.save(this, { force: true });
+        return;
+      }
       dim.mode = 'hub'; dim.activeId = ''; dim.activeDef = null; dim.challenge = null; dim.collapseT = 0; dim.localTime = 0;
       buildHubPortals(dim);
       this.player.x = 0; this.player.y = 0; this.cam.x = 0; this.cam.y = 0;

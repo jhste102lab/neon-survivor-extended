@@ -43,7 +43,8 @@ Object.assign(Game, {
   spawnNormalEnemyBatch(batch, t) {
     const limit = this.enemyLimit ? this.enemyLimit() : CFG.maxEnemies + (this.endless ? 55 : 0);
     const room = Math.max(0, limit - this.enemies.length);
-    const n = Math.min(batch, room);
+    const density = typeof RunSettings !== 'undefined' ? RunSettings.enemyDensity(this) : 1;
+    const n = Math.min(Math.max(1, Math.ceil(batch * density)), room);
     for (let i = 0; i < n; i++) this.spawnEnemy(this.pickEnemyType(t));
   },
 
@@ -61,7 +62,8 @@ Object.assign(Game, {
     const room = Math.max(0, limit - this.enemies.length);
     const loopMul = t >= CFG.winTime ? 1.45 + Math.min(0.5, (t - CFG.winTime) / 1000) : 1;
     const relief = this.pressureSpawnMultiplier ? this.pressureSpawnMultiplier() : 1;
-    const n = Math.min(Math.ceil(randi(10, 14 + Math.floor(t / 60)) * loopMul * relief), room);
+    const density = typeof RunSettings !== 'undefined' ? RunSettings.enemyDensity(this) : 1;
+    const n = Math.min(Math.max(1, Math.ceil(randi(10, 14 + Math.floor(t / 60)) * loopMul * relief * density)), room);
     if (n <= 0) return;
     const base = rand(0, TAU);
     const radius = EnemyFactoryPlacement.swarmBurstRadius ? EnemyFactoryPlacement.swarmBurstRadius(this) : 640;

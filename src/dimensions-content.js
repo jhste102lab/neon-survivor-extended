@@ -1,7 +1,7 @@
 'use strict';
 // Dimension-mode static content: portal labels, room goals, relics, and reward cards.
 const DIMENSION_GATEKEEPER = Object.freeze({
-  name: '균열 문지기', shape: 'hex', color: '#41f0ff', r: 74, hp: 26000, spd: 48, dmg: 34, xp: 220,
+  name: '차원 균열체', shape: 'hex', color: '#41f0ff', r: 74, hp: 26000, spd: 48, dmg: 34, xp: 220,
   gatekeeper: true, dash: false, ring: true, ringN: 18, ringCd: 4.8, ringGap: 2, trap: true, trapCd: 6.4, laneTrap: true, laneCd: 7.2,
 });
 
@@ -37,7 +37,7 @@ const DIMENSIONS = Object.freeze([
 
 const DIMENSION_REWARD_CARDS = Object.freeze([
   { id: 'recover', type: 'survival', icon: '❤️', name: '재정비', desc: '체력을 35% 회복합니다.', color: '#7dffc1' },
-  { id: 'barrier', type: 'survival', icon: '🛡️', name: '보호막 보급', desc: '최대 체력 25% 보호막을 얻습니다.', color: '#9ff3ff' },
+  { id: 'barrier', type: 'survival', icon: '🛡️', name: '보호막 내구도 보급', desc: '최대 체력 25% 보호막 내구도를 얻습니다.', color: '#9ff3ff' },
   { id: 'weapon_power', type: 'combat', icon: '⚔️', name: '무기 과충전', desc: '모든 무기 피해가 소폭 증가합니다.', color: '#ff7ad9' },
   { id: 'boss_mark', type: 'combat', icon: '🎯', name: '강적 표식', desc: '보스/엘리트에게 주는 피해가 증가합니다.', color: '#ffd23d' },
   { id: 'drop_quality', type: 'economy', icon: '🍀', name: '보급 품질', desc: '드롭과 회복 보정이 소폭 좋아집니다.', color: '#7dffc1' },

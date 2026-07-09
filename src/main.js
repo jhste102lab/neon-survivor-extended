@@ -123,6 +123,7 @@ function boot() {
   if (typeof I18N !== 'undefined') I18N.init();
   Profile.initDom();
   if (typeof DropPreferences !== 'undefined') DropPreferences.initDom();
+  if (typeof RunSettings !== 'undefined') RunSettings.initDom();
   Game.reset();
   Game.state = 'title';
   UI.refreshTitleBest();
@@ -146,7 +147,15 @@ function boot() {
   bind('btnToTitle', () => UI.toTitle());
   bind('btnToTitle2', () => UI.toTitle());
   bind('btnRandomNick', () => Profile.randomizeInput());
+  const allFxBtn = $('btnAllWeaponFx');
+  if (allFxBtn) allFxBtn.addEventListener('click', () => { AudioFX.ensure(); AudioFX.uiClick(); if (Game.toggleAllWeaponEffectsHidden) { Game.toggleAllWeaponEffectsHidden(); UIPauseOverlay.renderPauseBuild(); } });
   bindImmediateActionButton($('btnFocusMode'), runFocusButtonAction);
+  bindImmediateActionButton($('btnSlotCollapse'), () => {
+    const current = typeof RunSettings !== 'undefined' ? RunSettings.load() : { slotHudCollapsed: false };
+    current.slotHudCollapsed = !current.slotHudCollapsed;
+    if (typeof RunSettings !== 'undefined') RunSettings.save(current);
+    UI.refreshSlots();
+  });
   bindImmediateActionButton($('btnDash'), runDashButtonAction);
   bindSpeedControls();
   $('btnMute').addEventListener('click', () => { AudioFX.ensure(); AudioFX.toggleMute(); });
@@ -164,6 +173,6 @@ function boot() {
 window.G = Game;
 window.UIx = UI;
 window.NS_BOOT = boot;
-window.NS = Object.assign(window.NS || {}, { Game, UI, Input, Render, AudioFX, Music, CFG, WEAPONS, PASSIVES, EVOLUTIONS, COMPANION_ROLES, ENEMY_TYPES, BOSSES, RNG, Profile, DropPreferences, Leaderboard, UpgradeRules, GameRuntime, RunRecords, RunSnapshot, PerformanceBudget, I18N, sim: BalanceSim });
+window.NS = Object.assign(window.NS || {}, { Game, UI, Input, Render, AudioFX, Music, CFG, WEAPONS, PASSIVES, EVOLUTIONS, COMPANION_ROLES, ENEMY_TYPES, BOSSES, RNG, Profile, DropPreferences, RunSettings, Leaderboard, UpgradeRules, GameRuntime, RunRecords, RunSnapshot, PerformanceBudget, I18N, sim: BalanceSim });
 
 if (!window.NS_NO_AUTO_BOOT) boot();

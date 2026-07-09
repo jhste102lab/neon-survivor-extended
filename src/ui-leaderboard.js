@@ -16,6 +16,18 @@ function lbPassiveName(id) {
   return PASSIVES[id] && PASSIVES[id].name ? PASSIVES[id].name : id;
 }
 
+function lbSettingsLabel(settings) {
+  if (!settings) return '기본';
+  const parts = [];
+  if (settings.weaponCap && settings.weaponCap !== 'default') parts.push(`무기 ${settings.weaponCap === 'all' ? '전체' : settings.weaponCap}`);
+  if (settings.weaponCapBonusDamage > 0) parts.push(`화력 +${settings.weaponCapBonusDamage}%`);
+  if (settings.enemyMode === 'half') parts.push('몹 50% · 스탯 1.8배');
+  const drops = settings.dropFilters || {};
+  const off = Object.entries(drops).filter(([, on]) => on === false).map(([k]) => ({ chicken: '치킨', magnet: '자석', bomb: '폭탄' }[k] || k));
+  if (off.length) parts.push(`드롭 OFF: ${off.join(', ')}`);
+  return parts.join(' · ') || '기본';
+}
+
 function lbRows(title, rows, unit = '', labelSources = false) {
   if (!rows || !rows.length) return '';
   const label = source => labelSources && typeof SourceLabels !== 'undefined' ? SourceLabels.combatSource(source) : source;
@@ -44,6 +56,7 @@ Object.assign(UI, {
     const recent = (b.recentDamage || []).map(d => ({ source: `${typeof SourceLabels !== 'undefined' ? SourceLabels.damageKind(d.kind) : (d.kind || 'hit')} · ${typeof SourceLabels !== 'undefined' ? SourceLabels.combatSource(d.source) : d.source}`, value: d.damage }));
     return `
       <div class="lbDetailSummary">${lbEscape(entry.name)} · ${fmtTime(entry.time)} · Lv.${entry.level} · ${entry.kills}킬</div>
+      <div class="lbDetailSection"><b>런 설정</b><div><span>${lbEscape(lbSettingsLabel(b.settings))}</span><em>${b.settings && (b.settings.enemyMode === 'half' || b.settings.weaponCap !== 'default') ? '커스텀' : '기본'}</em></div></div>
       ${b.fieldTest ? '<div class="lbDetailWarn">FIELD TEST RUN · leaderboard upload disabled</div>' : ''}
       <div class="lbDetailSection"><b>무기</b><div class="lbPills">${weapons || '<span class="lbMuted">없음</span>'}</div></div>
       <div class="lbDetailSection"><b>패시브</b><div class="lbPills">${passives || '<span class="lbMuted">없음</span>'}</div></div>
@@ -127,7 +140,9 @@ Object.assign(UI, {
       if (isMine) name.setAttribute('title', `#${i + 1}`);
       const stat = document.createElement('span');
       stat.className = 'lbStat';
-      stat.textContent = tr('leaderboard.stat', { time: fmtTime(e.time), kills: e.kills, level: e.level, combo: e.maxCombo || 0 });
+      const settings = e.build && e.build.settings;
+      const custom = settings && (settings.enemyMode === 'half' || settings.weaponCap !== 'default' || settings.weaponCapBonusDamage > 0);
+      stat.textContent = `${tr('leaderboard.stat', { time: fmtTime(e.time), kills: e.kills, level: e.level, combo: e.maxCombo || 0 })}${custom ? ` · ${lbSettingsLabel(settings)}` : ''}`;
       row.append(rank, name, stat);
       row.addEventListener('click', () => this.showLeaderboardDetail(e));
       row.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); this.showLeaderboardDetail(e); } });

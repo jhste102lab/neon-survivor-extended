@@ -8,13 +8,13 @@ Object.assign(Game, {
     const temp = this.temporaryBuffStats ? this.temporaryBuffStats() : { dmgMul: 1, cdMul: 1, spdMul: 1, regenMul: 1, regenFlat: 0 };
     const baseRegen = 0.65 * (p.regen || 0);
     return {
-      dmg: (1 + 0.12 * (p.power || 0) + 0.08 * t.dmg) * temp.dmgMul,
+      dmg: (1 + 0.12 * (p.power || 0) + 0.08 * t.dmg) * temp.dmgMul * (1 + 0.10 * ((this.runSettings && this.runSettings.weaponCapBonusCount) || 0)),
       cd: Math.max(0.3, Math.pow(0.93, p.haste || 0) * Math.pow(0.96, t.cd) * temp.cdMul),
       spd: CFG.player.speed * Math.min(2.3, (1 + 0.08 * (p.boots || 0)) * (1 + 0.05 * t.spd) * temp.spdMul),
       maxHp: CFG.player.hp + 20 * (p.vitality || 0) + 20 * t.hp,
       pickup: CFG.player.pickup * (1 + 0.4 * (p.magnet || 0)),
       regen: baseRegen * temp.regenMul + temp.regenFlat,
-      crit: Math.min(0.6, CFG.critChance + 0.03 * (p.luck || 0)),
+      crit: Math.min(0.6, (CFG.critChance + 0.03 * (p.luck || 0)) * (temp.critMul || 1)),
       luck: 1 + 0.3 * (p.luck || 0),
       xp: 1 + 0.1 * (p.wisdom || 0),
     };
@@ -42,13 +42,15 @@ Object.assign(Game, {
   },
 
   temporaryBuffStats() {
-    const out = { dmgMul: 1, cdMul: 1, spdMul: 1, regenMul: 1, regenFlat: 0 };
+    const out = { dmgMul: 1, cdMul: 1, spdMul: 1, regenMul: 1, regenFlat: 0, critMul: 1, barrierMul: 1 };
     for (const buff of this.temporaryBuffs || []) {
       out.dmgMul *= buff.dmgMul || 1;
       out.cdMul *= buff.cdMul || 1;
       out.spdMul *= buff.spdMul || 1;
       out.regenMul *= buff.regenMul || 1;
       out.regenFlat += buff.regenFlat || 0;
+      out.critMul *= buff.critMul || 1;
+      out.barrierMul *= buff.barrierMul || 1;
     }
     return out;
   },

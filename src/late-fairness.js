@@ -10,7 +10,8 @@ Object.assign(Game, {
     if (!this.lateMagnetGravityActive()) return false;
     const cfg = CFG.lateMagnetGravity || {};
     this.gravityFields = this.gravityFields || [];
-    const radius = cfg.radius || 125;
+    const magnetLv = this.player && this.player.passives ? (this.player.passives.magnet || 0) : 0;
+    const radius = (cfg.radius || 125) * (1 + magnetLv * 0.04);
     let field = this.gravityFields.find(f => f && f.kind === 'magnet' && dist2(f.x, f.y, x, y) < radius * radius);
     if (!field) {
       field = { kind: 'magnet', x, y, r: radius, life: cfg.duration || 5, maxLife: cfg.duration || 5, pulse: 0 };
@@ -48,7 +49,10 @@ Object.assign(Game, {
       if (!f || dist2(e.x, e.y, f.x, f.y) > (f.r || 1) * (f.r || 1)) continue;
       const edge = Math.sqrt(dist2(e.x, e.y, f.x, f.y)) / Math.max(1, f.r || 1);
       const k = 0.72 + (1 - clamp(edge, 0, 1)) * 0.28;
-      const base = e.boss ? (cfg.bossSlow || 0.08) : e.special ? (cfg.specialSlow || 0.20) : (cfg.normalSlow || 0.30);
+      const magnetLv = this.player && this.player.passives ? (this.player.passives.magnet || 0) : 0;
+      const bonus = magnetLv * 0.03;
+      const baseRaw = e.boss ? (cfg.bossSlow || 0.08) : e.special ? (cfg.specialSlow || 0.20) : (cfg.normalSlow || 0.30);
+      const base = e.boss ? Math.min(0.18, baseRaw + bonus * 0.45) : baseRaw + bonus;
       slow = Math.max(slow, base * k);
     }
     return slow;
