@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import vm from 'node:vm';
 
 const context = vm.createContext({
@@ -23,6 +23,11 @@ const context = vm.createContext({
     enterAutomaticDimensionRift(id) { this.entered = id; return true; },
   },
 });
+
+for (const asset of ['portal-twirl.png', 'nebula-smoke.png', 'circuit-spark.png', 'gravity-ring.png', 'judgement-burst.png', 'mirror-window.png', 'train-trace.png', 'casino-symbol.png', 'ending-flare.png']) {
+  assert.equal(existsSync(`assets/vfx/kenney-particle-pack/${asset}`), true, `missing VFX asset: ${asset}`);
+}
+assert.match(readFileSync('assets/vfx/NOTICE.md', 'utf8'), /Creative Commons CC0 1\.0/);
 vm.runInContext(readFileSync('src/events.js', 'utf8'), context, { filename: 'src/events.js' });
 
 context.Game.updateDimensionRiftOfferSchedule();

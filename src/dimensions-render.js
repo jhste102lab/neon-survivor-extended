@@ -26,6 +26,38 @@ const DimensionPortalAssetCache = (() => {
   return { get };
 })();
 
+const DimensionVfxAssets = (() => {
+  const images = new Map(), tinted = new Map();
+  const root = 'assets/vfx/kenney-particle-pack/';
+  const byKind = Object.freeze({
+    core: 'nebula-smoke.png', generators: 'circuit-spark.png', anchors: 'gravity-ring.png',
+    duel: 'judgement-burst.png', nests: 'nebula-smoke.png', mirrors: 'mirror-window.png',
+    train: 'train-trace.png', casino: 'casino-symbol.png',
+  });
+  function imageFor(file) {
+    if (!file || typeof Image === 'undefined') return null;
+    if (!images.has(file)) { const img = new Image(); img.decoding = 'async'; img.src = root + file; images.set(file, img); }
+    return images.get(file);
+  }
+  function colored(file, color) {
+    const key = `${file}|${color}`, cached = tinted.get(key);
+    if (cached) return cached;
+    const img = imageFor(file);
+    if (!img || !img.complete || !img.naturalWidth || typeof document === 'undefined') return null;
+    const canvas = document.createElement('canvas'); canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+    const g = canvas.getContext('2d'); g.drawImage(img, 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = color; g.fillRect(0, 0, canvas.width, canvas.height);
+    tinted.set(key, canvas); return canvas;
+  }
+  return { colored, fileForKind: kind => byKind[kind] || byKind.core, portal: 'portal-twirl.png' };
+})();
+
+function drawDimensionVfx(ctx, file, color, x, y, size, rotation, alpha) {
+  const img = DimensionVfxAssets.colored(file, color);
+  if (!img) return false;
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rotation || 0); ctx.globalAlpha = alpha; ctx.drawImage(img, -size / 2, -size / 2, size, size); ctx.restore();
+  return true;
+}
+
 function drawDimensionPortalIcon(ctx, portal, fallback, x, y, size) {
   const img = DimensionPortalAssetCache.get(portal && portal.asset);
   if (img && img.complete && img.naturalWidth > 0) {
@@ -47,6 +79,10 @@ function drawDimensionPortalShape(ctx, portal, t, active = false) {
   ctx.save();
   ctx.translate(portal.x, portal.y);
   ctx.globalCompositeOperation = 'lighter';
+  ctx.restore();
+  ctx.save(); ctx.globalCompositeOperation = 'lighter';
+  drawDimensionVfx(ctx, DimensionVfxAssets.portal, color, portal.x, portal.y, r * 2.15, -t * 0.32 + (portal.phase || 0), active ? 0.42 : 0.28);
+  ctx.translate(portal.x, portal.y);
   ctx.strokeStyle = color;
   ctx.lineWidth = active ? 5 : 3;
   ctx.globalAlpha = 0.35 + pulse * 0.22;
@@ -128,6 +164,13 @@ function drawDimensionRoomBackdrop(ctx, dim, t) {
   ctx.fillRect(cam.x - 1300, cam.y - 900, 2600, 1800);
   ctx.globalCompositeOperation = 'lighter';
   ctx.strokeStyle = def.color || '#41f0ff'; ctx.fillStyle = def.accent || '#ff2bd6'; ctx.lineWidth = 2;
+  const texture = DimensionVfxAssets.fileForKind(kind);
+  const textureN = pressure > 0.72 ? 1 : kind === 'nests' ? 4 : 2;
+  for (let i = 0; i < textureN; i++) {
+    const a = i / textureN * TAU + t * (kind === 'train' ? 0 : 0.018);
+    const r = textureN === 1 ? 0 : 260 + i * 150;
+    drawDimensionVfx(ctx, texture, i % 2 ? def.accent : def.color, Math.cos(a) * r, Math.sin(a) * r, kind === 'train' ? 920 : 430 + i * 40, kind === 'train' ? -0.18 : a + t * 0.025, kind === 'nests' ? 0.075 : 0.105);
+  }
   if (kind === 'core') {
     ctx.globalAlpha = 0.14;
     for (let i = 0; i < count; i++) {

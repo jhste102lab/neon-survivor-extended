@@ -1,5 +1,14 @@
 'use strict';
 // Canvas drawing for the active field event marker.
+const EventVfxAssets = (() => {
+  let portal = null;
+  function portalTwirl() {
+    if (portal || typeof Image === 'undefined') return portal;
+    portal = new Image(); portal.decoding = 'async'; portal.src = 'assets/vfx/kenney-particle-pack/portal-twirl.png';
+    return portal;
+  }
+  return { portalTwirl };
+})();
 function eventFillColor(info, state) {
   if (info.role === 'danger') return state === 'offer' ? 'rgba(255,77,94,0.12)' : 'rgba(255,77,94,0.20)';
   if (info.role === 'risk') return state === 'offer' ? 'rgba(255,210,61,0.10)' : 'rgba(255,210,61,0.17)';
@@ -74,6 +83,13 @@ Object.assign(Render, {
     x.lineWidth = ev.state === 'offer' ? 3 : 4;
     x.setLineDash(ev.state === 'offer' ? [12, 8] : []);
     x.beginPath(); x.arc(ev.x, ev.y, ev.r + pulse * 7, 0, TAU); x.fill(); x.stroke();
+    if (ev.type === 'rift') {
+      const portal = EventVfxAssets.portalTwirl();
+      if (portal && portal.complete && portal.naturalWidth) {
+        const size = ev.r * 1.9;
+        x.save(); x.translate(ev.x, ev.y); x.rotate(-Game.time * .38); x.globalCompositeOperation = 'lighter'; x.globalAlpha = ev.state === 'offer' ? .28 : .18; x.drawImage(portal, -size / 2, -size / 2, size, size); x.restore();
+      }
+    }
     x.setLineDash([]);
     if (ev.state === 'active' && (ev.type === 'rift' || ev.type === 'supply')) {
       const need = ev.type === 'rift' && typeof DimensionRiftRules !== 'undefined' ? (DimensionRiftRules.get(ev.dimension).holdGoal || 8.5) : 6;
