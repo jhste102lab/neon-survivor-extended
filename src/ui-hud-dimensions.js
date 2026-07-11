@@ -16,10 +16,16 @@ Object.assign(UI, {
     const completed = dim.completed ? Object.keys(dim.completed).length : 0;
     if (dim.mode === 'dimension') {
       const def = dim.activeDef || {};
-      el.innerHTML = `<b>${def.icon || '◆'} ${def.name || '차원'}</b><strong>목표 · ${def.goal || '표시된 목표를 파괴하세요'}</strong><span>${G.dimensionProgressText ? G.dimensionProgressText() : ''}</span><small>${def.summary || ''}</small>`;
+      const briefing = dim.introT > 0;
+      el.classList.toggle('briefing', briefing);
+      el.innerHTML = briefing
+        ? `<em>DIMENSION BRIEFING</em><b>${def.icon || '◆'} ${def.name || '차원'}</b><strong>${def.goal || '표시된 목표를 파괴하세요'}</strong><small>${def.playHint || def.summary || ''}</small>`
+        : `<b>${def.icon || '◆'} ${def.name || '차원'}</b><span>${G.dimensionProgressText ? G.dimensionProgressText() : ''}</span>`;
     } else if (dim.mode === 'hub') {
+      el.classList.remove('briefing');
       el.innerHTML = `<b>차원 허브</b><span>정복 ${completed}/8 · 원하는 차원을 선택하세요</span>`;
     } else {
+      el.classList.remove('briefing');
       el.innerHTML = `<b>차원문 개방</b><span>정복 ${completed}/8 · 허브 포털로 진입</span>`;
     }
   },

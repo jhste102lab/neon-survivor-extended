@@ -179,7 +179,9 @@
   function spawnRoomLayout(game, def, diff) {
     const dim = game.dimension;
     const d = diff.value;
-    const hpMul = 1 + (d - 1) * 0.35;
+    const accessK = clamp(game.time / CFG.winTime, 0.55, 1);
+    const hpMul = (1 + (d - 1) * 0.35) * accessK;
+    dim.introT = 4.2;
     dim.challenge = { id: def.id, kind: def.kind, progress: 0, target: def.target, patternT: 1.4, waveT: 2.2, round: 0, objectiveTotal: def.target, objectiveKilled: 0, lastLowHpDropT: -999, contract: null };
     emptyWorld(game);
     game.player.x = 0; game.player.y = 220; game.cam.x = 0; game.cam.y = 0;
@@ -374,7 +376,6 @@
       applyEntrySafety(this);
       spawnRoomLayout(this, def, dimensionDifficulty(this, def));
       if (this.metrics) this.metrics.dimensionRiftStarts = (this.metrics.dimensionRiftStarts || 0) + 1;
-      GameRuntime.banner(`${def.icon} ${def.name} · 목표: ${def.goal}`, 'warn');
       if (typeof RunSnapshot !== 'undefined') RunSnapshot.save(this, { force: true });
       return true;
     },
@@ -518,6 +519,7 @@
     runDimensionFrame(dt, rdt) {
       const dim = ensureDimensionState(this);
       dim.localTime += dt;
+      dim.introT = Math.max(0, (dim.introT || 0) - dt);
       const st = this.cacheFrameStats();
       this.refreshWeaponSlotCap(this.player);
       const mv = this.updatePlayerMovement(dt, st);
@@ -525,7 +527,7 @@
       this.updatePlayerRegen(dt, st);
       this.updatePlayerTrail(dt, mv);
       this.updateCompanionRuntime(dt, st);
-      if (dim.mode === 'dimension') {
+      if (dim.mode === 'dimension' && !(dim.introT > 0)) {
         this.fireReadyWeaponCooldowns(dt, st);
         this.updatePersistentWeaponEffects(dt, st);
       }
@@ -539,7 +541,7 @@
     updateDimensionWorld(dt, st) {
       const dim = ensureDimensionState(this);
       if (dim.mode === 'hub') this.updateDimensionHub(dt);
-      else if (dim.mode === 'dimension') this.updateDimensionRoom(dt, st);
+      else if (dim.mode === 'dimension' && !(dim.introT > 0)) this.updateDimensionRoom(dt, st);
       else if (dim.mode === 'collapse') { dim.collapseT -= dt; if (dim.collapseT <= 0) this.finishDimensionCollapse(); }
       this.updateDimensionRelics(dt, st);
       if (dim.mode !== 'collapse') {

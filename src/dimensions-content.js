@@ -18,21 +18,21 @@ const DIMENSION_RELICS = Object.freeze({
 
 const DIMENSIONS = Object.freeze([
   { id: 'bullet_nebula', icon: '🌌', asset: 'assets/dimensions/noto-emoji/emoji_u1f30c.svg', name: '탄막 성운', danger: 3, relic: 'nebula_sense', color: '#7de8ff', accent: '#ff7ad9',
-    goal: '성운 코어 안정화', objectiveLabel: '성운 코어', kind: 'core', target: 1, summary: '탄막 사이를 읽고 성운 코어를 파괴합니다.', completeText: '성운 코어 안정화 완료' },
+    goal: '성운 코어 안정화', objectiveLabel: '성운 코어', kind: 'core', target: 1, summary: '탄막 사이를 읽고 성운 코어를 파괴합니다.', playHint: '외곽 노드를 먼저 부수고 중앙 코어에 화력을 집중하세요.', completeText: '성운 코어 안정화 완료' },
   { id: 'machine_prison', icon: '⚡', asset: 'assets/dimensions/noto-emoji/emoji_u26a1.svg', name: '기계 감옥', danger: 3, relic: 'insulated_glove', color: '#ffd23d', accent: '#41f0ff',
-    goal: '발전기 파괴', objectiveLabel: '발전기', kind: 'generators', target: 4, summary: '레이저와 전기벽을 피해 발전기를 부숩니다.', completeText: '감옥 전원 차단' },
+    goal: '발전기 파괴', objectiveLabel: '발전기', kind: 'generators', target: 4, summary: '레이저와 전기벽을 피해 발전기를 부숩니다.', playHint: '레이저 예고선을 건너며 네 발전기를 하나씩 끄세요.', completeText: '감옥 전원 차단' },
   { id: 'gravity_well', icon: '🕳️', asset: 'assets/dimensions/noto-emoji/emoji_u1f573.svg', name: '중력 우물', danger: 4, relic: 'gravity_fracture', color: '#a36bff', accent: '#7dffc1',
-    goal: '중력 앵커 파괴', objectiveLabel: '중력 앵커', kind: 'anchors', target: 3, summary: '끌림과 밀림 속에서 적을 몰아 앵커를 파괴합니다.', completeText: '중력 우물 안정화' },
+    goal: '중력 앵커 파괴', objectiveLabel: '중력 앵커', kind: 'anchors', target: 3, summary: '끌림과 밀림 속에서 적을 몰아 앵커를 파괴합니다.', playHint: '중력 방향이 바뀔 때 저항하지 말고 다음 앵커로 이동하세요.', completeText: '중력 우물 안정화' },
   { id: 'judges_duel', icon: '⚖️', asset: 'assets/dimensions/noto-emoji/emoji_u2696.svg', name: '심판자의 결투', danger: 4, relic: 'verdict_mark', color: '#ff7ad9', accent: '#ffffff',
-    goal: '심판자 처치', objectiveLabel: '심판자', kind: 'duel', target: 1, summary: '느린 패턴 보스의 판결을 읽고 처치합니다.', completeText: '판결장 안정화' },
+    goal: '심판자 처치', objectiveLabel: '심판자', kind: 'duel', target: 1, summary: '느린 패턴 보스의 판결을 읽고 처치합니다.', playHint: '십자 예고선의 빈 사분면을 찾아 심판자를 처치하세요.', completeText: '판결장 안정화' },
   { id: 'plague_garden', icon: '🍄', asset: 'assets/dimensions/noto-emoji/emoji_u1f344.svg', name: '역병 정원', danger: 4, relic: 'cleansing_spore', color: '#7dffc1', accent: '#ff5e8a',
-    goal: '독성 둥지 정화', objectiveLabel: '독성 둥지', kind: 'nests', target: 5, summary: '오염 영역을 관리하며 둥지와 포자 코어를 정화합니다.', completeText: '역병 정원 정화' },
+    goal: '독성 둥지 정화', objectiveLabel: '독성 둥지', kind: 'nests', target: 5, summary: '오염 영역을 관리하며 둥지와 포자 코어를 정화합니다.', playHint: '한 방향으로 밀리지 않게 가까운 둥지부터 정화하세요.', completeText: '역병 정원 정화' },
   { id: 'mirror_corridor', icon: '🔷', asset: 'assets/dimensions/noto-emoji/emoji_u1f537.svg', name: '거울 회랑', danger: 3, relic: 'mirror_veil', color: '#9ff3ff', accent: '#c39bff',
-    goal: '진짜 거울핵 파괴', objectiveLabel: '거울핵', kind: 'mirrors', target: 3, summary: '진짜와 가짜 핵을 구분하고 반사탄을 피합니다.', completeText: '거울 회랑 안정화' },
+    goal: '진짜 거울핵 파괴', objectiveLabel: '거울핵', kind: 'mirrors', target: 3, summary: '진짜와 가짜 핵을 구분하고 반사탄을 피합니다.', playHint: '밝은 거울핵 3개만 노리세요. 회색 가짜 핵은 반격합니다.', completeText: '거울 회랑 안정화' },
   { id: 'train_battlefield', icon: '🚄', asset: 'assets/dimensions/noto-emoji/emoji_u1f684.svg', name: '열차 위 전장', danger: 4, relic: 'propulsion_core', color: '#ffb13d', accent: '#41f0ff',
-    goal: '강습 웨이브 방어', objectiveLabel: '강습 웨이브', kind: 'train', target: 4, summary: '움직이는 전장에서 침입 드론과 강습선을 격퇴합니다.', completeText: '수송선 방어 완료' },
+    goal: '강습 웨이브 방어', objectiveLabel: '강습 웨이브', kind: 'train', target: 4, summary: '움직이는 전장에서 침입 드론과 강습선을 격퇴합니다.', playHint: '중앙을 지키며 강습선을 부수면 다음 웨이브가 출발합니다.', completeText: '수송선 방어 완료' },
   { id: 'casino_rift', icon: '🎰', asset: 'assets/dimensions/noto-emoji/emoji_u1f3b0.svg', name: '도박장의 균열', danger: 5, relic: 'lucky_pact', color: '#ffd23d', accent: '#ff2bd6',
-    goal: '계약 라운드 승리', objectiveLabel: '계약 라운드', kind: 'casino', target: 3, summary: '위험과 보상이 공개된 계약을 고르고 라운드를 승리합니다.', completeText: '잭팟 균열 안정화' },
+    goal: '계약 라운드 승리', objectiveLabel: '계약 라운드', kind: 'casino', target: 3, summary: '위험과 보상이 공개된 계약을 고르고 라운드를 승리합니다.', playHint: '매 라운드 공개되는 판돈을 확인하고 계약 코어를 파괴하세요.', completeText: '잭팟 균열 안정화' },
 ]);
 
 const DIMENSION_REWARD_CARDS = Object.freeze([
