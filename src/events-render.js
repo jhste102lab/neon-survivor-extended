@@ -41,6 +41,24 @@ function drawEventPopup(x, ev, info) {
   x.restore();
 }
 
+function drawEventCountdown(x, ev) {
+  if (ev.state !== 'active' || ev.type !== 'storm') return;
+  const text = `남은 시간 ${Math.max(0, Math.ceil(ev.life))}초`;
+  const y = ev.y - ev.r - 86;
+  x.save();
+  x.font = '900 14px "Jua","Arial",sans-serif';
+  const w = x.measureText(text).width + 24;
+  x.fillStyle = 'rgba(1,5,14,.94)';
+  x.strokeStyle = '#9ff3ff';
+  x.lineWidth = 2;
+  x.beginPath(); x.roundRect(ev.x - w / 2, y - 14, w, 28, 10); x.fill(); x.stroke();
+  x.fillStyle = '#ffffff';
+  x.shadowColor = '#41f0ff'; x.shadowBlur = 8;
+  x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillText(text, ev.x, y);
+  x.restore();
+}
+
 Object.assign(Render, {
   drawEvents(x) {
     const ev = Game.activeEvent;
@@ -69,6 +87,7 @@ Object.assign(Render, {
     x.fillStyle = '#ffffff';
     x.fillText(info.icon, ev.x, ev.y);
     drawEventPopup(x, ev, info);
+    drawEventCountdown(x, ev);
     x.restore();
   },
 });
