@@ -228,12 +228,46 @@ function drawDimensionRoomBackdrop(ctx, dim, t) {
   ctx.restore();
 }
 
+function drawDimensionInteractionMarkers(ctx, dim, t) {
+  if (!dim || dim.mode !== 'dimension' || dim.introT > 0) return;
+  const def = dim.activeDef || {}, c = dim.challenge || {};
+  const objectives = Game.enemies.filter(e => e.dimensionObjective && e.hp > 0);
+  let targets = objectives;
+  if (def.kind === 'core' && objectives.some(e => e.dimensionKind === 'node')) targets = objectives.filter(e => e.dimensionKind === 'node');
+  else if (['generators', 'anchors', 'nests', 'mirrors'].includes(def.kind)) targets = objectives.filter(e => (e.dimensionSeq || 0) === (c.activeSeq || 0));
+  ctx.save(); ctx.globalCompositeOperation = 'lighter';
+  for (const e of targets) {
+    const pulse = 1 + Math.sin(t * 7 + (e.dimensionSeq || 0)) * .08;
+    ctx.strokeStyle = c.exposedT > 0 || !['anchors', 'nests', 'duel'].includes(def.kind) ? '#ffffff' : '#ffd23d';
+    ctx.lineWidth = 4; ctx.globalAlpha = .72; ctx.setLineDash([10, 7]);
+    ctx.beginPath(); ctx.arc(e.x, e.y, (e.r + 24) * pulse, 0, TAU); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  if (def.kind === 'train' && c.lane != null) {
+    const y = c.lane * 170;
+    ctx.globalAlpha = c.laneReady ? .18 : .1; ctx.fillStyle = c.laneReady ? '#7dffc1' : '#ffd23d'; ctx.fillRect(Game.cam.x - 900, y - 78, 1800, 156);
+    ctx.globalAlpha = .72; ctx.strokeStyle = c.laneReady ? '#7dffc1' : '#ffd23d'; ctx.lineWidth = 3; ctx.setLineDash([20, 14]); ctx.beginPath(); ctx.moveTo(Game.cam.x - 900, y); ctx.lineTo(Game.cam.x + 900, y); ctx.stroke();
+  }
+  if (def.kind === 'casino' && c.choosing) {
+    ctx.setLineDash([]); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (const option of c.contractOptions || []) {
+      const pulse = 1 + Math.sin(t * 5 + option.x) * .07;
+      ctx.globalAlpha = .2; ctx.fillStyle = option.color; ctx.beginPath(); ctx.arc(option.x, option.y, 72 * pulse, 0, TAU); ctx.fill();
+      ctx.globalAlpha = .9; ctx.strokeStyle = option.color; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(option.x, option.y, 72 * pulse, 0, TAU); ctx.stroke();
+      ctx.fillStyle = '#fff'; ctx.font = '900 15px "Jua",sans-serif'; ctx.fillText(option.name, option.x, option.y - 8);
+      ctx.fillStyle = option.color; ctx.font = '11px "Jua",sans-serif'; ctx.fillText(option.risk, option.x, option.y + 15);
+    }
+  }
+  ctx.restore();
+}
+
 Object.assign(Render, {
   drawDimensionLayer(ctx) {
     const dim = Game.dimension;
     if (!dim) return;
     const t = (dim.localTime || Game.time || 0);
     drawDimensionRoomBackdrop(ctx, dim, t);
+    drawDimensionInteractionMarkers(ctx, dim, t);
     drawDimensionEntryPortal(ctx, dim, t);
     drawDimensionHub(ctx, dim, t);
   },

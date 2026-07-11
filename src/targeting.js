@@ -2,6 +2,7 @@
 // Enemy target selection helpers used by weapons and the director.
 function insertNearestEnemy(list, enemy, distance, limit) {
   if (!enemy || enemy.hp <= 0) return;
+  if (enemy.dimensionTargetPriority) distance -= 1e12;
   let at = list.length;
   while (at > 0 && distance < list[at - 1].d) at--;
   if (at >= limit) return;
@@ -19,6 +20,7 @@ function targetCacheUsable(game, x, y, maxR) {
 
 function insertStrongEnemy(list, enemy, score, limit) {
   if (!enemy || enemy.hp <= 0) return;
+  if (enemy.dimensionTargetPriority) score += 1e10;
   let at = list.length;
   while (at > 0 && score > list[at - 1].score) at--;
   if (at >= limit) return;
