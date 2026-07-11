@@ -80,7 +80,7 @@ const CFG = {
     normalSlow: 0.30, specialSlow: 0.20, bossSlow: 0.08,
   },
   dimensionRift: {
-    enabled: true, firstCheck: 120, lastRandomCheck: 480, interval: 120, chance: 0.30,
+    enabled: true, firstCheck: 120, guaranteedTime: 180, lastRandomCheck: 480, interval: 120, chance: 0.30,
     offerLife: 36, offerRadius: 104,
   },
   dimensionAutoRift: {

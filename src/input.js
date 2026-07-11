@@ -51,7 +51,7 @@ function touchJoystickBase(touch, padRect, metrics) {
 
 function bindTouchJoystick(input) {
   const joy = $('joy'), knob = $('knob'), pad = $('movePad');
-  let touchId = null, baseX = 0, baseY = 0;
+  let touchId = null, baseX = 0, baseY = 0, startX = 0, startY = 0, startMs = 0, dragged = false;
   const coarse = () => typeof matchMedia !== 'undefined' && matchMedia('(pointer: coarse)').matches;
 
   const startTouch = touch => {
@@ -60,6 +60,7 @@ function bindTouchJoystick(input) {
     const metrics = touchJoystickMetrics(joy);
     const base = touchJoystickBase(touch, pad ? pad.getBoundingClientRect() : null, metrics);
     touchId = touch.identifier;
+    startX = touch.clientX; startY = touch.clientY; startMs = performance.now(); dragged = false;
     baseX = base.x; baseY = base.y;
     joy.style.display = 'block';
     joy.style.left = (baseX - metrics.radius) + 'px';
@@ -75,6 +76,7 @@ function bindTouchJoystick(input) {
     let dx = touch.clientX - baseX, dy = touch.clientY - baseY;
     const metrics = touchJoystickMetrics(joy);
     const len = Math.hypot(dx, dy), max = metrics.max;
+    if (len > metrics.dead) dragged = true;
     if (len > max) { dx = dx / len * max; dy = dy / len * max; }
     knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
     input.joyVX = len > metrics.dead ? dx / max : 0;
@@ -84,8 +86,10 @@ function bindTouchJoystick(input) {
 
   const endTouch = touch => {
     if (touch.identifier !== touchId) return false;
+    const wasTap = !dragged && performance.now() - startMs < 260 && Math.hypot(touch.clientX - startX, touch.clientY - startY) < 12;
     touchId = null; input.joyActive = false; input.joyVX = 0; input.joyVY = 0;
     joy.style.display = 'none';
+    if (wasTap) input.setTapDestination(touch.clientX, touch.clientY);
     return true;
   };
 
@@ -107,14 +111,36 @@ const Input = {
     return InputVectorState.installOverride(this, fn);
   },
 
+  setTapDestination(screenX, screenY) {
+    const game = typeof GameRuntime !== 'undefined' ? GameRuntime.activeGame() : null;
+    if (!game || game.state !== 'play' || !game.player) return false;
+    const cameraOffset = typeof Render !== 'undefined' && Render.mobileCameraOffset ? Render.mobileCameraOffset() : 0;
+    this.tapTarget = {
+      x: game.cam.x + screenX - innerWidth / 2,
+      y: game.cam.y + screenY - innerHeight / 2 - cameraOffset,
+    };
+    if (game.spawnBurst) game.spawnBurst(this.tapTarget.x, this.tapTarget.y, '#9ff3ff', 6, 70, 3, 0.18);
+    return true;
+  },
+
   // 이동 벡터 (-1~1)
   moveVec() {
-    return InputVectorState.compute({
+    const manual = InputVectorState.compute({
       keys: this.keys,
       joyActive: this.joyActive,
       joyVX: this.joyVX,
       joyVY: this.joyVY,
       override: this.simMoveVec,
     });
+    if (Math.hypot(manual.x, manual.y) > 0.08 || !this.tapTarget) {
+      if (Math.hypot(manual.x, manual.y) > 0.08) this.tapTarget = null;
+      return manual;
+    }
+    const game = typeof GameRuntime !== 'undefined' ? GameRuntime.activeGame() : null;
+    if (!game || !game.player || game.state !== 'play') { this.tapTarget = null; return manual; }
+    const dx = this.tapTarget.x - game.player.x, dy = this.tapTarget.y - game.player.y;
+    const d = Math.hypot(dx, dy);
+    if (d < 18) { this.tapTarget = null; return { x: 0, y: 0 }; }
+    return { x: dx / d, y: dy / d };
   }
 };

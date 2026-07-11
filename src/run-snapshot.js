@@ -61,6 +61,7 @@ const RunSnapshot = {
         activeEvent: game.activeEvent,
         nextDimensionRiftT: game.nextDimensionRiftT,
         dimensionRiftFails: game.dimensionRiftFails,
+        dimensionRiftGuaranteed3: !!game.dimensionRiftGuaranteed3,
         finalDimensionRiftOffered: !!game.finalDimensionRiftOffered,
         cleared20: !!game.cleared20,
         endingSeen: !!game.endingSeen,
@@ -164,7 +165,7 @@ const RunSnapshot = {
     game.levelQueue = run.levelQueue || 0; game.deathT = -1; game.novaSeq = run.novaSeq || 0;
     game.dir = run.dir || game.dir; game.cam = run.cam || game.cam; game.blades = run.blades || game.blades;
     game.frameSeq = run.frameSeq || 0; game.endless = !!run.endless; game.focusMode = !!run.focusMode; game.activeEvent = run.activeEvent || null;
-    game.nextDimensionRiftT = run.nextDimensionRiftT || game.nextDimensionRiftT; game.dimensionRiftFails = run.dimensionRiftFails || 0; game.finalDimensionRiftOffered = !!run.finalDimensionRiftOffered; game.cleared20 = !!run.cleared20; game.endingSeen = !!run.endingSeen; game.nextAutoDimensionRiftT = run.nextAutoDimensionRiftT || game.nextAutoDimensionRiftT; game.autoDimensionRiftWarnT = run.autoDimensionRiftWarnT || 0; game.bossFortifySpawnT = run.bossFortifySpawnT || 0; game.temporaryBuffs = Array.isArray(run.temporaryBuffs) ? run.temporaryBuffs : [];
+    game.nextDimensionRiftT = run.nextDimensionRiftT || game.nextDimensionRiftT; game.dimensionRiftFails = run.dimensionRiftFails || 0; game.dimensionRiftGuaranteed3 = !!run.dimensionRiftGuaranteed3; game.finalDimensionRiftOffered = !!run.finalDimensionRiftOffered; game.cleared20 = !!run.cleared20; game.endingSeen = !!run.endingSeen; game.nextAutoDimensionRiftT = run.nextAutoDimensionRiftT || game.nextAutoDimensionRiftT; game.autoDimensionRiftWarnT = run.autoDimensionRiftWarnT || 0; game.bossFortifySpawnT = run.bossFortifySpawnT || 0; game.temporaryBuffs = Array.isArray(run.temporaryBuffs) ? run.temporaryBuffs : [];
     game.bossDebuffs = run.bossDebuffs || game.bossDebuffs;
     game.nextEventT = run.nextEventT || game.nextEventT; game.lastBossSpawnT = run.lastBossSpawnT || -999;
     game.idleT = run.idleT || 0; game.lastIdleWarnT = run.lastIdleWarnT || -999; game.unlockNotified = !!run.unlockNotified;

@@ -43,7 +43,16 @@ Object.assign(Game, {
   updateDimensionRiftOfferSchedule() {
     const cfg = CFG.dimensionRift || {};
     const due = this.nextDimensionRiftT || cfg.firstCheck || 120;
-    if (cfg.enabled === false || this.finalDimensionRiftOffered || this.activeEvent || this.time < due) return;
+    if (cfg.enabled === false || this.finalDimensionRiftOffered) return;
+    if (!this.dimensionRiftGuaranteed3 && this.time >= (cfg.guaranteedTime || 180)) {
+      if (this.activeEvent || this.eventSpawnBlocked()) return;
+      if (this.spawnDimensionPortal(false)) {
+        this.dimensionRiftGuaranteed3 = true;
+        GameRuntime.banner('3분 확정 차원 균열이 열렸습니다', 'warn');
+      }
+      return;
+    }
+    if (this.activeEvent || this.time < due) return;
     if (due > (cfg.lastRandomCheck || 480)) return;
     if (this.eventSpawnBlocked()) { this.nextDimensionRiftT = this.time + 10; return; }
     this.nextDimensionRiftT = due + (cfg.interval || 120);

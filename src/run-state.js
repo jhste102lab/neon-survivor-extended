@@ -29,6 +29,7 @@ function createInitialRunState(options = {}) {
     activeEvent: null,
     nextDimensionRiftT: (CFG.dimensionRift && CFG.dimensionRift.firstCheck) || 120,
     dimensionRiftFails: 0,
+    dimensionRiftGuaranteed3: false,
     finalDimensionRiftOffered: false,
     cleared20: false,
     endingSeen: false,

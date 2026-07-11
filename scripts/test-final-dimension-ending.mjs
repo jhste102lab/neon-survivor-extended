@@ -37,6 +37,13 @@ context.Game.activateEvent(context.Game.activeEvent);
 assert.equal(context.Game.entered, 'mirror_corridor', 'entering the portal should start the dimension immediately');
 assert.equal(context.Game.activeEvent, null);
 
+context.Game.time = 180;
+context.Game.dimensionRiftGuaranteed3 = false;
+context.Game.updateDimensionRiftOfferSchedule();
+assert.equal(context.Game.dimensionRiftGuaranteed3, true, 'the 3-minute portal must be guaranteed');
+assert.equal(context.Game.activeEvent.dimension, 'mirror_corridor');
+context.Game.activeEvent = null;
+
 context.Game.time = 600;
 context.Game.activeEvent = null;
 assert.equal(context.Game.offerFinalDimensionRift(30, 40), true);
@@ -70,3 +77,22 @@ assert.equal(rewardUi.UI.showDimensionRewardCards([{ kind: 'heal' }], '테스트
 assert.equal(rewardUi.Game.state, 'play', 'a reward rendering failure must never strand the run in levelup state');
 
 console.log('Dimension reward recovery test passed.');
+
+const tapInput = vm.createContext({
+  console, globalThis: {}, innerWidth: 400, innerHeight: 800, performance: { now: () => 0 },
+  addEventListener() {}, document: { addEventListener() {} }, $: () => ({ style: {} }), getComputedStyle: () => ({ width: '120px' }),
+  matchMedia: () => ({ matches: true }), clamp: (v, min, max) => Math.min(max, Math.max(min, v)),
+  Render: { mobileCameraOffset: () => -82 },
+  GameRuntime: { activeGame: () => tapInput.game },
+});
+tapInput.globalThis = tapInput;
+tapInput.game = { state: 'play', cam: { x: 0, y: 0 }, player: { x: 0, y: 0 }, spawnBurst() {} };
+vm.runInContext(readFileSync('src/input-vector.js', 'utf8'), tapInput, { filename: 'src/input-vector.js' });
+vm.runInContext(readFileSync('src/input.js', 'utf8'), tapInput, { filename: 'src/input.js' });
+assert.equal(vm.runInContext('Input.setTapDestination(300, 300)', tapInput), true);
+const tapMove = vm.runInContext('Input.moveVec()', tapInput);
+assert(tapMove.x > 0 && tapMove.y < 0, 'tap movement should point from the player toward the tapped world position');
+vm.runInContext("Input.keys.d = true", tapInput);
+vm.runInContext('Input.moveVec()', tapInput);
+assert.equal(vm.runInContext('Input.tapTarget', tapInput), null, 'manual controls must immediately override tap movement');
+console.log('Mobile tap-to-move compatibility test passed.');
