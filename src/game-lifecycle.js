@@ -79,6 +79,7 @@ Object.assign(Game, {
   reset() {
     const keepFieldTest = !!this.fieldTestInvincible;
     const initial = createInitialRunState();
+    if (typeof Input !== 'undefined') Input.tapTarget = null;
     this.time = initial.time; this.timeScale = initial.timeScale; this.userTimeScale = initial.userTimeScale; this.hitStopT = initial.hitStopT;
     this.enemies.length = 0; this.bullets.length = 0; this.ebullets.length = 0;
     this.gems.length = 0; this.drops.length = 0; this.hazards.length = 0; if (this.gravityFields) this.gravityFields.length = 0; this.particles.length = 0;
@@ -90,7 +91,7 @@ Object.assign(Game, {
     this.blades.angle = initial.blades.angle;
     this.frameSeq = initial.frameSeq; this.frameTargets = initial.frameTargets;
     if (typeof Grid !== 'undefined' && Grid.map) Grid.map.clear();
-    this.endless = initial.endless; this.st = initial.st; this.activeEvent = initial.activeEvent; this.nextEventT = initial.nextEventT; this.nextDimensionRiftT = initial.nextDimensionRiftT; this.dimensionRiftFails = initial.dimensionRiftFails; this.nextAutoDimensionRiftT = initial.nextAutoDimensionRiftT; this.autoDimensionRiftWarnT = initial.autoDimensionRiftWarnT; this.bossFortifySpawnT = initial.bossFortifySpawnT; this.temporaryBuffs = initial.temporaryBuffs; this.lastBossSpawnT = initial.lastBossSpawnT;
+    this.endless = initial.endless; this.st = initial.st; this.activeEvent = initial.activeEvent; this.nextEventT = initial.nextEventT; this.nextDimensionRiftT = initial.nextDimensionRiftT; this.dimensionRiftFails = initial.dimensionRiftFails; this.dimensionRiftGuaranteed3 = initial.dimensionRiftGuaranteed3; this.finalDimensionRiftOffered = initial.finalDimensionRiftOffered; this.cleared20 = initial.cleared20; this.endingSeen = initial.endingSeen; this.nextAutoDimensionRiftT = initial.nextAutoDimensionRiftT; this.autoDimensionRiftWarnT = initial.autoDimensionRiftWarnT; this.bossFortifySpawnT = initial.bossFortifySpawnT; this.temporaryBuffs = initial.temporaryBuffs; this.lastBossSpawnT = initial.lastBossSpawnT;
     this.bossDebuffs = initial.bossDebuffs;
     this.dimension = initial.dimension || (typeof this.createDimensionState === 'function' ? this.createDimensionState() : null);
     this.idleT = initial.idleT; this.lastIdleWarnT = initial.lastIdleWarnT;
@@ -182,6 +183,7 @@ Object.assign(Game, {
   goEndless() { // 레거시 승리창 버튼 호환: 현재 빌드에서는 승리창을 띄우지 않는다.
     if (this.state !== 'win' && this.state !== 'play') return;
     this.enterEndlessLoop(false);
+    this.endingSeen = true;
     this.state = 'play';
     GameRuntime.showOverlay(null);
     GameRuntime.resumeAudio();

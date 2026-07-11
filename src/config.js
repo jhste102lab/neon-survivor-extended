@@ -2,8 +2,9 @@
 // Game-wide configuration and balance constants.
 /* ---------------- 설정/밸런스 ---------------- */
 const CFG = {
-  ruleset: 'phase4-2026-06-30-late-fairness-patterns',
+  ruleset: 'final-dimension-2026-07-11',
   winTime: 600,            // 후반 루프/리더보드 기준 시간; 승리 팝업은 사용하지 않음
+  clearTime: 1200,         // 엔딩/트로피 기준 시간
   unlockTime: 300,         // 5분부터 진화/동료/추가 슬롯/이벤트 해금
   checkpointInterval: 300, // HUD의 다음 목적지 표시 간격
   weaponSlotInterval: 300, // 5분마다 무기 슬롯 확장
@@ -79,11 +80,11 @@ const CFG = {
     normalSlow: 0.30, specialSlow: 0.20, bossSlow: 0.08,
   },
   dimensionRift: {
-    enabled: true, firstCheck: 120, interval: 120, chance: 0.30, pityFails: 3,
-    offerLife: 28, offerRadius: 92, activeLife: 24, activeRadius: 122,
+    enabled: true, firstCheck: 120, guaranteedTime: 180, lastRandomCheck: 480, interval: 120, chance: 0.30,
+    offerLife: 36, offerRadius: 104,
   },
   dimensionAutoRift: {
-    enabled: true, start: 600, interval: 165, warn: 1.2, defer: 8,
+    enabled: false,
   },
   bombExecution: { normalStacks: 8 },
   bossFortifySpawn: { enabled: true, start: 600, duration: 16, cooldown: 34, armor: 0.35 },

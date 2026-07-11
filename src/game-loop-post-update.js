@@ -34,6 +34,14 @@ Object.assign(Game, {
     if (this.time >= CFG.winTime && !player.dead && !this.endless) this.enterEndlessLoop();
   },
 
+  showEndingIfReady(player) {
+    if (this.cleared20 || this.time < (CFG.clearTime || 1200) || player.dead) return;
+    if (this.isDimensionSpaceActive && this.isDimensionSpaceActive()) return;
+    if (this.activeEvent || this.levelQueue > 0 || this.state !== 'play') return;
+    this.cleared20 = true;
+    if (typeof UI !== 'undefined' && UI.win) UI.win();
+  },
+
   saveRunSnapshotIfDue() {
     if (typeof RunSnapshot !== 'undefined') RunSnapshot.schedule(this);
   },

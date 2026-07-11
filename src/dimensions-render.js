@@ -26,6 +26,38 @@ const DimensionPortalAssetCache = (() => {
   return { get };
 })();
 
+const DimensionVfxAssets = (() => {
+  const images = new Map(), tinted = new Map();
+  const root = 'assets/vfx/kenney-particle-pack/';
+  const byKind = Object.freeze({
+    core: 'nebula-smoke.png', generators: 'circuit-spark.png', anchors: 'gravity-ring.png',
+    duel: 'judgement-burst.png', nests: 'nebula-smoke.png', mirrors: 'mirror-window.png',
+    train: 'train-trace.png', casino: 'casino-symbol.png',
+  });
+  function imageFor(file) {
+    if (!file || typeof Image === 'undefined') return null;
+    if (!images.has(file)) { const img = new Image(); img.decoding = 'async'; img.src = root + file; images.set(file, img); }
+    return images.get(file);
+  }
+  function colored(file, color) {
+    const key = `${file}|${color}`, cached = tinted.get(key);
+    if (cached) return cached;
+    const img = imageFor(file);
+    if (!img || !img.complete || !img.naturalWidth || typeof document === 'undefined') return null;
+    const canvas = document.createElement('canvas'); canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+    const g = canvas.getContext('2d'); g.drawImage(img, 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = color; g.fillRect(0, 0, canvas.width, canvas.height);
+    tinted.set(key, canvas); return canvas;
+  }
+  return { colored, fileForKind: kind => byKind[kind] || byKind.core, portal: 'portal-twirl.png' };
+})();
+
+function drawDimensionVfx(ctx, file, color, x, y, size, rotation, alpha) {
+  const img = DimensionVfxAssets.colored(file, color);
+  if (!img) return false;
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rotation || 0); ctx.globalAlpha = alpha; ctx.drawImage(img, -size / 2, -size / 2, size, size); ctx.restore();
+  return true;
+}
+
 function drawDimensionPortalIcon(ctx, portal, fallback, x, y, size) {
   const img = DimensionPortalAssetCache.get(portal && portal.asset);
   if (img && img.complete && img.naturalWidth > 0) {
@@ -47,6 +79,10 @@ function drawDimensionPortalShape(ctx, portal, t, active = false) {
   ctx.save();
   ctx.translate(portal.x, portal.y);
   ctx.globalCompositeOperation = 'lighter';
+  ctx.restore();
+  ctx.save(); ctx.globalCompositeOperation = 'lighter';
+  drawDimensionVfx(ctx, DimensionVfxAssets.portal, color, portal.x, portal.y, r * 2.15, -t * 0.32 + (portal.phase || 0), active ? 0.42 : 0.28);
+  ctx.translate(portal.x, portal.y);
   ctx.strokeStyle = color;
   ctx.lineWidth = active ? 5 : 3;
   ctx.globalAlpha = 0.35 + pulse * 0.22;
@@ -119,21 +155,109 @@ function drawDimensionHub(ctx, dim, t) {
 function drawDimensionRoomBackdrop(ctx, dim, t) {
   if (!dim || dim.mode !== 'dimension') return;
   const def = dim.activeDef || {};
+  const kind = def.kind || 'core';
+  const pressure = typeof PerformanceBudget !== 'undefined' ? PerformanceBudget.visualPressure() : 0;
+  const count = pressure > 0.75 ? 7 : pressure > 0.4 ? 11 : 18;
+  const cam = Game.cam || { x: 0, y: 0 };
   ctx.save();
+  ctx.fillStyle = `${def.color || '#41f0ff'}12`;
+  ctx.fillRect(cam.x - 1300, cam.y - 900, 2600, 1800);
   ctx.globalCompositeOperation = 'lighter';
-  ctx.strokeStyle = def.color || '#41f0ff';
-  ctx.globalAlpha = 0.12;
-  for (let i = 0; i < 18; i++) {
-    const a = i / 18 * TAU + t * 0.05;
-    ctx.beginPath();
-    ctx.moveTo(Math.cos(a) * 120, Math.sin(a) * 120);
-    ctx.lineTo(Math.cos(a) * 980, Math.sin(a) * 980);
-    ctx.stroke();
+  ctx.strokeStyle = def.color || '#41f0ff'; ctx.fillStyle = def.accent || '#ff2bd6'; ctx.lineWidth = 2;
+  const texture = DimensionVfxAssets.fileForKind(kind);
+  const textureN = pressure > 0.72 ? 1 : kind === 'nests' ? 4 : 2;
+  for (let i = 0; i < textureN; i++) {
+    const a = i / textureN * TAU + t * (kind === 'train' ? 0 : 0.018);
+    const r = textureN === 1 ? 0 : 260 + i * 150;
+    drawDimensionVfx(ctx, texture, i % 2 ? def.accent : def.color, Math.cos(a) * r, Math.sin(a) * r, kind === 'train' ? 920 : 430 + i * 40, kind === 'train' ? -0.18 : a + t * 0.025, kind === 'nests' ? 0.075 : 0.105);
+  }
+  if (kind === 'core') {
+    ctx.globalAlpha = 0.14;
+    for (let i = 0; i < count; i++) {
+      const a = i / count * TAU + t * 0.04, inner = 120 + (i % 3) * 55;
+      ctx.beginPath(); ctx.moveTo(Math.cos(a) * inner, Math.sin(a) * inner); ctx.lineTo(Math.cos(a) * 1050, Math.sin(a) * 1050); ctx.stroke();
+    }
+  } else if (kind === 'generators') {
+    ctx.globalAlpha = 0.13;
+    for (let i = -count; i <= count; i += 2) {
+      const off = ((t * 34 + i * 93) % 950) - 475;
+      ctx.beginPath(); ctx.moveTo(-1150, off); ctx.lineTo(-260, off); ctx.lineTo(-180, off + 80); ctx.lineTo(1150, off + 80); ctx.stroke();
+    }
+  } else if (kind === 'anchors') {
+    ctx.globalAlpha = 0.15;
+    for (let i = 0; i < count; i++) {
+      const r = 110 + i * 72 + Math.sin(t * 1.4 + i) * 14;
+      ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.stroke();
+    }
+  } else if (kind === 'duel') {
+    ctx.globalAlpha = 0.18;
+    ctx.setLineDash([26, 18]);
+    ctx.beginPath(); ctx.moveTo(-1100, 0); ctx.lineTo(1100, 0); ctx.moveTo(0, -900); ctx.lineTo(0, 900); ctx.stroke(); ctx.setLineDash([]);
+    for (let i = 1; i < count / 2; i++) { ctx.strokeRect(-i * 95, -i * 62, i * 190, i * 124); }
+  } else if (kind === 'nests') {
+    ctx.globalAlpha = 0.12;
+    for (let i = 0; i < count; i++) {
+      const a = i * 2.399 + t * 0.025, r = 170 + (i % 6) * 145, size = 38 + (i % 4) * 18;
+      ctx.beginPath(); ctx.arc(Math.cos(a) * r, Math.sin(a) * r, size + Math.sin(t + i) * 5, 0, TAU); ctx.fill();
+    }
+  } else if (kind === 'mirrors') {
+    ctx.globalAlpha = 0.14;
+    for (let i = 0; i < count; i++) {
+      const a = i / count * TAU, r = 230 + (i % 4) * 175, s = 48 + (i % 3) * 18;
+      ctx.save(); ctx.translate(Math.cos(a) * r, Math.sin(a) * r); ctx.rotate(Math.PI / 4 + Math.sin(t * .4 + i) * .1); ctx.strokeRect(-s, -s, s * 2, s * 2); ctx.restore();
+    }
+  } else if (kind === 'train') {
+    ctx.globalAlpha = 0.15;
+    const shift = (t * 310) % 220;
+    for (let i = -count; i <= count; i++) {
+      const y = i * 90 + shift - 110;
+      ctx.beginPath(); ctx.moveTo(-1300, y); ctx.lineTo(1300, y - 360); ctx.stroke();
+    }
+  } else if (kind === 'casino') {
+    ctx.globalAlpha = 0.13;
+    const size = 150;
+    for (let y = -5; y <= 5; y++) for (let x = -7; x <= 7; x++) {
+      if ((x + y) % (pressure > .5 ? 3 : 2)) continue;
+      ctx.strokeRect(x * size + Math.sin(t + y) * 8, y * size, size - 12, size - 12);
+    }
   }
   ctx.globalAlpha = 0.16;
   ctx.strokeStyle = def.accent || '#ff2bd6';
   ctx.lineWidth = 3;
   ctx.beginPath(); ctx.arc(0, 0, 760 + Math.sin(t) * 12, 0, TAU); ctx.stroke();
+  ctx.restore();
+}
+
+function drawDimensionInteractionMarkers(ctx, dim, t) {
+  if (!dim || dim.mode !== 'dimension' || dim.introT > 0) return;
+  const def = dim.activeDef || {}, c = dim.challenge || {};
+  const objectives = Game.enemies.filter(e => e.dimensionObjective && e.hp > 0);
+  let targets = objectives;
+  if (def.kind === 'core' && objectives.some(e => e.dimensionKind === 'node')) targets = objectives.filter(e => e.dimensionKind === 'node');
+  else if (['generators', 'anchors', 'nests', 'mirrors'].includes(def.kind)) targets = objectives.filter(e => (e.dimensionSeq || 0) === (c.activeSeq || 0));
+  ctx.save(); ctx.globalCompositeOperation = 'lighter';
+  for (const e of targets) {
+    const pulse = 1 + Math.sin(t * 7 + (e.dimensionSeq || 0)) * .08;
+    ctx.strokeStyle = c.exposedT > 0 || !['anchors', 'nests', 'duel'].includes(def.kind) ? '#ffffff' : '#ffd23d';
+    ctx.lineWidth = 4; ctx.globalAlpha = .72; ctx.setLineDash([10, 7]);
+    ctx.beginPath(); ctx.arc(e.x, e.y, (e.r + 24) * pulse, 0, TAU); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  if (def.kind === 'train' && c.lane != null) {
+    const y = c.lane * 170;
+    ctx.globalAlpha = c.laneReady ? .18 : .1; ctx.fillStyle = c.laneReady ? '#7dffc1' : '#ffd23d'; ctx.fillRect(Game.cam.x - 900, y - 78, 1800, 156);
+    ctx.globalAlpha = .72; ctx.strokeStyle = c.laneReady ? '#7dffc1' : '#ffd23d'; ctx.lineWidth = 3; ctx.setLineDash([20, 14]); ctx.beginPath(); ctx.moveTo(Game.cam.x - 900, y); ctx.lineTo(Game.cam.x + 900, y); ctx.stroke();
+  }
+  if (def.kind === 'casino' && c.choosing) {
+    ctx.setLineDash([]); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (const option of c.contractOptions || []) {
+      const pulse = 1 + Math.sin(t * 5 + option.x) * .07;
+      ctx.globalAlpha = .2; ctx.fillStyle = option.color; ctx.beginPath(); ctx.arc(option.x, option.y, 72 * pulse, 0, TAU); ctx.fill();
+      ctx.globalAlpha = .9; ctx.strokeStyle = option.color; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(option.x, option.y, 72 * pulse, 0, TAU); ctx.stroke();
+      ctx.fillStyle = '#fff'; ctx.font = '900 15px "Jua",sans-serif'; ctx.fillText(option.name, option.x, option.y - 8);
+      ctx.fillStyle = option.color; ctx.font = '11px "Jua",sans-serif'; ctx.fillText(option.risk, option.x, option.y + 15);
+    }
+  }
   ctx.restore();
 }
 
@@ -143,6 +267,7 @@ Object.assign(Render, {
     if (!dim) return;
     const t = (dim.localTime || Game.time || 0);
     drawDimensionRoomBackdrop(ctx, dim, t);
+    drawDimensionInteractionMarkers(ctx, dim, t);
     drawDimensionEntryPortal(ctx, dim, t);
     drawDimensionHub(ctx, dim, t);
   },

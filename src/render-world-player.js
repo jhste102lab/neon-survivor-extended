@@ -18,6 +18,7 @@ const RenderWorldPlayer = (() => {
     drawPlayerInvulnerabilityRing(x, p, t, ms);
     drawPlayerOutline(x, p);
     drawPlayerDirection(x, p, ms);
+    drawTapDestination(x, t, ms);
     x.restore();
   }
 
@@ -75,6 +76,15 @@ const RenderWorldPlayer = (() => {
     x.beginPath();
     x.arc(p.x + Math.cos(ma) * 7, p.y + Math.sin(ma) * 7, 3 * ms, 0, TAU);
     x.fill();
+  }
+
+  function drawTapDestination(x, t, ms) {
+    const target = typeof Input !== 'undefined' ? Input.tapTarget : null;
+    if (!target) return;
+    const pulse = 1 + Math.sin(t * 8) * 0.12;
+    x.save(); x.translate(target.x, target.y); x.strokeStyle = '#9ff3ff'; x.globalAlpha = 0.72; x.lineWidth = 2 * ms;
+    x.beginPath(); x.arc(0, 0, 15 * pulse * ms, 0, TAU); x.stroke();
+    x.beginPath(); x.moveTo(-22 * ms, 0); x.lineTo(-10 * ms, 0); x.moveTo(22 * ms, 0); x.lineTo(10 * ms, 0); x.moveTo(0, -22 * ms); x.lineTo(0, -10 * ms); x.moveTo(0, 22 * ms); x.lineTo(0, 10 * ms); x.stroke(); x.restore();
   }
 
   return { drawPlayer };

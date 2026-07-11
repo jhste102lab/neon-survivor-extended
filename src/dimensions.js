@@ -118,7 +118,7 @@
       flash: 0, orbitCd: 0, boomCd: 0, novaId: 0, slowT: 0, slowK: 0, elite: !!opts.elite, boss: !!opts.boss,
       shootT: rand(1, 2.5), wobble: rand(0, TAU), age: 0,
       dimensionEnemy: true, dimensionObjective: !!opts.objective, dimensionStatic: !!opts.static, dimensionNoRewards: !!opts.noRewards,
-      dimensionContact: !!opts.contact, dimensionKind: opts.kind || '', label: opts.label || '', bossDef: opts.bossDef || null,
+      dimensionContact: !!opts.contact, dimensionKind: opts.kind || '', dimensionSeq: Number(opts.dimensionSeq || 0), label: opts.label || '', bossDef: opts.bossDef || null,
     };
   }
 
@@ -127,7 +127,7 @@
     const base = rand(0, TAU);
     for (let i = 0; i < count; i++) {
       const a = base + i / count * TAU;
-      const e = dimensionEnemy(def, { ...opts, x: Math.cos(a) * radius, y: Math.sin(a) * radius });
+      const e = dimensionEnemy(def, { ...opts, dimensionSeq: i, x: Math.cos(a) * radius, y: Math.sin(a) * radius });
       game.enemies.push(e);
       list.push(e);
     }
@@ -179,8 +179,10 @@
   function spawnRoomLayout(game, def, diff) {
     const dim = game.dimension;
     const d = diff.value;
-    const hpMul = 1 + (d - 1) * 0.35;
-    dim.challenge = { id: def.id, kind: def.kind, progress: 0, target: def.target, patternT: 1.4, waveT: 2.2, round: 0, objectiveTotal: def.target, objectiveKilled: 0, lastLowHpDropT: -999, contract: null };
+    const accessK = clamp(game.time / CFG.winTime, 0.55, 1);
+    const hpMul = (1 + (d - 1) * 0.35) * accessK;
+    dim.introT = 4.2;
+    dim.challenge = { id: def.id, kind: def.kind, progress: 0, target: def.target, patternT: 1.4, waveT: 2.2, round: 0, objectiveTotal: def.target, objectiveKilled: 0, activeSeq: 0, interactionCharge: 0, exposedT: 0, ruleT: 3.5, rule: 'move', lastLowHpDropT: -999, contract: null };
     emptyWorld(game);
     game.player.x = 0; game.player.y = 220; game.cam.x = 0; game.cam.y = 0;
     if (def.kind === 'core') {
@@ -228,17 +230,26 @@
   function spawnCasinoRound(game, def, hpMul) {
     const dim = game.dimension;
     const c = dim.challenge;
-    c.round += 1;
-    const contracts = [
+    c.choosing = true;
+    c.contract = null;
+    c.contractOptions = [
       { name: '안전 배당', risk: '적 체력 +10%', reward: '회복 드롭 보정', hp: 1.1, bullets: 0.85, color: '#7dffc1' },
       { name: '고위험 잭팟', risk: '탄막 +35%', reward: '점수 크게 증가', hp: 1.0, bullets: 1.35, color: '#ffd23d' },
       { name: '피의 판돈', risk: '현재 체력 -10%', reward: '이번 라운드 피해 보정', hp: 0.85, bullets: 1.05, color: '#ff4d5e', selfDamage: 0.10 },
-    ];
-    c.contract = pick(contracts);
+    ].map((contract, index) => ({ ...contract, x: (index - 1) * 220, y: 80 }));
+    c.roundHpMul = hpMul;
+  }
+
+  function startCasinoRound(game, def, c, contract) {
+    c.choosing = false;
+    c.contractOptions = [];
+    c.contract = contract;
+    c.round += 1;
     if (c.contract.selfDamage) game.player.hp = Math.max(1, game.player.hp - game.stat().maxHp * c.contract.selfDamage);
     GameRuntime.banner(`${c.contract.name}: ${c.contract.risk} / ${c.contract.reward}`, 'info');
-    spawnDimensionWave(game, def, 10 + c.round * 3, hpMul * c.contract.hp, 'casino');
-    game.enemies.push(dimensionEnemy(def, { x: 0, y: -260, r: 36, hp: (2200 + c.round * 600) * hpMul * c.contract.hp, objective: true, static: true, noRewards: true, kind: 'contract-core', shape: 'hex', color: c.contract.color }));
+    spawnDimensionWave(game, def, 10 + c.round * 3, c.roundHpMul * c.contract.hp, 'casino');
+    game.enemies.push(dimensionEnemy(def, { x: 0, y: -260, r: 36, hp: (2200 + c.round * 600) * c.roundHpMul * c.contract.hp, objective: true, static: true, noRewards: true, kind: 'contract-core', shape: 'hex', color: c.contract.color }));
+    Grid.rebuild(game.enemies);
   }
 
   function applyEntrySafety(game) {
@@ -363,10 +374,10 @@
       if (typeof RunSnapshot !== 'undefined') RunSnapshot.save(this, { force: true });
     },
 
-    enterAutomaticDimensionRift() {
+    enterAutomaticDimensionRift(id = '') {
       const dim = ensureDimensionState(this);
       if (dim.mode !== 'external' || this.isDimensionSpaceActive()) return false;
-      const def = pick(DIMENSIONS);
+      const def = dimensionById(id) || pick(DIMENSIONS);
       if (!def) return false;
       dim.external = takeWorldSnapshot(this);
       dim.externalPlayer = { x: this.player.x, y: this.player.y, camX: this.cam.x, camY: this.cam.y };
@@ -374,7 +385,6 @@
       applyEntrySafety(this);
       spawnRoomLayout(this, def, dimensionDifficulty(this, def));
       if (this.metrics) this.metrics.dimensionRiftStarts = (this.metrics.dimensionRiftStarts || 0) + 1;
-      GameRuntime.banner(`차원균열 — ${def.name} 낙하`, 'warn');
       if (typeof RunSnapshot !== 'undefined') RunSnapshot.save(this, { force: true });
       return true;
     },
@@ -423,7 +433,8 @@
       if (!autoRift) dim.completed[def.id] = true;
       const relic = relicFor(def.relic);
       if (relic) dim.relics[relic.id] = true;
-      dim.pendingReward = { def, relic, choices: rewardChoicesForDimension() };
+      const choices = typeof UpgradeRules !== 'undefined' ? UpgradeRules.generateChoices(this).slice(0, 2) : [];
+      dim.pendingReward = { def, relic, choices };
       emptyWorld(this);
       if (autoRift) {
         copyArraysFromSnapshot(this, dim.external || {});
@@ -452,14 +463,19 @@
       const dim = ensureDimensionState(this);
       const reward = dim.pendingReward;
       if (!reward || !reward.choices || !reward.choices.length) return;
-      const choices = reward.choices.map(card => ({ kind: 'dimensionReward', id: card.id, card }));
-      if (typeof UI !== 'undefined' && UI.showDimensionRewardCards) UI.showDimensionRewardCards(choices, reward.def.name);
-      else applyDimensionRewardCard(this, reward.choices[0]);
+      if (typeof UI !== 'undefined' && UI.showDimensionRewardCards) {
+        const shown = UI.showDimensionRewardCards(reward.choices, reward.def.name);
+        if (shown !== false) return;
+      }
+      if (reward.choices[0]) this.applyUpgrade(reward.choices[0]);
+      dim.pendingReward = null;
+      this.state = 'play';
     },
 
     pickDimensionReward(choice) {
-      if (!choice || !choice.card) return false;
-      applyDimensionRewardCard(this, choice.card);
+      if (!choice) return false;
+      const applied = this.applyUpgrade(choice);
+      if (!applied) return false;
       this.dimension.pendingReward = null;
       return true;
     },
@@ -512,6 +528,7 @@
     runDimensionFrame(dt, rdt) {
       const dim = ensureDimensionState(this);
       dim.localTime += dt;
+      dim.introT = Math.max(0, (dim.introT || 0) - dt);
       const st = this.cacheFrameStats();
       this.refreshWeaponSlotCap(this.player);
       const mv = this.updatePlayerMovement(dt, st);
@@ -519,7 +536,7 @@
       this.updatePlayerRegen(dt, st);
       this.updatePlayerTrail(dt, mv);
       this.updateCompanionRuntime(dt, st);
-      if (dim.mode === 'dimension') {
+      if (dim.mode === 'dimension' && !(dim.introT > 0)) {
         this.fireReadyWeaponCooldowns(dt, st);
         this.updatePersistentWeaponEffects(dt, st);
       }
@@ -533,7 +550,7 @@
     updateDimensionWorld(dt, st) {
       const dim = ensureDimensionState(this);
       if (dim.mode === 'hub') this.updateDimensionHub(dt);
-      else if (dim.mode === 'dimension') this.updateDimensionRoom(dt, st);
+      else if (dim.mode === 'dimension' && !(dim.introT > 0)) this.updateDimensionRoom(dt, st);
       else if (dim.mode === 'collapse') { dim.collapseT -= dt; if (dim.collapseT <= 0) this.finishDimensionCollapse(); }
       this.updateDimensionRelics(dt, st);
       if (dim.mode !== 'collapse') {
@@ -561,6 +578,8 @@
       const c = dim.challenge;
       if (!def || !c) return;
       this.updateDimensionSafetyDrops(dt);
+      this.updateDimensionInteraction(dt, def, c);
+      if (def.kind === 'casino' && c.choosing) return;
       this.updateDimensionPatterns(dt, def, c);
       const objectiveAlive = challengeTargetsAlive(this);
       const killed = Math.max(0, c.objectiveTotal - objectiveAlive);
@@ -577,6 +596,58 @@
         return;
       }
       if (objectiveAlive <= 0) this.completeDimensionRoom();
+    },
+
+    updateDimensionInteraction(dt, def, c) {
+      const objectives = this.enemies.filter(e => e.dimensionObjective && e.hp > 0).sort((a, b) => (a.dimensionSeq || 0) - (b.dimensionSeq || 0));
+      for (const e of this.enemies) e.dimensionTargetPriority = false;
+      const p = this.player;
+      c.exposedT = Math.max(0, (c.exposedT || 0) - dt);
+      if (def.kind === 'core') {
+        const nodes = objectives.filter(e => e.dimensionKind === 'node');
+        for (const e of nodes.length ? nodes : objectives.filter(e => e.dimensionKind === 'core')) e.dimensionTargetPriority = true;
+        c.action = objectives.some(e => e.dimensionKind === 'node') ? '외곽 노드를 먼저 파괴하세요' : '코어 노출 · 지금 공격하세요';
+      } else if (def.kind === 'generators' || def.kind === 'mirrors') {
+        const active = objectives.find(e => (e.dimensionSeq || 0) === (c.activeSeq || 0)) || objectives[0];
+        if (active) c.activeSeq = active.dimensionSeq || 0;
+        if (active) active.dimensionTargetPriority = true;
+        c.action = def.kind === 'mirrors' ? '빛나는 진짜 거울핵만 공격하세요' : `활성 발전기 ${Math.min((c.activeSeq || 0) + 1, c.target)}/${c.target}`;
+      } else if (def.kind === 'anchors' || def.kind === 'nests') {
+        const active = objectives.find(e => (e.dimensionSeq || 0) === (c.activeSeq || 0)) || objectives[0];
+        if (!active) return;
+        if (c.interactionSeq !== active.dimensionSeq) { c.interactionSeq = active.dimensionSeq; c.interactionCharge = 0; c.exposedT = 0; }
+        c.activeSeq = active.dimensionSeq || 0;
+        active.dimensionTargetPriority = true;
+        const inside = dist2(p.x, p.y, active.x, active.y) < (active.r + 105) ** 2;
+        c.interactionCharge = clamp((c.interactionCharge || 0) + (inside ? dt : -dt * 0.65), 0, 2.4);
+        if (c.interactionCharge >= 2.4) c.exposedT = Math.max(c.exposedT, 8);
+        c.action = c.exposedT > 0 ? '과부하 완료 · 지금 파괴하세요' : `${def.kind === 'anchors' ? '중력 앵커' : '정화 둥지'} 근처에서 충전 ${Math.round(c.interactionCharge / 2.4 * 100)}%`;
+      } else if (def.kind === 'duel') {
+        if (objectives[0]) objectives[0].dimensionTargetPriority = true;
+        c.ruleT -= dt;
+        const moving = Math.hypot(p.moveX || 0, p.moveY || 0) > 0.2 && p.moving;
+        const obeying = c.rule === 'move' ? moving : !moving;
+        c.ruleHold = clamp((c.ruleHold || 0) + (obeying ? dt : -dt * 1.5), 0, 1.6);
+        if (c.ruleHold >= 1.6) { c.exposedT = Math.max(c.exposedT, 7); c.ruleHold = 0; c.ruleT = 7; c.rule = c.rule === 'move' ? 'stop' : 'move'; }
+        if (c.ruleT <= 0) { c.ruleT = 4.5; c.rule = c.rule === 'move' ? 'stop' : 'move'; c.ruleHold = 0; }
+        c.action = c.exposedT > 0 ? '판결 파훼 · 심판자를 공격하세요' : (c.rule === 'move' ? '판결: 계속 이동하세요' : '판결: 움직이지 마세요');
+      } else if (def.kind === 'train') {
+        for (const e of objectives) e.dimensionTargetPriority = true;
+        if (c.lane == null || c.laneT <= 0) { c.lane = randi(-1, 1); c.laneT = 7; }
+        c.laneT -= dt;
+        const laneY = c.lane * 170;
+        c.laneReady = Math.abs(p.y - laneY) < 82;
+        c.action = c.laneReady ? '사격선 확보 · 강습선을 공격하세요' : `${c.lane < 0 ? '위' : c.lane > 0 ? '아래' : '중앙'} 차선으로 이동하세요`;
+      } else if (def.kind === 'casino') {
+        if (c.choosing) {
+          const selected = (c.contractOptions || []).find(option => dist2(p.x, p.y, option.x, option.y) < 82 ** 2);
+          if (selected) startCasinoRound(this, def, c, selected);
+          c.action = '세 계약 중 하나의 문으로 이동하세요';
+        } else {
+          for (const e of objectives) e.dimensionTargetPriority = true;
+          c.action = `${c.contract ? c.contract.name : '계약 확인'} · 계약 코어를 파괴하세요`;
+        }
+      }
     },
 
     updateDimensionPatterns(dt, def, c) {
@@ -706,6 +777,13 @@
     dimensionDamageMultiplierForEnemy(e) {
       const dim = ensureDimensionState(this);
       let mul = 1 + ((dim.bonuses && dim.bonuses.weaponPower) || 0);
+      const def = dim.activeDef, c = dim.challenge;
+      if (def && c && e.dimensionObjective) {
+        if (def.kind === 'core' && e.dimensionKind === 'core' && this.enemies.some(other => other.dimensionKind === 'node' && other.hp > 0)) mul *= 0.03;
+        else if (['generators', 'mirrors'].includes(def.kind) && (e.dimensionSeq || 0) !== (c.activeSeq || 0)) mul *= 0.03;
+        else if (['anchors', 'nests', 'duel'].includes(def.kind) && !(c.exposedT > 0)) mul *= 0.03;
+        else if (def.kind === 'train' && !c.laneReady) mul *= 0.08;
+      }
       if ((e.boss || e.elite) && dim.relics && dim.relics.verdict_mark) mul *= 1.12;
       if ((e.boss || e.elite) && dim.bonuses && dim.bonuses.bossDamage) mul *= 1 + dim.bonuses.bossDamage;
       if (dim.activeDef && dim.activeDef.kind === 'casino' && dim.challenge && dim.challenge.contract && dim.challenge.contract.name === '피의 판돈') mul *= 1.10;
@@ -731,6 +809,11 @@
       if (def.kind === 'casino') return `계약 라운드 ${Math.min(c.round, c.target)}/${c.target}`;
       if (def.kind === 'train') return `강습 웨이브 ${Math.min(c.progress + 1, c.target)}/${c.target}`;
       return `${def.objectiveLabel} ${Math.min(c.objectiveKilled || 0, c.objectiveTotal)}/${c.objectiveTotal}`;
+    },
+
+    dimensionActionText() {
+      const dim = ensureDimensionState(this);
+      return dim.challenge && dim.challenge.action || '';
     },
   });
 })();

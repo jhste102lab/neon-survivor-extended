@@ -55,7 +55,7 @@ const LeaderboardEntry = {
 
   normalizeRunSettings(raw) {
     if (!raw || typeof raw !== 'object') return null;
-    const weaponCap = ['default', '10', '15', '20', 'all'].includes(String(raw.weaponCap)) ? String(raw.weaponCap) : 'default';
+    const weaponCap = ['default', '60pct'].includes(String(raw.weaponCap)) ? String(raw.weaponCap) : 'default';
     const enemyMode = raw.enemyMode === 'half' ? 'half' : 'default';
     const dropFilters = raw.dropFilters && typeof raw.dropFilters === 'object' ? raw.dropFilters : {};
     return {
@@ -107,6 +107,8 @@ const LeaderboardEntry = {
       bossesKilled: Math.round(this.num(raw.bossesKilled, 0, 10000, 0)),
       specialKills: raw.specialKills && typeof raw.specialKills === 'object' ? { ...raw.specialKills } : {},
       build: this.normalizeBuildSnapshot(raw.build),
+      cleared20: !!raw.cleared20 && time >= (CFG.clearTime || 1200),
+      clearTime: !!raw.cleared20 && time >= (CFG.clearTime || 1200) ? (CFG.clearTime || 1200) : 0,
     };
     return entry.time > 0 ? entry : null;
   },
@@ -156,6 +158,8 @@ const LeaderboardEntry = {
       eventSuccess: Game.metrics ? Game.metrics.eventSuccess || 0 : 0,
       bossesKilled: Game.metrics ? Game.metrics.bossesKilled || 0 : 0,
       specialKills: Game.metrics ? { ...(Game.metrics.specialKills || {}) } : {},
+      cleared20: !!Game.cleared20,
+      clearTime: Game.cleared20 ? (CFG.clearTime || 1200) : 0,
       build: this.buildSnapshotFromGame(Game),
     });
   },

@@ -26,13 +26,23 @@ Object.assign(UI, {
   },
 
   showDimensionRewardCards(choices, sourceLabel = '') {
-    if (!choices || !choices.length) return;
-    this.rewardCardMode = true;
-    this.choices = choices;
-    Game.state = 'levelup';
-    this.setLevelOverlayCopy('event.rewardTitle', `${sourceLabel} 정복 보너스 선택`);
-    this.renderChoiceCards(this.choices);
-    showOverlay('lvOv');
+    if (!choices || !choices.length) return false;
+    try {
+      this.rewardCardMode = true;
+      this.choices = choices;
+      this.setLevelOverlayCopy('event.rewardTitle', `${sourceLabel} 정복 보너스 선택`);
+      this.renderChoiceCards(this.choices);
+      Game.state = 'levelup';
+      showOverlay('lvOv');
+      return true;
+    } catch (error) {
+      this.rewardCardMode = false;
+      this.choices = [];
+      Game.state = 'play';
+      showOverlay(null);
+      GameRuntime.banner('보상 화면 복구 · 게임을 계속합니다', 'warn');
+      return false;
+    }
   },
 
   showRewardCard(choice, sourceLabel = '') {
@@ -99,6 +109,7 @@ Object.assign(UI, {
     Game.slotsDirty = true;
     if (rewardMode) {
       this.rewardCardMode = false;
+      if (Game.dimension) Game.dimension.pendingReward = null;
       showOverlay(null);
       Game.state = 'play';
       if (Game.levelQueue > 0) GameRuntime.scheduleLevelUpPrompt(Game, 80);

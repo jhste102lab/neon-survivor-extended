@@ -19,7 +19,7 @@ function lbPassiveName(id) {
 function lbSettingsLabel(settings) {
   if (!settings) return '기본';
   const parts = [];
-  if (settings.weaponCap && settings.weaponCap !== 'default') parts.push(`무기 ${settings.weaponCap === 'all' ? '전체' : settings.weaponCap}`);
+  if (settings.weaponCap && settings.weaponCap !== 'default') parts.push(settings.weaponCap === '60pct' ? '무기 60%' : `무기 ${settings.weaponCap}`);
   if (settings.weaponCapBonusDamage > 0) parts.push(`화력 +${settings.weaponCapBonusDamage}%`);
   if (settings.enemyMode === 'half') parts.push('몹 50% · 스탯 1.8배');
   const drops = settings.dropFilters || {};
@@ -55,7 +55,7 @@ Object.assign(UI, {
     const drops = Object.entries(b.drops || {}).map(([k, v]) => ({ source: k, value: v })).filter(x => x.value > 0);
     const recent = (b.recentDamage || []).map(d => ({ source: `${typeof SourceLabels !== 'undefined' ? SourceLabels.damageKind(d.kind) : (d.kind || 'hit')} · ${typeof SourceLabels !== 'undefined' ? SourceLabels.combatSource(d.source) : d.source}`, value: d.damage }));
     return `
-      <div class="lbDetailSummary">${lbEscape(entry.name)} · ${fmtTime(entry.time)} · Lv.${entry.level} · ${entry.kills}킬</div>
+      <div class="lbDetailSummary">${entry.cleared20 ? '<span class="lbClearSeal">🏆 20분 클리어</span>' : ''}${lbEscape(entry.name)} · ${fmtTime(entry.time)} · Lv.${entry.level} · ${entry.kills}킬</div>
       <div class="lbDetailSection"><b>런 설정</b><div><span>${lbEscape(lbSettingsLabel(b.settings))}</span><em>${b.settings && (b.settings.enemyMode === 'half' || b.settings.weaponCap !== 'default') ? '커스텀' : '기본'}</em></div></div>
       ${b.fieldTest ? '<div class="lbDetailWarn">FIELD TEST RUN · leaderboard upload disabled</div>' : ''}
       <div class="lbDetailSection"><b>무기</b><div class="lbPills">${weapons || '<span class="lbMuted">없음</span>'}</div></div>
@@ -131,12 +131,19 @@ Object.assign(UI, {
       row.setAttribute('role', 'button');
       const isMine = !!((highlightRunId && e.runId === highlightRunId) || (!highlightRunId && highlightName && e.name === highlightName));
       row.classList.toggle('me', isMine);
+      row.classList.toggle('cleared20', !!e.cleared20);
       const rank = document.createElement('span');
       rank.className = 'lbRank';
       rank.textContent = `#${i + 1}`;
       const name = document.createElement('span');
       name.className = 'lbName';
       name.textContent = e.name;
+      if (e.cleared20) {
+        const trophy = document.createElement('span');
+        trophy.className = 'lbTrophy';
+        trophy.textContent = '🏆 20M';
+        name.appendChild(trophy);
+      }
       if (isMine) name.setAttribute('title', `#${i + 1}`);
       const stat = document.createElement('span');
       stat.className = 'lbStat';

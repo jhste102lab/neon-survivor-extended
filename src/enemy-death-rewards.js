@@ -117,6 +117,7 @@
 
       if (e.boss) {
         grantBossRewards(this, e);
+        if (this.time >= CFG.winTime && this.offerFinalDimensionRift) this.offerFinalDimensionRift(e.x, e.y);
         if (e.dimensionGatekeeper && this.openDimensionHubPortal) this.openDimensionHubPortal(e.x, e.y);
       } else if (e.elite) {
         this.spawnDrop('chest', e.x, e.y);

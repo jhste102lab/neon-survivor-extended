@@ -51,7 +51,7 @@ function cleanRows(value, maxRows = 5) {
 function cleanRunSettings(value) {
   if (!value || typeof value !== 'object') return null;
   const weaponCapRaw = String(value.weaponCap || 'default');
-  const weaponCap = ['default', '10', '15', '20', 'all'].includes(weaponCapRaw) ? weaponCapRaw : 'default';
+  const weaponCap = ['default', '60pct'].includes(weaponCapRaw) ? weaponCapRaw : 'default';
   const enemyMode = value.enemyMode === 'half' ? 'half' : 'default';
   const dropFilters = value.dropFilters && typeof value.dropFilters === 'object' ? value.dropFilters : {};
   return {
@@ -103,6 +103,7 @@ export function normalizeEntry(raw, stamp = '') {
   const time = boundedNumber(raw.time, 0, 21600, 0);
   if (!runId || !name || time <= 0) return null;
 
+  const cleared20 = !!raw.cleared20 && time >= 1200;
   return {
     runId,
     name,
@@ -121,5 +122,7 @@ export function normalizeEntry(raw, stamp = '') {
     bossesKilled: Math.round(boundedNumber(raw.bossesKilled, 0, 10000, 0)),
     specialKills: cleanSpecialKills(raw.specialKills),
     build: cleanBuildSnapshot(raw.build),
+    cleared20,
+    clearTime: cleared20 ? 1200 : 0,
   };
 }

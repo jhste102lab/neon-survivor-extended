@@ -1,4 +1,4 @@
-export const RULESET = 'phase4-2026-06-30-late-fairness-patterns';
+export const RULESET = 'final-dimension-2026-07-11';
 export const WIN_TIME_SECONDS = 600;
 export const MAX_CLIENT_TIME_SCALE = 3;
 export const SESSION_TIME_GRACE_SECONDS = 10;
