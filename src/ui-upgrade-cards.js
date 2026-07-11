@@ -99,6 +99,7 @@ Object.assign(UI, {
     Game.slotsDirty = true;
     if (rewardMode) {
       this.rewardCardMode = false;
+      if (Game.dimension) Game.dimension.pendingReward = null;
       showOverlay(null);
       Game.state = 'play';
       if (Game.levelQueue > 0) GameRuntime.scheduleLevelUpPrompt(Game, 80);

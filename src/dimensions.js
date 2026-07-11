@@ -363,10 +363,10 @@
       if (typeof RunSnapshot !== 'undefined') RunSnapshot.save(this, { force: true });
     },
 
-    enterAutomaticDimensionRift() {
+    enterAutomaticDimensionRift(id = '') {
       const dim = ensureDimensionState(this);
       if (dim.mode !== 'external' || this.isDimensionSpaceActive()) return false;
-      const def = pick(DIMENSIONS);
+      const def = dimensionById(id) || pick(DIMENSIONS);
       if (!def) return false;
       dim.external = takeWorldSnapshot(this);
       dim.externalPlayer = { x: this.player.x, y: this.player.y, camX: this.cam.x, camY: this.cam.y };
@@ -423,7 +423,8 @@
       if (!autoRift) dim.completed[def.id] = true;
       const relic = relicFor(def.relic);
       if (relic) dim.relics[relic.id] = true;
-      dim.pendingReward = { def, relic, choices: rewardChoicesForDimension() };
+      const choices = typeof UpgradeRules !== 'undefined' ? UpgradeRules.generateChoices(this).slice(0, 2) : [];
+      dim.pendingReward = { def, relic, choices };
       emptyWorld(this);
       if (autoRift) {
         copyArraysFromSnapshot(this, dim.external || {});
@@ -452,14 +453,14 @@
       const dim = ensureDimensionState(this);
       const reward = dim.pendingReward;
       if (!reward || !reward.choices || !reward.choices.length) return;
-      const choices = reward.choices.map(card => ({ kind: 'dimensionReward', id: card.id, card }));
-      if (typeof UI !== 'undefined' && UI.showDimensionRewardCards) UI.showDimensionRewardCards(choices, reward.def.name);
-      else applyDimensionRewardCard(this, reward.choices[0]);
+      if (typeof UI !== 'undefined' && UI.showDimensionRewardCards) UI.showDimensionRewardCards(reward.choices, reward.def.name);
+      else if (reward.choices[0]) this.applyUpgrade(reward.choices[0]);
     },
 
     pickDimensionReward(choice) {
-      if (!choice || !choice.card) return false;
-      applyDimensionRewardCard(this, choice.card);
+      if (!choice) return false;
+      const applied = this.applyUpgrade(choice);
+      if (!applied) return false;
       this.dimension.pendingReward = null;
       return true;
     },

@@ -12,7 +12,7 @@ const GameLoopPhases = (() => {
     'cacheFrameStats', 'refreshWeaponSlotCap', 'updatePlayerMovement', 'updateIdlePressure',
     'updatePlayerInvulnerability', 'updatePlayerRegen', 'updatePlayerTrail', 'updateCompanionRuntime',
     'fireReadyWeaponCooldowns', 'updatePersistentWeaponEffects', 'updateDeathTransition', 'updateWorldSystems',
-    'updateComboTimer', 'updateCameraFollow', 'updateMusicIntensity', 'showUnlockNotificationIfReady', 'enterEndlessIfReady', 'saveRunSnapshotIfDue',
+    'updateComboTimer', 'updateCameraFollow', 'updateMusicIntensity', 'showUnlockNotificationIfReady', 'enterEndlessIfReady', 'showEndingIfReady', 'saveRunSnapshotIfDue',
   ]);
 
   function assertPlayHelpers(game) {
@@ -42,6 +42,7 @@ const GameLoopPhases = (() => {
     game.showUnlockNotificationIfReady(player);
     if (game.updateLateFairnessRewards) game.updateLateFairnessRewards(dt);
     game.enterEndlessIfReady(player);
+    game.showEndingIfReady(player);
     game.saveRunSnapshotIfDue();
   }
 

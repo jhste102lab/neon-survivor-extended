@@ -176,9 +176,21 @@
 </div>
 
 <div id="winOv" class="overlay hide">
-  <div class="panel">
-    <h2 class="ovtitle" data-i18n="win.title">🏆 LATE LOOP</h2>
-    <div style="color:#cfe6ff;margin-bottom:6px" data-i18n="win.message">This build keeps going without a fixed victory time.</div>
+  <div class="panel endingPanel">
+    <div class="endingCurtain endingCurtainLeft" aria-hidden="true"></div>
+    <div class="endingCurtain endingCurtainRight" aria-hidden="true"></div>
+    <div class="endingStarfield" aria-hidden="true"></div>
+    <div class="endingSun" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="endingHalo" aria-hidden="true"></div>
+    <div class="endingContent">
+      <div class="endingEyebrow">SURVIVOR ARCHIVE · RUN COMPLETE</div>
+      <div class="endingTime" aria-label="20분 생존">20:00</div>
+      <h2 class="ovtitle endingTitle">NEON DAWN</h2>
+      <div class="endingRule"><span></span><b>✦</b><span></span></div>
+      <div class="endingCopy">차원의 파동이 멎고, 마침내 도시의 새벽이 열렸습니다.<br>당신의 생존 기록은 사라지지 않습니다.</div>
+      <div class="endingTrophy">🏆 <b>TWENTY MINUTE SURVIVOR</b><small>리더보드 영구 트로피 획득</small></div>
+      <div class="endingCredits"><span>A GAME FOR THE LAST SURVIVOR</span><b>NEON SURVIVOR</b><em>끝까지 살아남은 당신에게</em></div>
+    </div>
     <div class="newbest hide" id="nbWin" data-i18n="record.newBest">🏆 New Record!</div>
     <div class="statgrid" id="winStats"></div>
     <div class="leaderboard resultLb" id="winLeaderboard"></div>

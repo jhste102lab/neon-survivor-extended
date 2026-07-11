@@ -1,5 +1,5 @@
 'use strict';
-// Field event state machine plus early random dimension rift scheduler.
+// Field event state machine plus opt-in random dimension portal scheduler.
 Object.assign(Game, {
   eventDelay() {
     return rand(72, 108) * (this.endless ? 1 : 1.15);
@@ -42,19 +42,33 @@ Object.assign(Game, {
 
   updateDimensionRiftOfferSchedule() {
     const cfg = CFG.dimensionRift || {};
-    if (cfg.enabled === false || this.activeEvent || this.time < (this.nextDimensionRiftT || cfg.firstCheck || 120)) return;
+    const due = this.nextDimensionRiftT || cfg.firstCheck || 120;
+    if (cfg.enabled === false || this.finalDimensionRiftOffered || this.activeEvent || this.time < due) return;
+    if (due > (cfg.lastRandomCheck || 480)) return;
     if (this.eventSpawnBlocked()) { this.nextDimensionRiftT = this.time + 10; return; }
-    const fails = Math.max(0, this.dimensionRiftFails || 0);
-    const pity = fails >= (cfg.pityFails || 3);
-    const success = pity || RNG.next() < (cfg.chance || 0.3);
-    this.nextDimensionRiftT = this.time + (cfg.interval || 120);
-    if (!success) { this.dimensionRiftFails = fails + 1; return; }
-    this.dimensionRiftFails = 0;
-    this.spawnEventOffer('rift', { dimension: DimensionRiftRules.pick().id, scheduledRift: true });
+    this.nextDimensionRiftT = due + (cfg.interval || 120);
+    if (RNG.next() >= (cfg.chance || 0.3)) return;
+    this.spawnDimensionPortal(false);
+  },
+
+  spawnDimensionPortal(final = false, x = null, y = null) {
+    if (this.activeEvent || !Array.isArray(DIMENSIONS) || !DIMENSIONS.length) return false;
+    const def = pick(DIMENSIONS);
+    this.spawnEventOffer('rift', { dimension: def.id, scheduledRift: true, final, x, y });
+    if (final) this.finalDimensionRiftOffered = true;
+    return true;
+  },
+
+  offerFinalDimensionRift(x, y) {
+    if (this.finalDimensionRiftOffered) return false;
+    if (this.activeEvent) this.activeEvent = null;
+    return this.spawnDimensionPortal(true, x, y);
   },
 
   eventDisplayInfo(ev) {
     if (ev && ev.type === 'rift' && typeof DimensionRiftRules !== 'undefined') {
+      const full = typeof DIMENSIONS !== 'undefined' && DIMENSIONS.find(def => def.id === ev.dimension);
+      if (full) return { icon: full.icon, name: `${full.name} 차원 균열`, color: full.color };
       const dim = DimensionRiftRules.get(ev.dimension);
       return { icon: dim.icon, name: dim.name, color: dim.color };
     }
@@ -74,7 +88,8 @@ Object.assign(Game, {
       state: 'offer', type: selectedType,
       dimension: selectedType === 'rift' ? (opts.dimension || (typeof DimensionRiftRules !== 'undefined' ? DimensionRiftRules.pick().id : 'archive')) : '',
       scheduledRift: !!opts.scheduledRift,
-      x: p.x + Math.cos(a) * d, y: p.y + Math.sin(a) * d,
+      x: Number.isFinite(opts.x) ? opts.x : p.x + Math.cos(a) * d,
+      y: Number.isFinite(opts.y) ? opts.y : p.y + Math.sin(a) * d,
       r: offerRadius, life: offerLife, maxLife: offerLife, hold: 0, pulse: 0,
     };
     this.metrics.eventOffers++;
@@ -83,6 +98,12 @@ Object.assign(Game, {
   },
 
   activateEvent(ev) {
+    if (ev.type === 'rift' && ev.scheduledRift && this.enterAutomaticDimensionRift) {
+      const dimensionId = ev.dimension;
+      this.activeEvent = null;
+      this.enterAutomaticDimensionRift(dimensionId);
+      return;
+    }
     ev.state = 'active';
     ev.startedAt = this.time;
     ev.pulse = 0;

@@ -3,7 +3,7 @@
 const RunSettings = {
   key: 'ns_run_settings_v1',
   defaults: Object.freeze({ weaponCap: 'default', enemyMode: 'default', slotHudCollapsed: false }),
-  weaponCapOptions: Object.freeze(['default', '10', '15', '20', 'all']),
+  weaponCapOptions: Object.freeze(['default', '60pct']),
   enemyModeOptions: Object.freeze(['default', 'half']),
 
   normalize(raw = {}) {
@@ -35,13 +35,19 @@ const RunSettings = {
       weaponCapBonusCount: 0,
       weaponCapBonusDamage: 0,
       weaponCapBonusThresholds: [],
+      weaponCapResolved: this.resolveWeaponCap(s.weaponCap),
     };
   },
 
   selectedWeaponCap(game) {
     const cap = String(game && game.runSettings && game.runSettings.weaponCap || 'default');
-    if (cap === 'default' || cap === 'all') return ENDLESS_MAX_WEAPONS;
-    return clamp(Math.round(Number(cap) || ENDLESS_MAX_WEAPONS), MAX_WEAPONS, ENDLESS_MAX_WEAPONS);
+    if (cap === 'default') return ENDLESS_MAX_WEAPONS;
+    return game && game.runSettings && game.runSettings.weaponCapResolved || this.resolveWeaponCap(cap);
+  },
+
+  resolveWeaponCap(cap) {
+    if (cap !== '60pct') return ENDLESS_MAX_WEAPONS;
+    return clamp(Math.floor(Object.keys(WEAPONS).length * 0.6), MAX_WEAPONS, ENDLESS_MAX_WEAPONS);
   },
 
   enemyDensity(game) {
@@ -76,7 +82,7 @@ const RunSettings = {
           <div class="runSettingChoices" data-run-setting="weaponCap">
             ${this.weaponCapOptions.map(value => `<button type="button" class="runSettingChip${s.weaponCap === value ? ' active' : ''}" data-value="${value}">${this.weaponCapLabel(value)}</button>`).join('')}
           </div>
-          <p>상한 때문에 10/15/20칸 해금을 못 받으면 해당 단계마다 모든 무기 피해 +10%.</p>
+          <p>60% 제한은 현재 ${Object.keys(WEAPONS).length}종 중 최대 ${this.resolveWeaponCap('60pct')}개입니다. 진화는 새 무기로 세지 않습니다.</p>
         </div>
         <div class="runSettingGroup">
           <b>몹 밀도</b>
@@ -98,7 +104,7 @@ const RunSettings = {
   },
 
   weaponCapLabel(value) {
-    return ({ default: '기본', '10': '10개', '15': '15개', '20': '20개', all: '전체' })[value] || value;
+    return ({ default: '기본', '60pct': `60% · ${this.resolveWeaponCap('60pct')}개` })[value] || value;
   },
 
   initDom() {
