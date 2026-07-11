@@ -52,3 +52,16 @@ ending.Game.showEndingIfReady(ending.Game.player);
 assert.equal(ending.UI.calls, 1, 'ending must not repeat');
 
 console.log('Final dimension portal and 20-minute ending tests passed.');
+
+const rewardUi = vm.createContext({
+  UI: {}, Game: { state: 'play' }, GameRuntime: { banner() {} }, AudioFX: { uiClick() {} },
+  showOverlay() {}, tr: key => key, $: () => null, document: { querySelector: () => null },
+  UpgradeRules: {}, levelTierInfo: () => ({}), maxWeaponSlotsFor: () => 5, MAX_WEAPONS: 5,
+});
+vm.runInContext(readFileSync('src/ui-upgrade-cards.js', 'utf8'), rewardUi, { filename: 'src/ui-upgrade-cards.js' });
+rewardUi.UI.setLevelOverlayCopy = () => {};
+rewardUi.UI.renderChoiceCards = () => { throw new Error('simulated card renderer failure'); };
+assert.equal(rewardUi.UI.showDimensionRewardCards([{ kind: 'heal' }], '테스트 차원'), false);
+assert.equal(rewardUi.Game.state, 'play', 'a reward rendering failure must never strand the run in levelup state');
+
+console.log('Dimension reward recovery test passed.');

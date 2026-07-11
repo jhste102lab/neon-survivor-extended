@@ -374,7 +374,7 @@
       applyEntrySafety(this);
       spawnRoomLayout(this, def, dimensionDifficulty(this, def));
       if (this.metrics) this.metrics.dimensionRiftStarts = (this.metrics.dimensionRiftStarts || 0) + 1;
-      GameRuntime.banner(`차원균열 — ${def.name} 낙하`, 'warn');
+      GameRuntime.banner(`${def.icon} ${def.name} · 목표: ${def.goal}`, 'warn');
       if (typeof RunSnapshot !== 'undefined') RunSnapshot.save(this, { force: true });
       return true;
     },
@@ -453,8 +453,13 @@
       const dim = ensureDimensionState(this);
       const reward = dim.pendingReward;
       if (!reward || !reward.choices || !reward.choices.length) return;
-      if (typeof UI !== 'undefined' && UI.showDimensionRewardCards) UI.showDimensionRewardCards(reward.choices, reward.def.name);
-      else if (reward.choices[0]) this.applyUpgrade(reward.choices[0]);
+      if (typeof UI !== 'undefined' && UI.showDimensionRewardCards) {
+        const shown = UI.showDimensionRewardCards(reward.choices, reward.def.name);
+        if (shown !== false) return;
+      }
+      if (reward.choices[0]) this.applyUpgrade(reward.choices[0]);
+      dim.pendingReward = null;
+      this.state = 'play';
     },
 
     pickDimensionReward(choice) {

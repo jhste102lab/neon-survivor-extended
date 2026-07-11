@@ -119,16 +119,64 @@ function drawDimensionHub(ctx, dim, t) {
 function drawDimensionRoomBackdrop(ctx, dim, t) {
   if (!dim || dim.mode !== 'dimension') return;
   const def = dim.activeDef || {};
+  const kind = def.kind || 'core';
+  const pressure = typeof PerformanceBudget !== 'undefined' ? PerformanceBudget.visualPressure() : 0;
+  const count = pressure > 0.75 ? 7 : pressure > 0.4 ? 11 : 18;
+  const cam = Game.cam || { x: 0, y: 0 };
   ctx.save();
+  ctx.fillStyle = `${def.color || '#41f0ff'}12`;
+  ctx.fillRect(cam.x - 1300, cam.y - 900, 2600, 1800);
   ctx.globalCompositeOperation = 'lighter';
-  ctx.strokeStyle = def.color || '#41f0ff';
-  ctx.globalAlpha = 0.12;
-  for (let i = 0; i < 18; i++) {
-    const a = i / 18 * TAU + t * 0.05;
-    ctx.beginPath();
-    ctx.moveTo(Math.cos(a) * 120, Math.sin(a) * 120);
-    ctx.lineTo(Math.cos(a) * 980, Math.sin(a) * 980);
-    ctx.stroke();
+  ctx.strokeStyle = def.color || '#41f0ff'; ctx.fillStyle = def.accent || '#ff2bd6'; ctx.lineWidth = 2;
+  if (kind === 'core') {
+    ctx.globalAlpha = 0.14;
+    for (let i = 0; i < count; i++) {
+      const a = i / count * TAU + t * 0.04, inner = 120 + (i % 3) * 55;
+      ctx.beginPath(); ctx.moveTo(Math.cos(a) * inner, Math.sin(a) * inner); ctx.lineTo(Math.cos(a) * 1050, Math.sin(a) * 1050); ctx.stroke();
+    }
+  } else if (kind === 'generators') {
+    ctx.globalAlpha = 0.13;
+    for (let i = -count; i <= count; i += 2) {
+      const off = ((t * 34 + i * 93) % 950) - 475;
+      ctx.beginPath(); ctx.moveTo(-1150, off); ctx.lineTo(-260, off); ctx.lineTo(-180, off + 80); ctx.lineTo(1150, off + 80); ctx.stroke();
+    }
+  } else if (kind === 'anchors') {
+    ctx.globalAlpha = 0.15;
+    for (let i = 0; i < count; i++) {
+      const r = 110 + i * 72 + Math.sin(t * 1.4 + i) * 14;
+      ctx.beginPath(); ctx.arc(0, 0, r, 0, TAU); ctx.stroke();
+    }
+  } else if (kind === 'duel') {
+    ctx.globalAlpha = 0.18;
+    ctx.setLineDash([26, 18]);
+    ctx.beginPath(); ctx.moveTo(-1100, 0); ctx.lineTo(1100, 0); ctx.moveTo(0, -900); ctx.lineTo(0, 900); ctx.stroke(); ctx.setLineDash([]);
+    for (let i = 1; i < count / 2; i++) { ctx.strokeRect(-i * 95, -i * 62, i * 190, i * 124); }
+  } else if (kind === 'nests') {
+    ctx.globalAlpha = 0.12;
+    for (let i = 0; i < count; i++) {
+      const a = i * 2.399 + t * 0.025, r = 170 + (i % 6) * 145, size = 38 + (i % 4) * 18;
+      ctx.beginPath(); ctx.arc(Math.cos(a) * r, Math.sin(a) * r, size + Math.sin(t + i) * 5, 0, TAU); ctx.fill();
+    }
+  } else if (kind === 'mirrors') {
+    ctx.globalAlpha = 0.14;
+    for (let i = 0; i < count; i++) {
+      const a = i / count * TAU, r = 230 + (i % 4) * 175, s = 48 + (i % 3) * 18;
+      ctx.save(); ctx.translate(Math.cos(a) * r, Math.sin(a) * r); ctx.rotate(Math.PI / 4 + Math.sin(t * .4 + i) * .1); ctx.strokeRect(-s, -s, s * 2, s * 2); ctx.restore();
+    }
+  } else if (kind === 'train') {
+    ctx.globalAlpha = 0.15;
+    const shift = (t * 310) % 220;
+    for (let i = -count; i <= count; i++) {
+      const y = i * 90 + shift - 110;
+      ctx.beginPath(); ctx.moveTo(-1300, y); ctx.lineTo(1300, y - 360); ctx.stroke();
+    }
+  } else if (kind === 'casino') {
+    ctx.globalAlpha = 0.13;
+    const size = 150;
+    for (let y = -5; y <= 5; y++) for (let x = -7; x <= 7; x++) {
+      if ((x + y) % (pressure > .5 ? 3 : 2)) continue;
+      ctx.strokeRect(x * size + Math.sin(t + y) * 8, y * size, size - 12, size - 12);
+    }
   }
   ctx.globalAlpha = 0.16;
   ctx.strokeStyle = def.accent || '#ff2bd6';
