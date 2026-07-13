@@ -29,7 +29,7 @@ function createInitialRunState(options = {}) {
     activeEvent: null,
     nextDimensionRiftT: (CFG.dimensionRift && CFG.dimensionRift.firstCheck) || 120,
     dimensionRiftFails: 0,
-    dimensionRiftGuaranteed3: false,
+    dimensionRiftGuaranteed5: false,
     finalDimensionRiftOffered: false,
     cleared20: false,
     endingSeen: false,
@@ -65,6 +65,7 @@ function createInitialRunState(options = {}) {
       evoBonusTokens: 0,
       evoSpent: 0,
       barrier: 0,
+      barrierMax: 0,
       companions: typeof createCompanionState === 'function' ? createCompanionState() : { count: 0, power: 0, rate: 0, fireT: 0.6, trail: [], nodes: [] },
     },
   };

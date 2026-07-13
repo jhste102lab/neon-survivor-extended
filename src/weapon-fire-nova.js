@@ -19,7 +19,11 @@
     if (evolved) {
       const idleK = this.idleRecoverySuppression ? this.idleRecoverySuppression() : 0;
       const barrierGain = 8 * (1 - idleK * 0.84);
-      if (barrierGain > 0.5) p.barrier = Math.min(54 * (1 - idleK * 0.45), (p.barrier || 0) + barrierGain);
+      if (barrierGain > 0.5) {
+        const maxBarrier = 54 * (1 - idleK * 0.45);
+        p.barrierMax = Math.max(p.barrierMax || 0, maxBarrier);
+        p.barrier = Math.min(maxBarrier, (p.barrier || 0) + barrierGain);
+      }
     }
     GameRuntime.playSound('missile');
     this.shake(3, 0.2);

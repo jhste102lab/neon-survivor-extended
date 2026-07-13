@@ -19,7 +19,7 @@ function lbPassiveName(id) {
 function lbSettingsLabel(settings) {
   if (!settings) return '기본';
   const parts = [];
-  if (settings.weaponCap && settings.weaponCap !== 'default') parts.push(settings.weaponCap === '60pct' ? '무기 60%' : `무기 ${settings.weaponCap}`);
+  if (settings.weaponCap && settings.weaponCap !== 'default') parts.push(settings.weaponCap === 'all' ? '무기 전체' : `무기 ${settings.weaponCap}`);
   if (settings.weaponCapBonusDamage > 0) parts.push(`화력 +${settings.weaponCapBonusDamage}%`);
   if (settings.enemyMode === 'half') parts.push('몹 50% · 스탯 1.8배');
   const drops = settings.dropFilters || {};

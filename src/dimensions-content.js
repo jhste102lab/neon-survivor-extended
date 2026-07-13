@@ -10,10 +10,10 @@ const DIMENSION_RELICS = Object.freeze({
   insulated_glove: { id: 'insulated_glove', icon: '🧤', name: '절연 장갑', color: '#ffd23d', desc: '레이저와 장판 피해를 한 번 막습니다.', detail: '위험 장판/레이저 피해 1회 80% 감소 · 쿨다운 16초' },
   gravity_fracture: { id: 'gravity_fracture', icon: '🕳️', name: '중력 파열', color: '#a36bff', desc: '주기적으로 적을 끌어모아 폭발합니다.', detail: '10초마다 주변 적을 끌고 작은 폭발 피해' },
   verdict_mark: { id: 'verdict_mark', icon: '⚖️', name: '심판의 표식', color: '#ff7ad9', desc: '보스와 엘리트에게 주는 피해가 증가합니다.', detail: '보스/엘리트 피해 +12%' },
-  cleansing_spore: { id: 'cleansing_spore', icon: '🍄', name: '정화 포자', color: '#7dffc1', desc: '독성 장판을 견디고 정화하면 회복합니다.', detail: '역병/독성 피해 25% 감소 · 정화 시 소형 회복' },
-  mirror_veil: { id: 'mirror_veil', icon: '🔷', name: '반사막', color: '#9ff3ff', desc: '적 탄환 하나를 막고 되돌립니다.', detail: '적 탄환 1개 무효/반사 · 쿨다운 14초' },
+  cleansing_spore: { id: 'cleansing_spore', icon: '🍄', name: '정화 포자', color: '#7dffc1', desc: '독성 장판을 더 오래 견딥니다.', detail: '역병/독성 피해 25% 감소' },
+  mirror_veil: { id: 'mirror_veil', icon: '🔷', name: '반사막', color: '#9ff3ff', desc: '적 탄환 하나를 완전히 막습니다.', detail: '적 탄환 1개 무효 · 쿨다운 14초' },
   propulsion_core: { id: 'propulsion_core', icon: '🚄', name: '추진 코어', color: '#ffb13d', desc: '짧은 이동 가속이 충전됩니다.', detail: '이동 중 12초마다 1.1초 가속' },
-  lucky_pact: { id: 'lucky_pact', icon: '🎰', name: '행운 계약', color: '#ffd23d', desc: '보상 선택과 드롭 운이 좋아집니다.', detail: '차원 보상 선택지 품질과 드롭 품질 소폭 증가' },
+  lucky_pact: { id: 'lucky_pact', icon: '🎰', name: '행운 계약', color: '#ffd23d', desc: '필드의 보급품 출현 확률이 높아집니다.', detail: '아이템 드롭 확률 +15%' },
 });
 
 const DIMENSIONS = Object.freeze([

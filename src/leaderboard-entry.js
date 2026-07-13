@@ -55,7 +55,7 @@ const LeaderboardEntry = {
 
   normalizeRunSettings(raw) {
     if (!raw || typeof raw !== 'object') return null;
-    const weaponCap = ['default', '60pct'].includes(String(raw.weaponCap)) ? String(raw.weaponCap) : 'default';
+    const weaponCap = ['default', '10', '15', '20', 'all'].includes(String(raw.weaponCap)) ? String(raw.weaponCap) : 'default';
     const enemyMode = raw.enemyMode === 'half' ? 'half' : 'default';
     const dropFilters = raw.dropFilters && typeof raw.dropFilters === 'object' ? raw.dropFilters : {};
     return {

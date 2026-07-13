@@ -3,11 +3,8 @@
 Object.assign(Game, {
   weaponSealCountForBoss(boss) {
     const cfg = CFG.weaponSeals || {};
-    if (!boss || boss.bossKind === 'mega') return cfg.megaCount || 6;
-    const t = this.time || 0;
-    if (t >= (cfg.normalLateTime || 1140)) return cfg.normalLateCount || 5;
-    if (t >= (cfg.normalMidTime || 780)) return cfg.normalMidCount || 4;
-    return cfg.normalBaseCount || 3;
+    const ratio = clamp(Number(cfg.maxOwnedRatio == null ? 0.6 : cfg.maxOwnedRatio), 0, 0.95);
+    return Math.floor(((this.player && this.player.weapons) || []).filter(w => w && w.id).length * ratio);
   },
 
   sealRecentWeapon(duration, source = 'magnet') {
@@ -29,7 +26,8 @@ Object.assign(Game, {
     if (cfg.enabled === false) return [];
     const weapons = (this.player.weapons || []).filter(w => w && w.id);
     const existing = new Set((this.bossDebuffs.weaponSeals || []).map(seal => seal.id));
-    const room = Math.max(0, weapons.length - Math.max(1, cfg.minActiveWeapons || 4) - existing.size);
+    const maxSealed = Math.floor(weapons.length * clamp(Number(cfg.maxOwnedRatio == null ? 0.6 : cfg.maxOwnedRatio), 0, 0.95));
+    const room = Math.max(0, maxSealed - existing.size);
     const wanted = Math.max(0, Math.min(Math.floor(count || 0), room));
     if (!wanted) {
       this.extendWeaponSeals(10);

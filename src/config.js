@@ -2,7 +2,7 @@
 // Game-wide configuration and balance constants.
 /* ---------------- 설정/밸런스 ---------------- */
 const CFG = {
-  ruleset: 'final-dimension-2026-07-11',
+  ruleset: 'dimension-feedback-2026-07-13',
   winTime: 600,            // 후반 루프/리더보드 기준 시간; 승리 팝업은 사용하지 않음
   clearTime: 1200,         // 엔딩/트로피 기준 시간
   unlockTime: 300,         // 5분부터 진화/동료/추가 슬롯/이벤트 해금
@@ -55,8 +55,7 @@ const CFG = {
     protectedT: 2.6, blockKnockSpeed: 360,
   },
   weaponSeals: {
-    enabled: true, minActiveWeapons: 4, megaCount: 6, normalBaseCount: 3, normalMidCount: 4, normalLateCount: 5,
-    normalMidTime: 780, normalLateTime: 1140, normalDuration: 70, megaDuration: 90,
+    enabled: true, maxOwnedRatio: 0.60, normalDuration: 70, megaDuration: 90,
     gradualStart: 45, gradualEvery: 15, topWeaponProtectedCount: 3, topWeaponSealLimit: 1,
   },
   lateXp: {
@@ -80,7 +79,7 @@ const CFG = {
     normalSlow: 0.30, specialSlow: 0.20, bossSlow: 0.08,
   },
   dimensionRift: {
-    enabled: true, firstCheck: 120, guaranteedTime: 180, lastRandomCheck: 480, interval: 120, chance: 0.30,
+    enabled: true, firstCheck: 120, guaranteedTime: 300, finalCutoff: 600, lastRandomCheck: 480, interval: 120, chance: 0.30,
     offerLife: 36, offerRadius: 104,
   },
   dimensionAutoRift: {

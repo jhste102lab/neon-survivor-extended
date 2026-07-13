@@ -8,7 +8,9 @@ function updateCompanionGuardianRoleEffect(game, player, dt, c) {
     const idleK = game.idleRecoverySuppression ? game.idleRecoverySuppression() : 0;
     const maxBarrier = (22 + r * 5 + Math.min(15, game.evolutionCount ? game.evolutionCount() * 2 : 0)) * (1 - idleK * 0.55);
     const amount = (7 + r * 2) * (1 - idleK * 0.82);
-    if (amount > 0.5) player.barrier = Math.min(maxBarrier, (player.barrier || 0) + amount);
+    if (amount > 0.5) {
+      player.barrierMax = Math.max(player.barrierMax || 0, maxBarrier);
+      player.barrier = Math.min(maxBarrier, (player.barrier || 0) + amount);
+    }
   }
 }
-

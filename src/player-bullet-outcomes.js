@@ -31,7 +31,11 @@ const PlayerBulletOutcomes = {
     } else if (outcome.type === 'healPlayer') {
       const stNow = game.st || st || game.stat();
       if (outcome.hp) game.player.hp = Math.min(stNow.maxHp, game.player.hp + outcome.hp);
-      if (outcome.barrier) game.player.barrier = Math.min(outcome.maxBarrier || 42, (game.player.barrier || 0) + outcome.barrier);
+      if (outcome.barrier) {
+        const maxBarrier = outcome.maxBarrier || 42;
+        game.player.barrierMax = Math.max(game.player.barrierMax || 0, maxBarrier);
+        game.player.barrier = Math.min(maxBarrier, (game.player.barrier || 0) + outcome.barrier);
+      }
     } else if (outcome.type === 'decrementPierce') {
       outcome.bullet.pierce = Math.max(0, (outcome.bullet.pierce || 0) - (outcome.amount || 1));
     } else if (outcome.type === 'spawnPlayerBullet') {

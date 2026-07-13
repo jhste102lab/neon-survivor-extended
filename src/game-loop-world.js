@@ -8,6 +8,7 @@ Object.assign(Game, {
     this.director(dt);
     if (this.updateEvents) this.updateEvents(dt, st);
     if (this.updateSupportBuffs) this.updateSupportBuffs(dt, st);
+    if (this.updateDimensionRelics) this.updateDimensionRelics(dt, st);
     if (this.updateLateMagnetGravityFields) this.updateLateMagnetGravityFields(dt);
     this.updateEnemies(dt, st);
     this.updateBullets(dt, st);
