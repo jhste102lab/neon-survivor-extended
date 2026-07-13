@@ -165,7 +165,10 @@ function transcendChoiceDetails(id, player) {
 function dimensionRewardDescription(choice) {
   const card = choice.card || (typeof DIMENSION_REWARD_CARDS !== 'undefined' ? DIMENSION_REWARD_CARDS.find(c => c.id === choice.id) : null);
   if (!card) return null;
-  return { icon: card.icon, name: card.name, level: '차원 보너스', description: card.desc, details: [card.type === 'risk' ? '위험과 보상이 함께 증가합니다.' : '이번 정복 보상으로 즉시 적용됩니다.'], color: card.color || '#41f0ff', tag: 'DIMENSION', isNew: false };
+  const details = card.type === 'relic'
+    ? [card.detail || '남은 런 동안 고유 효과가 유지됩니다.', '이 카드를 선택해야만 획득합니다.']
+    : [card.type === 'risk' ? '위험과 보상이 함께 증가합니다.' : '이번 정복 보상으로 즉시 적용됩니다.'];
+  return { icon: card.icon, name: card.name, level: card.type === 'relic' ? '차원 고유 강화' : '차원 보너스', description: card.desc, details, color: card.color || '#41f0ff', tag: card.type === 'relic' ? 'DIMENSION RELIC' : 'DIMENSION', isNew: card.type === 'relic' };
 }
 
 function minorRewardDescription(choice) {

@@ -4,8 +4,8 @@ import vm from 'node:vm';
 
 const context = vm.createContext({
   console,
-  CFG: { winTime: 600, clearTime: 1200, dimensionRift: { firstCheck: 120, lastRandomCheck: 480, interval: 120, chance: 0.3, offerLife: 36, offerRadius: 104 } },
-  DIMENSIONS: [{ id: 'mirror_corridor', icon: '🔷', name: '거울 회랑', color: '#9ff3ff' }],
+  CFG: { winTime: 600, clearTime: 1200, dimensionRift: { firstCheck: 120, guaranteedTime: 300, finalCutoff: 600, lastRandomCheck: 480, interval: 120, chance: 0.3, offerLife: 36, offerRadius: 104 } },
+  DIMENSIONS: [{ id: 'mirror_corridor', icon: '🔷', name: '거울 회랑', color: '#9ff3ff' }, { id: 'plague_garden', icon: '🍄', name: '역병 정원', color: '#7dffc1' }],
   DimensionRiftRules: { get: () => ({ icon: '🌀', name: '균열', color: '#fff' }) },
   FIELD_EVENTS: { rift: { icon: '🌀', name: '균열', color: '#fff' } },
   FieldEventDefinitions: { ids: () => ['rift'], require: () => ({ offerLife: 28, offerRadius: 92, activeLife: 24, activeRadius: 122, update() {} }) },
@@ -31,26 +31,55 @@ assert.match(readFileSync('assets/vfx/NOTICE.md', 'utf8'), /Creative Commons CC0
 vm.runInContext(readFileSync('src/events.js', 'utf8'), context, { filename: 'src/events.js' });
 
 context.Game.updateDimensionRiftOfferSchedule();
-assert.equal(context.Game.activeEvent.dimension, 'mirror_corridor');
+assert.equal(context.Game.activeEvent.dimension, '', 'scheduled portals must hide the random destination until contact');
 assert.equal(context.Game.nextDimensionRiftT, 240);
 context.Game.activateEvent(context.Game.activeEvent);
-assert.equal(context.Game.entered, 'mirror_corridor', 'entering the portal should start the dimension immediately');
+assert.equal(context.Game.entered, '', 'entering the portal should immediately request a random unvisited dimension');
 assert.equal(context.Game.activeEvent, null);
 
-context.Game.time = 180;
-context.Game.dimensionRiftGuaranteed3 = false;
+context.Game.time = 300;
+context.Game.dimensionRiftGuaranteed5 = false;
+context.Game.activeEvent = { type: 'neon_storm', state: 'offer' };
 context.Game.updateDimensionRiftOfferSchedule();
-assert.equal(context.Game.dimensionRiftGuaranteed3, true, 'the 3-minute portal must be guaranteed');
-assert.equal(context.Game.activeEvent.dimension, 'mirror_corridor');
+assert.equal(context.Game.dimensionRiftGuaranteed5, true, 'the 5-minute portal must be guaranteed');
+assert.equal(context.Game.activeEvent.dimension, '');
 context.Game.activeEvent = null;
 
 context.Game.time = 600;
 context.Game.activeEvent = null;
+context.Game.nextDimensionRiftT = 480;
+context.Game.updateDimensionRiftOfferSchedule();
+assert.equal(context.Game.activeEvent, null, 'random portal checks must stop at the 10-minute cutoff');
 assert.equal(context.Game.offerFinalDimensionRift(30, 40), true);
 assert.equal(context.Game.finalDimensionRiftOffered, true);
 assert.equal(context.Game.activeEvent.final, undefined); // final is scheduler state, not trusted event payload
 context.Game.activeEvent = null;
 assert.equal(context.Game.offerFinalDimensionRift(30, 40), false, 'final boss portal must be offered only once');
+
+const dimensionSource = readFileSync('src/dimensions.js', 'utf8');
+assert.match(dimensionSource, /DIMENSIONS\.filter\(candidate => !dim\.visited\[candidate\.id\]\)/, 'automatic dimensions must be selected only from unvisited definitions');
+assert.match(dimensionSource, /dim\.visited\[def\.id\] = true/, 'a dimension must be marked visited on entry rather than only on clear');
+assert.match(dimensionSource, /const choices = rewardChoicesForDimension\(this, def\)/, 'dimension clear must use the three-card reward builder');
+assert.match(dimensionSource, /\{ kind: 'dimensionReward', id: relic\.id/, 'the first reward must be the dimension-specific relic card');
+assert.match(dimensionSource, /generateChoices\(game\)\.filter\(Boolean\)\.slice\(0, 2\)/, 'two normal level-up choices must accompany the themed card');
+
+const sealContext = vm.createContext({
+  Game: {}, CFG: { weaponSeals: { enabled: true, maxOwnedRatio: 0.6, topWeaponProtectedCount: 3, topWeaponSealLimit: 1 } },
+  WEAPONS: Object.fromEntries(Array.from({ length: 24 }, (_, i) => [`w${i}`, { name: `W${i}` }])),
+  clamp: (value, min, max) => Math.min(max, Math.max(min, value)), randi: () => 0,
+  tr: key => key, GameRuntime: { banner() {} },
+});
+vm.runInContext(readFileSync('src/boss-interactions-seals.js', 'utf8'), sealContext, { filename: 'src/boss-interactions-seals.js' });
+sealContext.Game.ensureBossInteractionState = function () { this.bossDebuffs ||= { weaponSeals: [] }; this.bossDebuffs.weaponSeals ||= []; };
+for (const owned of [1, 2, 5, 7, 10, 24]) {
+  sealContext.Game.player = { weapons: Array.from({ length: owned }, (_, i) => ({ id: `w${i}`, lv: i + 1 })) };
+  sealContext.Game.bossDebuffs = { weaponSeals: [] };
+  const expected = Math.floor(owned * 0.6);
+  assert.equal(sealContext.Game.weaponSealCountForBoss({ bossKind: 'mega' }), expected, `boss seal count must be 60% of ${owned} owned weapons`);
+  const sealed = sealContext.Game.applyWeaponSeals(owned, 70, 'test');
+  assert.equal(sealed.length, expected, `simultaneous seals must be capped at 60% for ${owned} weapons`);
+}
+console.log('Boss weapon-seal ratio tests passed.');
 
 const ending = vm.createContext({
   CFG: { clearTime: 1200 }, UI: { calls: 0, win() { this.calls++; } },

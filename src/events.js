@@ -42,28 +42,34 @@ Object.assign(Game, {
 
   updateDimensionRiftOfferSchedule() {
     const cfg = CFG.dimensionRift || {};
-    const due = this.nextDimensionRiftT || cfg.firstCheck || 120;
+    let due = this.nextDimensionRiftT || cfg.firstCheck || 120;
     if (cfg.enabled === false || this.finalDimensionRiftOffered) return;
-    if (!this.dimensionRiftGuaranteed3 && this.time >= (cfg.guaranteedTime || 180)) {
-      if (this.activeEvent || this.eventSpawnBlocked()) return;
+    if (this.time >= (cfg.finalCutoff || CFG.winTime || 600)) return;
+    if (!this.dimensionRiftGuaranteed5 && this.time >= (cfg.guaranteedTime || 300)) {
+      if (this.activeEvent) {
+        this.activeEvent = null;
+        GameRuntime.banner('5분 확정 균열이 필드 이벤트를 대체합니다', 'info');
+      }
       if (this.spawnDimensionPortal(false)) {
-        this.dimensionRiftGuaranteed3 = true;
-        GameRuntime.banner('3분 확정 차원 균열이 열렸습니다', 'warn');
+        this.dimensionRiftGuaranteed5 = true;
+        GameRuntime.banner('5분 확정 차원 균열이 열렸습니다', 'warn');
       }
       return;
     }
-    if (this.activeEvent || this.time < due) return;
-    if (due > (cfg.lastRandomCheck || 480)) return;
-    if (this.eventSpawnBlocked()) { this.nextDimensionRiftT = this.time + 10; return; }
-    this.nextDimensionRiftT = due + (cfg.interval || 120);
-    if (RNG.next() >= (cfg.chance || 0.3)) return;
-    this.spawnDimensionPortal(false);
+    if (this.time < due || due > (cfg.lastRandomCheck || 480)) return;
+    while (due <= this.time && due <= (cfg.lastRandomCheck || 480)) {
+      this.nextDimensionRiftT = due + (cfg.interval || 120);
+      if (!this.activeEvent && !this.eventSpawnBlocked() && RNG.next() < (cfg.chance || 0.3)) {
+        this.spawnDimensionPortal(false);
+        return;
+      }
+      due = this.nextDimensionRiftT;
+    }
   },
 
   spawnDimensionPortal(final = false, x = null, y = null) {
     if (this.activeEvent || !Array.isArray(DIMENSIONS) || !DIMENSIONS.length) return false;
-    const def = pick(DIMENSIONS);
-    this.spawnEventOffer('rift', { dimension: def.id, scheduledRift: true, final, x, y });
+    this.spawnEventOffer('rift', { dimension: '', scheduledRift: true, final, x, y });
     if (final) this.finalDimensionRiftOffered = true;
     return true;
   },
@@ -75,6 +81,7 @@ Object.assign(Game, {
   },
 
   eventDisplayInfo(ev) {
+    if (ev && ev.type === 'rift' && ev.scheduledRift && !ev.dimension) return FIELD_EVENTS.rift;
     if (ev && ev.type === 'rift' && typeof DimensionRiftRules !== 'undefined') {
       const full = typeof DIMENSIONS !== 'undefined' && DIMENSIONS.find(def => def.id === ev.dimension);
       if (full) return { icon: full.icon, name: `${full.name} 차원 균열`, color: full.color };
@@ -95,7 +102,9 @@ Object.assign(Game, {
     const offerRadius = selectedType === 'rift' && opts.scheduledRift ? (cfg.offerRadius || definition.offerRadius) : definition.offerRadius;
     this.activeEvent = {
       state: 'offer', type: selectedType,
-      dimension: selectedType === 'rift' ? (opts.dimension || (typeof DimensionRiftRules !== 'undefined' ? DimensionRiftRules.pick().id : 'archive')) : '',
+      dimension: selectedType === 'rift'
+        ? (opts.scheduledRift ? String(opts.dimension || '') : (opts.dimension || (typeof DimensionRiftRules !== 'undefined' ? DimensionRiftRules.pick().id : 'archive')))
+        : '',
       scheduledRift: !!opts.scheduledRift,
       x: Number.isFinite(opts.x) ? opts.x : p.x + Math.cos(a) * d,
       y: Number.isFinite(opts.y) ? opts.y : p.y + Math.sin(a) * d,
@@ -110,7 +119,7 @@ Object.assign(Game, {
     if (ev.type === 'rift' && ev.scheduledRift && this.enterAutomaticDimensionRift) {
       const dimensionId = ev.dimension;
       this.activeEvent = null;
-      this.enterAutomaticDimensionRift(dimensionId);
+      if (!this.enterAutomaticDimensionRift(dimensionId)) GameRuntime.banner('모든 차원을 이미 방문했습니다', 'info');
       return;
     }
     ev.state = 'active';

@@ -38,7 +38,11 @@
   function grantEvolvedBarrier(game, player) {
     const idleK = game.idleRecoverySuppression ? game.idleRecoverySuppression() : 0;
     const gain = 0.45 * (1 - idleK * 0.88);
-    if (gain > 0.03) player.barrier = Math.min(36 * (1 - idleK * 0.5), (player.barrier || 0) + gain);
+    if (gain > 0.03) {
+      const maxBarrier = 36 * (1 - idleK * 0.5);
+      player.barrierMax = Math.max(player.barrierMax || 0, maxBarrier);
+      player.barrier = Math.min(maxBarrier, (player.barrier || 0) + gain);
+    }
   }
 
   function hitEnemyWithBlade(game, enemy, blade, context) {

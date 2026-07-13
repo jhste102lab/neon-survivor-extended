@@ -57,7 +57,7 @@
     return {
       unlocked: false, gatekeeperSpawned: false, gatekeeperDefeated: false, riftAuto: false,
       mode: 'external', localTime: 0, activeId: '', activeDef: null,
-      entryPortal: null, exitPortal: null, hubPortals: [], completed: {}, relics: {}, rewardChoices: [], bonuses: {},
+      entryPortal: null, exitPortal: null, hubPortals: [], completed: {}, visited: {}, relics: {}, rewardChoices: [], bonuses: {},
       external: null, externalPlayer: null, dimensionCheckpoint: null, challenge: null,
       collapseT: 0, successT: 0, completeAnnounced: false, reentryUnlocked: false,
       nextRelicPulseT: 0, relicCooldowns: {}, pendingReward: null,
@@ -256,20 +256,30 @@
     const st = game.stat();
     const minHp = st.maxHp * 0.60;
     if (game.player.hp < minHp) game.player.hp = minHp;
-    else game.player.barrier = Math.max(game.player.barrier || 0, st.maxHp * 0.15);
+    else {
+      const maxBarrier = st.maxHp * 0.15;
+      game.player.barrierMax = Math.max(game.player.barrierMax || 0, maxBarrier);
+      game.player.barrier = Math.max(game.player.barrier || 0, maxBarrier);
+    }
     game.player.invuln = Math.max(game.player.invuln || 0, 0.9);
   }
 
-  function rewardChoicesForDimension() {
-    const byType = type => DIMENSION_REWARD_CARDS.filter(c => c.type === type || (type === 'economy' && c.type === 'risk'));
-    return [pick(byType('survival')), pick(byType('combat')), pick(byType('economy'))].filter(Boolean);
+  function rewardChoicesForDimension(game, def) {
+    const relic = def && relicFor(def.relic);
+    const themed = relic ? { kind: 'dimensionReward', id: relic.id, card: { ...relic, type: 'relic' } } : null;
+    const regular = typeof UpgradeRules !== 'undefined' ? UpgradeRules.generateChoices(game).filter(Boolean).slice(0, 2) : [];
+    return [themed, ...regular].filter(Boolean).slice(0, 3);
   }
 
   function applyDimensionRewardCard(game, card) {
     const st = game.stat();
     const b = game.dimension.bonuses || (game.dimension.bonuses = {});
     if (card.id === 'recover') game.player.hp = Math.min(st.maxHp, game.player.hp + st.maxHp * 0.35);
-    else if (card.id === 'barrier') game.player.barrier = Math.max(game.player.barrier || 0, st.maxHp * 0.25);
+    else if (card.id === 'barrier') {
+      const maxBarrier = st.maxHp * 0.25;
+      game.player.barrierMax = Math.max(game.player.barrierMax || 0, maxBarrier);
+      game.player.barrier = Math.max(game.player.barrier || 0, maxBarrier);
+    }
     else if (card.id === 'weapon_power') b.weaponPower = (b.weaponPower || 0) + 0.08;
     else if (card.id === 'boss_mark') b.bossDamage = (b.bossDamage || 0) + 0.10;
     else if (card.id === 'drop_quality') b.dropQuality = (b.dropQuality || 0) + 0.12;
@@ -377,8 +387,12 @@
     enterAutomaticDimensionRift(id = '') {
       const dim = ensureDimensionState(this);
       if (dim.mode !== 'external' || this.isDimensionSpaceActive()) return false;
-      const def = dimensionById(id) || pick(DIMENSIONS);
+      dim.visited = dim.visited || {};
+      const available = DIMENSIONS.filter(candidate => !dim.visited[candidate.id]);
+      const requested = dimensionById(id);
+      const def = requested && !dim.visited[requested.id] ? requested : pick(available);
       if (!def) return false;
+      dim.visited[def.id] = true;
       dim.external = takeWorldSnapshot(this);
       dim.externalPlayer = { x: this.player.x, y: this.player.y, camX: this.cam.x, camY: this.cam.y };
       dim.mode = 'dimension'; dim.activeId = def.id; dim.activeDef = def; dim.localTime = 0; dim.successT = 0; dim.collapseT = 0; dim.riftAuto = true;
@@ -412,7 +426,9 @@
       const dim = ensureDimensionState(this);
       const def = dimensionById(id);
       if (!def || dim.mode !== 'hub') return;
-      if (dim.completed[id] && !dim.reentryUnlocked) { GameRuntime.banner('이미 정복한 차원입니다', 'info'); return; }
+      dim.visited = dim.visited || {};
+      if (dim.visited[id] && !dim.reentryUnlocked) { GameRuntime.banner('이미 방문한 차원입니다', 'info'); return; }
+      dim.visited[id] = true;
       dim.dimensionCheckpoint = {
         player: JSON.parse(JSON.stringify(this.player)),
         completed: { ...dim.completed }, relics: { ...dim.relics }, bonuses: { ...(dim.bonuses || {}) },
@@ -430,10 +446,9 @@
       const def = dim.activeDef;
       if (!def || dim.mode !== 'dimension') return;
       const autoRift = !!dim.riftAuto;
-      if (!autoRift) dim.completed[def.id] = true;
+      dim.completed[def.id] = true;
       const relic = relicFor(def.relic);
-      if (relic) dim.relics[relic.id] = true;
-      const choices = typeof UpgradeRules !== 'undefined' ? UpgradeRules.generateChoices(this).slice(0, 2) : [];
+      const choices = rewardChoicesForDimension(this, def);
       dim.pendingReward = { def, relic, choices };
       emptyWorld(this);
       if (autoRift) {
@@ -443,8 +458,7 @@
         this.player.hp = Math.max(this.player.hp, this.stat().maxHp * 0.50);
         dim.mode = 'external'; dim.activeId = ''; dim.activeDef = null; dim.challenge = null; dim.localTime = 0; dim.riftAuto = false;
         if (this.metrics) this.metrics.dimensionRiftClears = (this.metrics.dimensionRiftClears || 0) + 1;
-        if (relic) GameRuntime.banner(`차원균열 클리어 · ${relic.icon} ${relic.name} 획득`, 'good');
-        else GameRuntime.banner('차원균열 클리어 — 원래 전장 복귀', 'good');
+        GameRuntime.banner('차원균열 클리어 · 보상 3장 중 하나를 선택하세요', 'good');
         this.showDimensionRewardChoices();
         if (typeof RunSnapshot !== 'undefined') RunSnapshot.save(this, { force: true });
         return;
@@ -453,7 +467,7 @@
       buildHubPortals(dim);
       this.player.x = 0; this.player.y = 0; this.cam.x = 0; this.cam.y = 0;
       this.player.hp = Math.max(this.player.hp, this.stat().maxHp * 0.50);
-      if (relic) GameRuntime.banner(`${relic.icon} ${relic.name} 획득`, 'good');
+      GameRuntime.banner('차원 클리어 · 보상 3장 중 하나를 선택하세요', 'good');
       this.showDimensionRewardChoices();
       this.checkDimensionConquest();
       if (typeof RunSnapshot !== 'undefined') RunSnapshot.save(this, { force: true });
@@ -473,10 +487,18 @@
     },
 
     pickDimensionReward(choice) {
-      if (!choice) return false;
-      const applied = this.applyUpgrade(choice);
-      if (!applied) return false;
-      this.dimension.pendingReward = null;
+      if (!choice || choice.kind !== 'dimensionReward') return false;
+      const dim = ensureDimensionState(this);
+      const relic = relicFor(choice.id);
+      if (!relic || (dim.relics && dim.relics[relic.id])) return false;
+      dim.relics = dim.relics || {};
+      dim.relics[relic.id] = true;
+      if (relic.id === 'lucky_pact') {
+        dim.bonuses = dim.bonuses || {};
+        dim.bonuses.dropQuality = (dim.bonuses.dropQuality || 0) + 0.15;
+      }
+      GameRuntime.banner(`${relic.icon} ${relic.name} 획득`, 'good');
+      dim.pendingReward = null;
       return true;
     },
 
@@ -712,7 +734,9 @@
       if (hpRatio < 0.20 && (dim.localTime - (c.lastLowHpDropT || -999)) > 8) {
         c.lastLowHpDropT = dim.localTime;
         this.spawnDrop('chicken', this.player.x + rand(-80, 80), this.player.y + rand(-80, 80));
-        this.player.barrier = Math.max(this.player.barrier || 0, st.maxHp * 0.10);
+        const maxBarrier = st.maxHp * 0.10;
+        this.player.barrierMax = Math.max(this.player.barrierMax || 0, maxBarrier);
+        this.player.barrier = Math.max(this.player.barrier || 0, maxBarrier);
       } else if (hpRatio < 0.35 && (dim.localTime - (c.lastLowHpDropT || -999)) > 12) {
         c.lastLowHpDropT = dim.localTime;
         this.spawnDrop('chicken', this.player.x + rand(-140, 140), this.player.y + rand(-140, 140));

@@ -51,7 +51,7 @@ function cleanRows(value, maxRows = 5) {
 function cleanRunSettings(value) {
   if (!value || typeof value !== 'object') return null;
   const weaponCapRaw = String(value.weaponCap || 'default');
-  const weaponCap = ['default', '60pct'].includes(weaponCapRaw) ? weaponCapRaw : 'default';
+  const weaponCap = ['default', '10', '15', '20', 'all'].includes(weaponCapRaw) ? weaponCapRaw : 'default';
   const enemyMode = value.enemyMode === 'half' ? 'half' : 'default';
   const dropFilters = value.dropFilters && typeof value.dropFilters === 'object' ? value.dropFilters : {};
   return {

@@ -60,7 +60,10 @@ const SupportBuffRuntime = {
     const p = game.player;
     const maxBarrier = 14 + lv * 5;
     const gain = (0.36 + lv * 0.16) * dt * motion;
-    if (gain > 0.001) p.barrier = Math.min(maxBarrier, (p.barrier || 0) + gain);
+    if (gain > 0.001) {
+      p.barrierMax = Math.max(p.barrierMax || 0, maxBarrier);
+      p.barrier = Math.min(maxBarrier, (p.barrier || 0) + gain);
+    }
   },
 
   updatePulse(game, dt, st, lv, motion, state) {

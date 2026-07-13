@@ -4,7 +4,7 @@
 
 **NEON SURVIVOR** is a fast browser bullet-hell survival shooter about one tiny pilot trapped inside a glowing monster storm. You dodge by hand, your weapons fire automatically, and every level-up turns the run into a new build: lightning chains, black holes, drones, mines, lasers, orbitals, evolutions, companions, and boss pressure that keeps escalating past 10 minutes.
 
-No install, no downloads, no account required — open the page and survive as long as you can on PC or mobile. The current v1.2.1 Cloudflare build includes the Dimension Mode overhaul: a 10-minute Rift Gatekeeper, 5-second hold portals, a freely revisitable dimension hub, eight selectable dimensions, collapse auto-escape, dimension relics/reward cards, open-source portal art, bestiary stat rows, and corrected Overclock 7% interval text.
+No install, no downloads, no account required — open the page and survive as long as you can on PC or mobile. The current v1.2.4 Cloudflare build includes the Dimension Mode overhaul: a 10-minute Rift Gatekeeper, 5-second hold portals, a freely revisitable dimension hub, eight selectable dimensions, collapse auto-escape, dimension relics/reward cards, open-source portal art, bestiary stat rows, and corrected Overclock 7% interval text.
 
 
 ## 📝 v1.2.1 Patch notes — Dimension Mode overhaul

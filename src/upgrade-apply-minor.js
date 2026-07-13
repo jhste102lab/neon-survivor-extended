@@ -19,6 +19,7 @@ const MinorRewardApplicator = {
 
   barrier(game, amount) {
     const p = game.player;
+    p.barrierMax = Math.max(p.barrierMax || 0, 58);
     p.barrier = Math.min(58, (p.barrier || 0) + amount);
     return UpgradeApplyResults.done();
   },

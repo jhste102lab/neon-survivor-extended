@@ -28,39 +28,40 @@ for (const file of ['src/run-settings.js', 'src/weapon-stats.js', 'src/game-loop
   vm.runInContext(readFileSync(join(root, file), 'utf8'), context, { filename: file });
 }
 
-context.RunSettings.save({ weaponCap: '60pct', enemyMode: 'half' });
+context.RunSettings.save({ weaponCap: '15', enemyMode: 'half' });
 const loaded = context.RunSettings.load();
-assert.equal(loaded.weaponCap, '60pct');
+assert.equal(loaded.weaponCap, '15');
 assert.equal(loaded.enemyMode, 'half');
+assert.equal(context.RunSettings.normalize({ weaponCap: '60pct' }).weaponCap, 'default', 'legacy mistaken 60% run setting must migrate to default');
 
 const game = context.Game;
 game.time = 600;
 game.runSettings = context.RunSettings.snapshotForRun();
-assert.equal(game.runSettings.weaponCap, '60pct');
-assert.equal(context.maxWeaponSlotsFor(game), 14, '60% cap should resolve from the current 24-weapon catalog');
+assert.equal(game.runSettings.weaponCap, '15');
+assert.equal(context.maxWeaponSlotsFor(game), 15, 'the original absolute weapon-cap choice must be restored');
 game.applyWeaponCapBonusThresholds();
-assert.deepEqual(Array.from(game.runSettings.weaponCapBonusThresholds), [15], '600s base 15 unlock should grant one capped threshold bonus');
-assert.equal(game.runSettings.weaponCapBonusDamage, 10);
+assert.deepEqual(Array.from(game.runSettings.weaponCapBonusThresholds), [], 'a cap equal to the unlocked threshold must not grant bonus damage');
+assert.equal(game.runSettings.weaponCapBonusDamage, 0);
 
 game.time = 900;
 game.applyWeaponCapBonusThresholds();
-assert.deepEqual(Array.from(game.runSettings.weaponCapBonusThresholds), [15, 20], '900s base 20 unlock should grant second capped threshold bonus');
-assert.equal(game.runSettings.weaponCapBonusDamage, 20);
+assert.deepEqual(Array.from(game.runSettings.weaponCapBonusThresholds), [20], 'a 15-weapon cap should grant only the missed 20-slot threshold bonus');
+assert.equal(game.runSettings.weaponCapBonusDamage, 10);
 assert.equal(context.RunSettings.enemyDensity(game), 0.5);
 assert.equal(context.RunSettings.enemyStatMul(game), 1.8);
 
 const normalized = normalizeEntry({
-  runId: 'run-settings-test', name: 'Tester', time: 700, kills: 10, level: 4, maxCombo: 3, ruleset: 'final-dimension-2026-07-11',
-  build: { settings: { weaponCap: '60pct', enemyMode: 'half', enemyDensity: 0.5, enemyStatMul: 1.8, weaponCapBonusDamage: 20, weaponCapBonusThresholds: [15, 20], dropFilters: { chicken: true, magnet: false, bomb: true } } },
+  runId: 'run-settings-test', name: 'Tester', time: 700, kills: 10, level: 4, maxCombo: 3, ruleset: 'dimension-feedback-2026-07-13',
+  build: { settings: { weaponCap: '15', enemyMode: 'half', enemyDensity: 0.5, enemyStatMul: 1.8, weaponCapBonusDamage: 10, weaponCapBonusThresholds: [20], dropFilters: { chicken: true, magnet: false, bomb: true } } },
 });
-assert.equal(normalized.build.settings.weaponCap, '60pct');
+assert.equal(normalized.build.settings.weaponCap, '15');
 assert.equal(normalized.build.settings.enemyMode, 'half');
 assert.equal(normalized.build.settings.dropFilters.magnet, false);
 assert.equal(normalized.cleared20, false);
 
 const trophyEntry = normalizeEntry({
   runId: 'clear-test', name: 'Closer', time: 1200, kills: 20, level: 10, maxCombo: 5,
-  ruleset: 'final-dimension-2026-07-11', cleared20: true,
+  ruleset: 'dimension-feedback-2026-07-13', cleared20: true,
 });
 assert.equal(trophyEntry.cleared20, true);
 assert.equal(trophyEntry.clearTime, 1200);
